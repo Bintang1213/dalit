@@ -1,0 +1,156 @@
+.place-order {
+    display: flex;
+    justify-content: space-between;
+    gap: 50px;
+    padding: 30px;
+    font-family: sans-serif;
+    width: 100%;
+  }
+  
+  .place-order-left,
+    .place-order-right {
+    width: 100%;      /* ✅ Ubah dari 200% jadi 100% */
+    max-width: 500px;
+    }
+    
+  .place-order-left .title,
+  .place-order-right .title {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 40px;
+  }
+  
+  .place-order-left input,
+  .place-order-left textarea {
+    margin-bottom: 15px;
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #c5c5c5;
+    border-radius: 6px;
+    outline-color: crimson;
+    font-size: 16px;
+  }
+  
+  .place-order-left textarea {
+    resize: none;
+    height: 100px;
+  }
+  
+  .summary-line {
+    display: flex;
+    justify-content: space-between;
+    font-size: 16px;
+    margin-bottom: 15px;
+    margin-top: 15px;
+  }
+  
+  .summary-total {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    font-size: 16px;
+    margin: 15px 0;
+  }
+  
+  .payment-label {
+    font-weight: bold;
+    margin: 20px 0 10px;
+    margin-top: 10%;
+  }
+  
+  .payment-options {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 10px;
+  }
+  
+  .payment-options input[type="radio"] {
+    accent-color: red;
+    margin-right: 8px;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .order-button {
+    background-color: crimson;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    font-weight: 800;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s;
+    width: 200px;
+    margin-top: 7%;
+    font-size:large;
+    
+  }
+  
+  .order-button:hover {
+    background-color: #c2185b;
+  }
+
+  .back-button .back-arrow {
+    font-size: 1.8rem; /* Ukuran ikon bisa disesuaikan */
+    }
+
+    .back-button h2 {
+        margin: 0;  /* Menghapus margin default pada h2 */
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: black;
+    }
+  
+  .place-order-page {
+    padding: 30px;
+  }
+  
+  .back-button:hover {
+    color: #e63946;
+  }
+  
+  /* Radio button style agar sama dengan Cart */
+.radio-options {
+    display: flex;
+    gap: 40px;
+    flex-wrap: wrap;
+  }
+  
+  .radio-options input[type="radio"] {
+    display: none;
+  }
+  
+  .radio-options label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 18px;
+    position: relative;
+    cursor: pointer;
+  }
+  
+  .radio-options label::before {
+    content: '';
+    width: 18px;
+    height: 18px;
+    border: 2px solid #d91b42;
+    border-radius: 50%;
+    display: inline-block;
+    box-sizing: border-box;
+  }
+  
+  .radio-options input[type="radio"]:checked + label::before {
+    background-color: #d91b42;
+  }
+  
+  .place-order-right input[type="number"] {
+    margin-top: 10px;
+    margin-bottom: 15px;
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #c5c5c5;
+    border-radius: 6px;
+    outline-color: crimson;
+    font-size: 16px;
+  }
+  

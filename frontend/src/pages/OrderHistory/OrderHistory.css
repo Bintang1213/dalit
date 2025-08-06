@@ -1,0 +1,341 @@
+/* Tetap dipertahankan */
+.page-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.order-history {
+  flex: 1;
+  padding: 2rem;
+  font-family: 'Poppins', sans-serif;
+}
+
+.order-history__header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.back-arrow {
+  font-size: 1.8rem;
+  cursor: pointer;
+  color: red;
+}
+
+/* Tambahkan scroll horizontal jika layar sempit */
+.order-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 2rem;
+  overflow-x: auto;
+  display: block;
+}
+
+.order-table table {
+  width: 120%;
+  min-width: 800px;
+}
+
+.order-table th,
+.order-table td {
+  border: 1px solid #ccc;
+  padding: 1rem;
+  text-align: left;
+}
+
+.order-table th {
+  background-color: #b30000;
+  color: white;
+}
+
+/* Status Colors */
+.status-menunggu {
+  color: gray;
+  font-weight: bold;
+}
+.status-diproses {
+  color: orange;
+  font-weight: bold;
+}
+.status-selesai {
+  color: green;
+  font-weight: bold;
+}
+.status-gagal {
+  color: red;
+  font-weight: bold;
+}
+
+/* Button Style */
+.view-detail-btn {
+  background-color: crimson;
+  color: white;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.view-detail-btn:hover {
+  background-color: darkred;
+}
+.view-detail-btn:focus {
+  outline: none;
+}
+
+/* Pagination */
+.pagination {
+  margin-top: 20px;
+  text-align: center;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+}
+.pagination button {
+  margin: 0 5px;
+  padding: 6px 12px;
+  border: none;
+  background-color: #eee;
+  cursor: pointer;
+  border-radius: 4px;
+}
+.pagination button.active {
+  background-color: crimson;
+  color: white;
+}
+
+/* Modal */
+.modal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+}
+
+.modal-content {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 600px;
+  position: relative;
+}
+
+.close-btn {
+  position: absolute;
+  top: 10px; right: 10px;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.modal-content h3 {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.modal-content p {
+  margin: 8px 0;
+  font-size: 16px;
+}
+
+.modal-content .items ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.modal-content .items ul li {
+  padding: 5px 0;
+}
+
+.modal-content .total-amount {
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+button {
+  padding: 10px 20px;
+  background-color: crimson;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 20px;
+}
+button:hover {
+  background-color: darkred;
+}
+button:focus {
+  outline: none;
+}
+.table-wrapper {
+  overflow-x: auto;
+  width: 100%;
+}
+
+.order-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  min-width: 900px;
+}
+
+.order-table th, .order-table td {
+  border: 1px solid #ccc;
+  padding: 1rem;
+  text-align: left;
+  vertical-align: top;
+  white-space: nowrap;
+}
+
+.order-table td.ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 180px;
+}
+
+.order-table th {
+  background-color: #b30000;
+  color: white;
+}
+
+/* Default unknown status */
+.status-unknown {
+  color: #666;
+  font-weight: bold;
+}
+
+/* ========================= */
+/*        Responsiveness     */
+/* ========================= */
+/* Wrapper untuk scroll horizontal */
+.table-wrapper {
+  overflow-x: auto;
+  width: 100%;
+}
+
+/* Table utama */
+.order-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  min-width: 700px; /* Disesuaikan agar tidak terlalu lebar */
+  margin-top: 2rem;
+}
+
+/* Atur kolom supaya tidak terlalu lebar */
+.order-table th,
+.order-table td {
+  border: 1px solid #ccc;
+  padding: 1rem;
+  text-align: left;
+  vertical-align: top;
+  white-space: nowrap;
+}
+
+.order-table th {
+  background-color: #b30000;
+  color: white;
+}
+
+/* Kolom yang perlu pemotongan teks */
+.order-table td.ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 150px;
+}
+
+/* Bungkus tabel biar bisa digeser & ditarik ke kanan */
+.table-wrapper {
+  overflow-x: auto;
+  width: 100%;
+  padding-left: 2rem; /* Biar tabel agak ke kanan */
+}
+
+/* Tabel utama */
+.order-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  min-width: 800px;
+  margin-top: 2rem;
+}
+
+/* Judul kolom */
+.order-table th {
+  background-color: #b30000;
+  color: white;
+  padding: 1rem;
+  text-align: left;
+  white-space: nowrap;
+}
+
+/* Isi data order */
+.order-table td {
+  border: 1px solid #ccc;
+  padding: 0.5rem 1rem; /* Tinggi dikurangi */
+  text-align: left;
+  vertical-align: middle;
+  white-space: nowrap;
+  line-height: 1.4;
+}
+
+/* Kalau kamu pakai ellipsis */
+.order-table td.ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+}
+
+/* Scroll di HP tetap nyaman */
+@media (max-width: 768px) {
+  .table-wrapper {
+    padding-left: 1rem;
+  }
+
+  .order-table {
+    min-width: 600px;
+  }
+
+  .order-table td {
+    padding: 0.4rem 0.8rem;
+  }
+}
+
+
+@media (max-width: 480px) {
+  .back-arrow {
+    font-size: 1.5rem;
+  }
+
+  .order-history__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .order-history__header h2 {
+    font-size: 1rem;
+  }
+
+  .modal-content {
+    padding: 15px;
+  }
+
+  .modal-content h3 {
+    font-size: 1rem;
+  }
+
+  .modal-content p,
+  .modal-content .total-amount {
+    font-size: 14px;
+  }
+}

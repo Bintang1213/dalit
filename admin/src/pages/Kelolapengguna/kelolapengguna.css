@@ -1,0 +1,122 @@
+.container-pengguna {
+  width: 80%;
+  padding: 30px;
+  box-sizing: border-box;
+  background-color: #f7f7f7;
+  font-family: 'Poppins', sans-serif;
+  margin: 0 auto;
+}
+
+.kelola-pengguna-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.kelola-pengguna-header h2 {
+  font-size: 32px;
+  color: #222;
+  font-weight: bold;
+  margin: 0;
+}
+
+.kelola-pengguna-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border: 1px solid #ccc; /* tambahkan garis luar tabel */
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
+}
+
+.kelola-pengguna-table th,
+.kelola-pengguna-table td {
+  padding: 16px 20px;
+  text-align: left;
+  font-size: 16px;
+  border: 1px solid #ccc; /* garis vertikal dan horizontal */
+  white-space: nowrap;
+}
+
+.kelola-pengguna-table th {
+  background-color: #b30000;
+  color: white;
+}
+
+.kelola-pengguna-table tr:hover {
+  background-color: #f9f9f9;
+  transition: 0.2s ease;
+}
+
+/* Tombol Hapus */
+.btn-hapus {
+  background-color: #e74c3c;
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(231, 76, 60, 0.4);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.btn-hapus:hover {
+  background-color: #c0392b;
+  box-shadow: 0 4px 10px rgba(192, 57, 43, 0.6);
+}
+
+/* Pagination */
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  gap: 10px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.pagination-arrow {
+  padding: 6px 12px;
+  background-color: #b30000;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.3s ease;
+}
+
+.pagination-arrow:hover {
+  background-color: #990000;
+}
+
+@media (max-width: 768px) {
+  .container-pengguna {
+    padding: 20px;
+    width: 100%;
+  }
+
+  .kelola-pengguna-header h2 {
+    font-size: 24px;
+  }
+
+  .kelola-pengguna-table th,
+  .kelola-pengguna-table td {
+    padding: 12px;
+    font-size: 14px;
+  }
+
+  .btn-hapus {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .pagination-controls {
+    font-size: 14px;
+  }
+}

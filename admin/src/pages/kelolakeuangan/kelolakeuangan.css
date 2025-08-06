@@ -1,0 +1,214 @@
+.container-keuangan {
+  width: 80%;
+  padding: 30px;
+  background-color: #f7f7f7;
+  font-family: 'Poppins', sans-serif;
+  margin: auto;
+  padding-bottom: 300px;
+}
+
+.kelola-keuangan-header {
+  margin-bottom: 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.kelola-keuangan-header h2 {
+  font-size: 32px;
+  color: #222;
+  font-weight: bold;
+}
+
+.filter-kategori select {
+  padding: 8px 12px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background-color: white;
+  cursor: pointer;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.tabel-keuangan {
+  width: 100%;
+  border-collapse: collapse; /* Penting supaya border nyambung */
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin-top: 1px;
+  border: 1px solid #ddd; /* Border utama tabel */
+}
+
+/* Border di semua sisi th dan td */
+.tabel-keuangan th,
+.tabel-keuangan td {
+  padding: 16px;
+  font-size: 15px;
+  white-space: nowrap;
+  text-align: center;
+  vertical-align: middle;
+  border: 1px solid #ddd;
+}
+
+.tabel-keuangan th {
+  background-color: #b30000;
+  color: white;
+  font-weight: 600;
+}
+
+/* Lebar kolom pertama */
+.tabel-keuangan td:nth-child(1),
+.tabel-keuangan th:nth-child(1) {
+  width: 50px;
+}
+
+/* Baris total */
+.total-row {
+  background-color: #fff9f4;
+}
+
+/* Pagination */
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 1.5rem;
+  gap: 1rem;
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.pagination-arrow {
+  cursor: pointer;
+  font-size: 1.5rem;
+  color: crimson;
+  user-select: none;
+  padding: 0 10px;
+  transition: 0.2s;
+}
+
+.pagination-arrow:hover {
+  color: darkred;
+}
+
+/* Tombol Download */
+.download-button-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+  padding-right: 20px;
+}
+
+.download-button {
+  background-color: #d63031; /* Warna merah modern */
+  color: white;
+  padding: 10px 24px;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 500;
+  font-family: 'Poppins', sans-serif;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(214, 48, 49, 0.2);
+  transition: all 0.3s ease-in-out;
+}
+
+.download-button:hover {
+  background-color: #c0392b;
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(192, 57, 43, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container-keuangan {
+    width: 100%;
+    padding: 10px;
+  }
+
+  .kelola-keuangan-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .filter-kategori {
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  .tabel-keuangan th,
+  .tabel-keuangan td {
+    font-size: 14px;
+    padding: 12px;
+  }
+
+  .btn-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin: 16px 0;
+  }
+
+  .btn-red {
+    display: flex;
+    align-items: center;
+    padding: 8px 16px;
+    background-color: red;
+    color: white;
+    font-weight: bold;
+    font-size: 13px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+
+  .btn-red:hover {
+    background-color: darkred;
+  }
+
+  #laporan-download {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .export-button {
+    padding: 8px 16px;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s;
+  }
+
+  .export-button:hover {
+    background-color: #bb2d3b;
+  }
+}
+
+/* Border radius sudut tabel */
+.tabel-keuangan th:first-child {
+  border-top-left-radius: 10px;
+}
+
+.tabel-keuangan th:last-child {
+  border-top-right-radius: 10px;
+}
+
+.tabel-keuangan tr:last-child td:first-child {
+  border-bottom-left-radius: 10px;
+}
+
+.tabel-keuangan tr:last-child td:last-child {
+  border-bottom-right-radius: 10px;
+}

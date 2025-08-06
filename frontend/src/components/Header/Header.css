@@ -1,0 +1,97 @@
+.header {
+    height: 34vw;
+    margin: 20px auto;
+    background: url('/banner.png');
+    background-size: cover; 
+    background-position: center;
+    position: relative;
+    border-radius: 40px;
+    overflow: hidden;
+    box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2); /* Efek bayangan */
+}
+
+.header-contents {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    gap: 1.5vw;
+    max-width: 50%;
+    bottom: 10%;
+    left: 6vw;
+}
+
+/* Animasi floating */
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-5px); }
+    100% { transform: translateY(0px); }
+}
+
+.header-contents h2 {
+    font-weight: 600;
+    color: white;
+    font-size: max(4vw, 22px);
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5); /* Tambah efek shadow */
+    animation: float 2.5s ease-in-out infinite;
+}
+
+.header-contents p {
+    color: white;
+    font-size: 1.2vw;
+    opacity: 0.9;
+    margin-left: 6%;
+}
+
+.header-contents button {
+    border: none;
+    color: #fff;
+    font-weight: 600;
+    padding: 1vw 2.5vw;
+    font-size: max(1vw, 14px);
+    border-radius: 50px;
+    background: crimson;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0px 5px 15px rgba(220, 20, 60, 0.5);
+}
+
+/* Efek saat tombol ditekan */
+.header-contents button:active {
+    transform: scale(0.95);
+    background: #b22222;
+}
+
+/* Tambahan hover effect */
+.header-contents button:hover {
+    background: #ff4d4d;
+    box-shadow: 0px 8px 20px rgba(220, 20, 60, 0.7);
+}
+
+/* Responsif */
+@media (max-width: 1050px) {
+    .header-contents {
+        max-width: 60%;
+    }
+}
+
+@media (max-width: 400px) {
+  .explore-menu-list-wrapper {
+    padding-left: 8px;
+  }
+
+  .explore-menu-list {
+    gap: 12px;
+  }
+
+  .explore-menu-list-item img {
+    width: 70px;
+    aspect-ratio: 1/1; /* ✅ jaga bulat, tidak gepeng */
+    object-fit: cover;
+  }
+
+  .explore-menu-list-item p {
+    font-size: 12px;
+  }
+}
+

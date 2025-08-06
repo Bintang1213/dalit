@@ -1,0 +1,126 @@
+.explore-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+    text-align: center;
+}
+
+.explore-menu h1 {
+    color: crimson;
+    font-weight: 600;
+    font-size: max(2vw, 24px);
+}
+
+.explore-menu-text {
+    max-width: 100%;
+    color: #555;
+    font-size: max(1.2vw, 16px);
+    line-height: 1.6;
+}
+
+.explore-menu-list-wrapper {
+    overflow-x: auto;
+    padding: 0 20px;
+    scroll-padding-left: 20px;
+    scrollbar-width: none;
+}
+
+
+.explore-menu-list-wrapper::-webkit-scrollbar {
+    display: none; /* hilangkan scrollbar di Chrome/Safari */
+}
+
+.explore-menu-list {
+    display: flex;
+    gap: 20px;
+    white-space: nowrap;
+    width: max-content;
+}
+
+.explore-menu-list-item {
+    display: inline-block;
+    padding: 10px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.5s;
+    transform-origin: center;
+    flex-shrink: 0;
+    scroll-snap-align: start; /* opsional snap per item */
+}
+
+.explore-menu-list-item:first-child {
+    margin-left: 4px; /* tambahan kecil untuk jaga-jaga */
+}
+
+.explore-menu-list-item:hover {
+    transform: scale(1.1);
+    opacity: 0.9;
+}
+
+.explore-menu-list-item img {
+    width: clamp(70px, 10vw, 130px);
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    cursor: pointer;
+    border-radius: 50%;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.explore-menu-list-item img:hover {
+    animation: float 1.5s ease-in-out infinite;
+    box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-5px); }
+    100% { transform: translateY(0px); }
+}
+
+.explore-menu-list-item p {
+    margin-top: 10px;
+    color: #444;
+    font-size: clamp(12px, 1.5vw, 18px);
+    font-weight: 500;
+    transition: color 0.3s;
+    white-space: normal;
+}
+
+.explore-menu-list-item p:hover {
+    color: crimson;
+}
+
+.explore-menu hr {
+    margin: 15px 0;
+    height: 3px;
+    background: #e2e2e2;
+    border: none;
+    width: 80%;
+    border-radius: 2px;
+}
+
+.explore-menu-list-item .active {
+    border: 5px solid crimson;
+    padding: 5px;
+    box-shadow: 0px 4px 12px rgba(220, 20, 60, 0.5);
+}
+
+/* Responsif khusus layar kecil */
+@media (max-width: 400px) {
+    .explore-menu-text {
+        max-width: 100%;
+        font-size: 13px;
+    }
+
+    .explore-menu-list {
+        gap: 6px;
+    }
+
+    .explore-menu-list-item img {
+        width: clamp(55px, 16vw, 80px);
+    }
+
+    .explore-menu-list-item p {
+        font-size: clamp(10px, 3vw, 12px);
+    }
+}
