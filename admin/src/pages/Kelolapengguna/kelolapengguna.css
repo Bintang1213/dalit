@@ -1,10 +1,13 @@
+/* Sesuaikan margin-left dengan lebar sidebar kamu */
 .container-pengguna {
-  width: 80%;
-  padding: 30px;
+  width: calc(100% - 250px); /* sisakan ruang untuk sidebar */
+  margin-left: 250px;        /* geser ke kanan supaya tidak tertindih sidebar */
+  padding: 25px;
   box-sizing: border-box;
   background-color: #f7f7f7;
   font-family: 'Poppins', sans-serif;
-  margin: 0 auto;
+  min-height: 100vh;
+  /* kalau mau full tinggi viewport supaya rapi */
 }
 
 .kelola-pengguna-header {
@@ -25,7 +28,7 @@
   width: 100%;
   border-collapse: collapse;
   background: white;
-  border: 1px solid #ccc; /* tambahkan garis luar tabel */
+  border: 1px solid #ccc;
   border-radius: 10px;
   overflow: hidden;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -37,7 +40,7 @@
   padding: 16px 20px;
   text-align: left;
   font-size: 16px;
-  border: 1px solid #ccc; /* garis vertikal dan horizontal */
+  border: 1px solid #ccc;
   white-space: nowrap;
 }
 
@@ -99,6 +102,7 @@
   .container-pengguna {
     padding: 20px;
     width: 100%;
+    margin-left: 0; /* supaya full layar kalau di mobile */
   }
 
   .kelola-pengguna-header h2 {

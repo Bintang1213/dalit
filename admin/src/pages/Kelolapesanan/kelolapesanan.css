@@ -1,8 +1,9 @@
 .container-pesanan {
-  width: 80%;
-  padding: 30px;
+  margin-left: 250px;
+  padding: 19px;
   box-sizing: border-box;
   background-color: #f7f7f7;
+  min-height: 100vh;
 }
 
 .judul {

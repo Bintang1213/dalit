@@ -1,11 +1,13 @@
 .kelola-menu-content {
-  width: 80%;
+  width: 100%;
   padding: 30px;
+  padding-left: 270px; /* <--- ini tambahan penting */
   box-sizing: border-box;
   background-color: #f7f7f7;
   font-family: 'Poppins', sans-serif;
-  margin: auto;
+  min-height: 100vh;
 }
+
 
 .kelola-menu-header {
   display: flex;
