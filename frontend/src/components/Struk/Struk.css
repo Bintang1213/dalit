@@ -3,47 +3,52 @@
   flex-direction: column;
   align-items: center;
   padding: 30px 20px;
-  background-color: #ffffff;
+  background-color: #f8f8f8;
   height: 100dvh;
-  font-family: 'Arial', sans-serif;
+  font-family: 'Courier New', Courier, monospace;
   box-sizing: border-box;
 }
 
 .struk-box {
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background: #ffffff;
+  border: 1px dashed #aaa;
+  border-radius: 4px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.08);
   padding: 24px;
-  max-width: 400px;
+  max-width: 380px;
   width: 100%;
   font-size: 13px;
   line-height: 1.6;
   box-sizing: border-box;
+  position: relative;
 }
 
 .title {
   text-align: center;
   font-size: 16px;
   font-weight: bold;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
+  letter-spacing: 1px;
 }
 
 .alamat {
   text-align: center;
-  margin-bottom: 10px;
-  font-size: 13px;
+  margin-bottom: 12px;
+  font-size: 12px;
+  color: #444;
 }
 
 hr {
   border: none;
-  border-top: 1px solid #000;
+  border-top: 1px dashed #bbb;
   margin: 10px 0;
 }
 
 .tanggal-jam {
   display: flex;
   justify-content: space-between;
-  font-size: 13px;
+  font-size: 12px;
+  margin-bottom: 2px;
 }
 
 .kode-pesanan {
@@ -56,6 +61,7 @@ hr {
 
 .pelanggan {
   font-size: 13px;
+  margin-bottom: 4px;
 }
 
 .bold-item {
@@ -73,29 +79,51 @@ hr {
   margin: 4px 0;
 }
 
-.harga {
+.jumlah {
+  width: 40px;
   text-align: right;
-  min-width: 100px;
 }
 
-.rangkuman, .pembayaran {
+.harga {
+  text-align: right;
+  min-width: 90px;
+}
+
+.rangkuman,
+.pembayaran {
   font-size: 13px;
+  margin-top: 8px;
 }
 
 .total {
   font-weight: bold;
-  margin-top: 8px;
+  margin-top: 10px;
 }
 
 .catatan {
   font-size: 13px;
-  margin-top: 10px;
+  margin-top: 12px;
 }
 
 .terima-kasih {
   font-size: 13px;
   text-align: center;
   margin-top: 16px;
+  font-style: italic;
+  color: #333;
+  border-top: 1px dotted #bbb;
+  padding-top: 6px;
+}
+
+/* Garis potong seperti kasir */
+.struk-box::after {
+  content: "----------------------------------";
+  display: block;
+  text-align: center;
+  color: #ccc;
+  font-size: 12px;
+  margin-top: 12px;
+  letter-spacing: 1px;
 }
 
 /* Tombol gabungan */
@@ -110,16 +138,16 @@ hr {
   display: flex;
   align-items: center;
   padding: 8px 16px;
-  background-color: red;
+  background-color: #c62828;
   color: white;
   font-weight: bold;
   font-size: 13px;
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  transition: 0.2s;
+  transition: background-color 0.2s ease-in-out;
 }
 
 .btn-red:hover {
-  background-color: darkred;
+  background-color: #b71c1c;
 }

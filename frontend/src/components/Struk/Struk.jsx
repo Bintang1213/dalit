@@ -13,11 +13,18 @@ const Struk = () => {
   const handleDownload = () => {
     const strukElement = document.getElementById('struk-download');
 
+    // Sembunyikan tombol sebelum ambil screenshot
+    const buttons = strukElement.querySelector('.btn-actions');
+    if (buttons) buttons.style.display = 'none';
+
     html2canvas(strukElement).then((canvas) => {
       const link = document.createElement('a');
       link.download = 'struk-kedai-wartiyem.png';
       link.href = canvas.toDataURL();
       link.click();
+
+      // Tampilkan kembali tombol setelah unduh
+      if (buttons) buttons.style.display = 'flex';
     });
   };
 
@@ -101,8 +108,6 @@ const Struk = () => {
           <div className="item"><span>Metode Pemesanan</span><span>{order.method}</span></div>
           <div className="item"><span>{order.payment}</span><span>Rp. {total.toLocaleString()}</span></div>
         </div>
-
-        <hr />
 
         {order.note && (
           <div className="catatan">

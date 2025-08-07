@@ -54,7 +54,7 @@ const Footer = () => {
             <h2>HUBUNGI KAMI</h2>
             <ul>
               <li>📞 085943622000</li>
-              <li>✉  kedaiwartiyem@gmail.com</li>
+              <li>📧  kedaiwartiyem@gmail.com</li>
               <li>📍 Jl. Ampera No.57 Bulak, Kec. Jatibarang, Kab. Indramayu</li>
             </ul>
           </div>
