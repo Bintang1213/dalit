@@ -91,7 +91,7 @@ const KelolaPengguna = () => {
         </tbody>
       </table>
 
-       {/* Pagination seperti KelolaMenu */}
+       {/* Pagination */}
        <div className="pagination-controls">
         <span
           className="pagination-arrow"

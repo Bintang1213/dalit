@@ -1,10 +1,11 @@
 .container-keuangan {
-  width: 80%;
+  width: calc(100% - 260px); /* 260px untuk sidebar + margin kecil */
+  margin-left: 260px; /* geser ke kanan supaya tidak tertutup sidebar */
   padding: 30px;
   background-color: #f7f7f7;
   font-family: 'Poppins', sans-serif;
-  margin: auto;
   padding-bottom: 300px;
+  position: relative;
 }
 
 .kelola-keuangan-header {
@@ -36,16 +37,15 @@
 
 .tabel-keuangan {
   width: 100%;
-  border-collapse: collapse; /* Penting supaya border nyambung */
+  border-collapse: collapse;
   background: white;
   border-radius: 10px;
   overflow: hidden;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   margin-top: 1px;
-  border: 1px solid #ddd; /* Border utama tabel */
+  border: 1px solid #ddd;
 }
 
-/* Border di semua sisi th dan td */
 .tabel-keuangan th,
 .tabel-keuangan td {
   padding: 16px;
@@ -62,18 +62,15 @@
   font-weight: 600;
 }
 
-/* Lebar kolom pertama */
 .tabel-keuangan td:nth-child(1),
 .tabel-keuangan th:nth-child(1) {
   width: 50px;
 }
 
-/* Baris total */
 .total-row {
   background-color: #fff9f4;
 }
 
-/* Pagination */
 .pagination-controls {
   display: flex;
   justify-content: center;
@@ -97,7 +94,6 @@
   color: darkred;
 }
 
-/* Tombol Download */
 .download-button-container {
   display: flex;
   justify-content: flex-end;
@@ -106,7 +102,7 @@
 }
 
 .download-button {
-  background-color: #d63031; /* Warna merah modern */
+  background-color: #d63031;
   color: white;
   padding: 10px 24px;
   border: none;
@@ -129,6 +125,7 @@
 @media (max-width: 768px) {
   .container-keuangan {
     width: 100%;
+    margin-left: 0; /* hilangkan margin kiri di mobile supaya full lebar */
     padding: 10px;
   }
 

@@ -4,18 +4,18 @@ import { assets } from "../../assets/assets";
 import { FaUser } from "react-icons/fa";
 
 const Navbar = () => {
-  const adminName = "Admin"; // Bisa ambil dari localStorage jika perlu
+  const adminName = "Admin";
 
   return (
     <div className="navbar">
-      <div className="navbar-left">
+      <div className="navbar-logo">
         <img className="logo" src={assets.Tengko} alt="Logo" />
       </div>
 
-      <div className="navbar-right">
+      <div className="navbar-content">
         <div className="sticky-note">
+          <span>Hi, {adminName}</span>
           <FaUser />
-          <span>Selamat datang, {adminName}</span>
         </div>
       </div>
     </div>
