@@ -16,7 +16,9 @@ const Header = () => {
       <div className="header-contents">
       <h2 data-aos="fade-down">Pesan Tanpa Ribet, Nikmat Tanpa Batas!</h2>   
         <p data-aos="fade-right">Selamat datang dan selamat memilih hidangan terbaik!</p>
-        <button data-aos="zoom-in">Order lagi yaa!😉</button>
+        <a href="#explore-menu">
+  <button data-aos="zoom-in">Lihat Menu</button>
+</a>
       </div>
     </div>
   );

@@ -1,8 +1,8 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext } from 'react';
 import './FoodItem.css';
-import { assets } from '../../assets/assets';
 import { StoreContext } from '../../context/StoreContext';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
+import { FaPlus, FaMinus } from 'react-icons/fa'; // <-- Tambahkan ini
 
 const FoodItem = ({ id, name, price, description, image }) => {
   const { cartItems, addToCart, removeFromCart, url } = useContext(StoreContext);
@@ -10,20 +10,21 @@ const FoodItem = ({ id, name, price, description, image }) => {
   return (
     <div className='food-item'>
       <div className="food-item-img-container">
-        {/* Perbaikan: Mengganti LazyLoadImagAe menjadi LazyLoadImage */}
         <LazyLoadImage className='food-item-image' src={url + "/images/" + image} alt={name} effect="blur" />
         {!cartItems[id] ? (
-          <img className='add' onClick={() => addToCart(id)} src={assets.add_icon_white} alt="" />
+          <div className='add-icon-wrapper' onClick={() => addToCart(id)}>
+            <FaPlus className='add-icon' />
+          </div>
         ) : (
           <div className='food-item-counter'>
-            <img onClick={() => removeFromCart(id)} src={assets.remove_icon_red} alt="" />
+            <FaMinus className='counter-icon minus' onClick={() => removeFromCart(id)} />
             <p>{cartItems[id]}</p>
-            <img onClick={() => addToCart(id)} src={assets.add_icon_green} alt="" />
+            <FaPlus className='counter-icon plus' onClick={() => addToCart(id)} />
           </div>
         )}
       </div>
       <div className="food-item-info">
-        {name}
+        <p className="food-item-name">{name}</p>
         <p className="food-item-desc">{description}</p>
         <p className="food-item-price">Rp. {price}</p>
       </div>

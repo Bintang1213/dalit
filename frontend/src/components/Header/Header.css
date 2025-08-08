@@ -54,7 +54,10 @@
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0px 5px 15px rgba(220, 20, 60, 0.5);
+    margin-left: 20px; /* geser ke kanan */
+    font-size: 15px;
 }
+
 
 /* Efek saat tombol ditekan */
 .header-contents button:active {

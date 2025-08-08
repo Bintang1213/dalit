@@ -27,7 +27,7 @@ const FoodDisplay = ({ category }) => {
 
   return (
     <div className='food-display' id='food-display'>
-      <h2>Hidangan Terbaik di Dekat Anda</h2>
+      <h2>Hidangan Terbaik Kami</h2>
       <div className="food-display-list" ref={listRef}>
         {food_list.map((item, index) => (
           (category === "All" || category === item.category) && (

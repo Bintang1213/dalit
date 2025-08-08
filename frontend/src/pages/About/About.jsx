@@ -18,7 +18,7 @@ const About = () => {
             Kedai Wartiyem didirikan oleh Ibu Dewi Karmila Wulandari pada tahun 2020, setelah sebelumnya melayani pelanggan melalui WhatsApp dan Facebook sejak 2018. Dengan semangat menghadirkan cita rasa rumahan yang autentik, kami terus berkembang mengikuti perubahan zaman.
           </p>
           <p>
-            Untuk menjawab tantangan operasional dan permintaan pelanggan, kami mengembangkan sistem pemesanan digital yang mendukung layanan dine-in, take away, dan delivery. Tujuannya: lebih cepat, akurat, dan efisien.
+            Untuk menjawab tantangan operasional dan permintaan pelanggan, kami mengembangkan sistem pemesanan digital yang mendukung layanan makan di tempat, di bungkus, dan di antar. Tujuannya: lebih cepat, akurat, dan efisien.
           </p>
         </div>
         <div className="story-image">
@@ -47,31 +47,12 @@ const About = () => {
 
       {/* Keunggulan Section */}
       <section className="keunggulan-section">
-        <h2>Kenapa Memilih Kami?</h2>
+        <h2>Kenapa Harus Pilih Kami?</h2>
         <div className="keunggulan-grid">
           <div className="keunggulan-item">✔️ Cepat & Praktis</div>
           <div className="keunggulan-item">✔️ Rasa Autentik</div>
           <div className="keunggulan-item">✔️ Pemesanan Digital</div>
           <div className="keunggulan-item">✔️ Bahan Berkualitas</div>
-        </div>
-      </section>
-
-      {/* Team Section */}
-      <section className="team-section">
-        <h2 className="team-heading">Tim Kami</h2>
-        <div className="team-grid">
-          <div className="team-card">
-            <img src={assets.om} alt="Bintang Rizqy" />
-            <h3>Bintang Rizqy Andi Alkhalifi</h3>
-          </div>
-          <div className="team-card">
-            <img src={assets.maba} alt="Naba Imelda" />
-            <h3>Naba Imelda Nurussauba</h3>
-          </div>
-          <div className="team-card">
-            <img src={assets.cc} alt="Saisah Billah" />
-            <h3>Salsah Billah</h3>
-          </div>
         </div>
       </section>
 
@@ -94,6 +75,24 @@ const About = () => {
           referrerPolicy="no-referrer-when-downgrade"
           title="Lokasi Kedai Wartiyem"
         ></iframe>
+      </section>
+      {/* Team Section */}
+      <section className="team-section">
+        <h2 className="team-heading">Dikembangkan Oleh</h2>
+        <div className="team-grid">
+          <div className="team-card">
+            <img src={assets.om} alt="Bintang Rizqy" />
+            <h3>Bintang Rizqy Andi Alkhalifi</h3>
+          </div>
+          <div className="team-card">
+            <img src={assets.maba} alt="Naba Imelda" />
+            <h3>Naba Imelda Nurussauba</h3>
+          </div>
+          <div className="team-card">
+            <img src={assets.cc} alt="Salsah Billah" />
+            <h3>Salsah Billah</h3>
+          </div>
+        </div>
       </section>
     </div>
   );

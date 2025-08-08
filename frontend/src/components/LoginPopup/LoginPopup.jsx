@@ -3,6 +3,7 @@ import "./LoginPopup.css";
 import { assets } from "../../assets/assets";
 import { StoreContext } from "../../context/StoreContext";
 import axios from "axios";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const LoginPopup = ({ setShowLogin }) => {
   const { url, setToken } = useContext(StoreContext);
@@ -52,7 +53,7 @@ const LoginPopup = ({ setShowLogin }) => {
     <div className="login-popup">
       <form onSubmit={onLogin} className="login-popup-container">
         <div className="login-popup-title">
-          <h2>{currState}</h2>
+          <h2>{currState === "Login" ? "Masuk" : "Daftar"}</h2>
           <img src={assets.cross_icon} alt="Tutup" onClick={() => setShowLogin(false)} />
         </div>
 
@@ -81,7 +82,7 @@ const LoginPopup = ({ setShowLogin }) => {
             <input
               type={showPassword ? "text" : "password"}
               name="password"
-              placeholder="Password"
+              placeholder="Buat Password"
               value={data.password}
               onChange={onChangeHandler}
               required
@@ -95,22 +96,25 @@ const LoginPopup = ({ setShowLogin }) => {
                 right: "10px",
                 transform: "translateY(-50%)",
                 cursor: "pointer",
+                fontSize: "18px",
+                color: "#555",
               }}
             >
-              {showPassword ? "🙈" : "👁️"}
+              {showPassword ? <FaEyeSlash /> : <FaEye />}
             </span>
           </div>
         </div>
 
-        <button type="submit">{currState === "Login" ? "Login" : "Daftar"}</button>
+        <button type="submit">{currState === "Login" ? "Masuk" : "Daftar"}</button>
 
-        <div className="login-popup-condition">
-          <input type="checkbox" required />
-          <p>
-            Dengan melanjutkan, saya menyetujui ketentuan penggunaan & kebijakan privasi
-          </p>
-        </div>
-
+        {currState === "Daftar" && (
+          <div className="login-popup-condition">
+            <input type="checkbox" required />
+            <p>
+              Dengan melanjutkan, saya menyetujui ketentuan penggunaan & kebijakan privasi
+            </p>
+          </div>
+        )}
         {currState === "Login" && (
           <p
             style={{ marginTop: "10px", color: "#007bff", cursor: "pointer" }}

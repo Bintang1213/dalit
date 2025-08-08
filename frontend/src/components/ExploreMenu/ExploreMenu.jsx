@@ -15,11 +15,12 @@ const ExploreMenu = ({ category, setCategory }) => {
 
   return (
     <div className='explore-menu' id='explore-menu'>
-      <h1 data-aos="fade-up">Telusuri menu terbaik kami</h1>
+      <h1 data-aos="fade-up">Telusuri Menu Terbaik Kami</h1>
       <p className='explore-menu-text' data-aos="fade-up">
-        Makan enak itu bukan sekadar mengisi perut, tapi juga cara terbaik untuk menikmati hidup.
-        Karena setiap suapan membawa kebahagiaan tersendiri!
-      </p>
+  Makan enak itu bukan sekadar mengisi perut, tapi juga cara terbaik untuk menikmati hidup.<br />
+  Karena setiap suapan membawa kebahagiaan tersendiri!
+</p>
+
       
       <div className="explore-menu-list-wrapper">
         <div className="explore-menu-list">

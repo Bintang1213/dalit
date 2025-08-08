@@ -74,21 +74,36 @@ const OrderHistory = () => {
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-  if (loading) return <div>Memuat riwayat pesanan...</div>;
-  if (error) return <div>{error}</div>;
+    if (error) {
+    return (
+      <div className="order-history">
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          minHeight: '50vh',
+          textAlign: 'center',
+          padding: '2rem'
+        }}>
+          <h3 style={{ fontWeight: '600', color: '#333', marginBottom: '0.5rem' }}>
+            Anda belum login
+          </h3>
+          <p style={{ color: '#666' }}>
+            Silakan login untuk melihat riwayat pesanan Anda.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="order-history">
-      <div className="order-history__header">
-        <span className="back-arrow" onClick={() => navigate("/")}>&larr;</span>
-        <h2>Riwayat Pesanan</h2>
-      </div>
-
       <div className="table-wrapper">
         <table className="order-table">
           <thead>
             <tr>
-              <th>Tgl Pesan</th>
+              <th>Waktu Pesan</th>
               <th>Pesanan</th>
               <th>Pembayaran</th>
               <th>Layanan</th>
