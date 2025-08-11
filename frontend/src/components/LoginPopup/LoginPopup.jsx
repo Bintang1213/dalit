@@ -16,15 +16,17 @@ const LoginPopup = ({ setShowLogin }) => {
   });
 
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false); // state loading baru
 
   const onChangeHandler = (event) => {
-    const name = event.target.name;
-    const value = event.target.value;
+    const { name, value } = event.target;
     setData((prev) => ({ ...prev, [name]: value }));
   };
 
   const onLogin = async (event) => {
     event.preventDefault();
+    setLoading(true); // mulai loading
+
     let newUrl = url + (currState === "Login" ? "/api/user/login" : "/api/user/register");
 
     try {
@@ -46,6 +48,8 @@ const LoginPopup = ({ setShowLogin }) => {
     } catch (error) {
       alert("Terjadi kesalahan. Silakan coba lagi.");
       console.error(error);
+    } finally {
+      setLoading(false); // stop loading setelah selesai
     }
   };
 
@@ -100,12 +104,14 @@ const LoginPopup = ({ setShowLogin }) => {
                 color: "#555",
               }}
             >
-              {showPassword ? <FaEyeSlash /> : <FaEye />}
+              {showPassword ? <FaEye /> : <FaEyeSlash />}
             </span>
           </div>
         </div>
 
-        <button type="submit">{currState === "Login" ? "Masuk" : "Daftar"}</button>
+        <button type="submit" disabled={loading}>
+          {loading ? "Loading..." : currState === "Login" ? "Masuk" : "Daftar"}
+        </button>
 
         {currState === "Daftar" && (
           <div className="login-popup-condition">

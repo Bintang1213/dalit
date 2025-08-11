@@ -1,0 +1,44 @@
+/* Judul kategori */
+.menu-category-title {
+  font-size: 20px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: crimson;
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Icon kategori SVG */
+.menu-category-icon {
+  width: 18px;
+  height: 18px;
+}
+
+/* Hilangkan garis merah bawaan judul utama */
+.menu-title::after {
+  content: none;
+}
+
+/* Section kategori */
+.menu-category-section {
+  margin-bottom: 50px;
+}
+
+/* Garis pembatas kategori */
+.menu-category-line {
+  height: 2px;
+  background-color: rgba(83, 83, 83, 0.15);
+  width: 100%;
+  border-radius: 2px;
+  margin-bottom: 25px;
+}
+
+/* Grid menu */
+.menu-items {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 30px;
+}

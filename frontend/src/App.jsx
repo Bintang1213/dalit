@@ -12,6 +12,7 @@ import OrderHistory from './pages/OrderHistory/OrderHistory';
 import About from './pages/About/About';
 import Midtrans from './pages/Midtrans/Midtrans';
 import Struk from './components/Struk/Struk';
+import Menu from './pages/Menu/Menu';
 
 const App = () => {
   const [showLogin, setShowLogin] = useState(false);
@@ -21,7 +22,7 @@ const App = () => {
     <>
       {showLogin ? <LoginPopup setShowLogin={setShowLogin} /> : null}
       <div className='app'>
-        {location.pathname !== '/riwayat' && location.pathname !== '/cart' && location.pathname !== '/order' && location.pathname !== '/struk' &&(
+        {location.pathname !== '/cart' && location.pathname !== '/order' && location.pathname !== '/struk' &&(
           <Navbar setShowLogin={setShowLogin} />
         )}
         <AnimatePresence mode="wait">

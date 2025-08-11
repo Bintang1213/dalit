@@ -5,7 +5,6 @@
     padding: 30px;
     font-family: sans-serif;
     width: 100%;
-    background-color: #ffffff;
   }
   
   .place-order-left,
@@ -26,7 +25,7 @@
     margin-bottom: 15px;
     width: 100%;
     padding: 12px;
-    border: 1px solid #c5c5c5;
+    border: 1px solid #b90000;
     border-radius: 6px;
     outline-color: crimson;
     font-size: 16px;
@@ -91,16 +90,32 @@
     background-color: #c2185b;
   }
 
-  .back-button .back-arrow {
-    font-size: 1.8rem; /* Ukuran ikon bisa disesuaikan */
-    }
+.back-button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: bold;
+  font-size: 1.5rem;
+}
 
-    .back-button h2 {
-        margin: 0;  /* Menghapus margin default pada h2 */
-        font-size: 1.5rem;
-        font-weight: bold;
-        color: black;
-    }
+.back-button .back-arrow {
+  font-size: 1.8rem;
+  cursor: pointer;
+  color: #d40505;
+  transition: color 0.3s ease;
+}
+
+.back-button .back-arrow:hover {
+  color: #ff4c4c;
+}
+
+.back-button h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: black;
+}
+
   
   .place-order-page {
     padding: 30px;

@@ -2,6 +2,7 @@ import React, { useContext, useState } from "react";
 import "./Cart.css";
 import { StoreContext } from "../../context/StoreContext";
 import { useNavigate } from "react-router-dom";
+import LoginPopup from "../../components/LoginPopup/LoginPopup";
 
 const Cart = () => {
   const {
@@ -10,21 +11,42 @@ const Cart = () => {
     removeFromCart,
     getTotalCartAmount,
     url,
+    token,
   } = useContext(StoreContext);
 
   const [orderMethod, setOrderMethod] = useState("");
+  const [showLogin, setShowLogin] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-const handleConfirm = () => {
-  if (!orderMethod) {
-    alert("Silakan pilih metode pemesanan terlebih dahulu.");
-    return;
-  }
-  navigate("/order", { state: { method: orderMethod } });
-};
+  const handleConfirm = () => {
+    if (!orderMethod) {
+      alert("Silakan pilih metode pemesanan terlebih dahulu.");
+      return;
+    }
+
+    if (!token) {
+      alert("Silakan login terlebih dahulu.");
+      setLoading(true);
+      setTimeout(() => {
+        setLoading(false);
+        setShowLogin(true);
+      }, 1000); // loading 1 detik sebelum popup muncul
+    } else {
+      navigate("/order", { state: { method: orderMethod } });
+    }
+  };
 
   return (
     <div className="cart">
+      {loading && (
+        <div className="loading-overlay">
+          <div className="spinner"></div>
+          <p>Memuat...</p>
+        </div>
+      )}
+      {showLogin && <LoginPopup setShowLogin={setShowLogin} />}
+
       <div className="back-button">
         <span className="back-arrow" onClick={() => navigate("/")}>&larr;</span>
         <h2>Keranjang</h2>
@@ -63,6 +85,7 @@ const handleConfirm = () => {
               </div>
             );
           }
+          return null;
         })}
       </div>
 

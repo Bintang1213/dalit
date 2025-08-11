@@ -5,6 +5,18 @@
 .food-display h2{
     font-size: max(2vw,24px);
     font-weight: 600;
+    text-align: left;
+    padding-left: 10px;
+    padding-bottom: 20px;
+}
+.food-display h2::after {
+  content: '';
+  width: 222px;
+  height: 3px;
+  background-color: crimson;
+  display: block;
+  margin-top: 2px; /* sedikit jarak dari teks */
+  border-radius: 2px;
 }
 .food-display-list{
     display: grid;
