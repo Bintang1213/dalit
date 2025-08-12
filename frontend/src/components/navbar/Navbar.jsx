@@ -61,7 +61,8 @@ const Navbar = ({ setShowLogin }) => {
 
       <ul ref={menuRef} className={`navbar-menu ${mobileMenuOpen ? "active" : ""}`}>
         <Link to="/" onClick={() => { setMenu("home"); setMobileMenuOpen(false); }} className={menu === "home" ? "active" : ""}>Beranda</Link>
-        <Link to="/riwayat" onClick={() => { setMenu("pesanan"); setMobileMenuOpen(false); }} className={menu === "pesanan" ? "active" : ""}>Riwayat Pesanan Anda</Link>
+        <Link to="/Menu" onClick={() => { setMenu("menu"); setMobileMenuOpen(false); }} className={menu === "menu" ? "active" : ""}>Menu</Link>
+        <Link to="/riwayat" onClick={() => { setMenu("pesanan"); setMobileMenuOpen(false); }} className={menu === "pesanan" ? "active" : ""}>Pesanan</Link>
         <Link to="/tentang-kami" onClick={() => { setMenu("tentang"); setMobileMenuOpen(false); }} className={menu === "tentang" ? "active" : ""}>Tentang Kami</Link>
       </ul>
 

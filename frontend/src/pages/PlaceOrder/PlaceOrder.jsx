@@ -40,11 +40,12 @@ const PlaceOrder = () => {
     e.preventDefault();
 
     // Validasi Nama (hanya huruf dan spasi)
-    const nameRegex = /^[A-Za-z\s]+$/;
-    if (!formData.name || !nameRegex.test(formData.name)) {
-      alert("Nama hanya boleh berisi huruf dan spasi.");
-      return;
-    }
+    // Validasi Nama (huruf, spasi, titik, dan koma)
+  const nameRegex = /^[A-Za-z\s.,']+$/;
+  if (!formData.name || !nameRegex.test(formData.name)) {
+    alert("Nama hanya boleh berisi huruf, spasi, titik (.), dan koma (,).");
+    return;
+  }
 
     // Validasi Nomor Meja jika Makan di Tempat (hanya angka)
     if (method === "Makan di Tempat") {

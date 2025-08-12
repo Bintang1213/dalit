@@ -1,14 +1,15 @@
 .navbar {
   padding: 40px 0px;
-  display: flex;
+  display:flex;
   justify-content: space-between;
   align-items: center;
-  margin-right: 8px;
+  margin-right: 10px;
   flex-wrap: nowrap;
 }
 
 .navbar-logo {
-  width: 140px;
+  width: 170px;
+  margin-left: -30px;
 }
 
 .navbar-menu {

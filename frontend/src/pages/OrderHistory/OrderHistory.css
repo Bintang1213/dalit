@@ -1,5 +1,5 @@
 .order-history {
-  padding: 2rem;
+  padding: 1px;
   font-family: 'Poppins', sans-serif;
   background-color: #f8f8f8;
 }
@@ -10,12 +10,6 @@
   gap: 1rem;
   font-size: 20px;
   margin-bottom: 1rem;
-}
-
-.back-arrow {
-  font-size: 2rem;
-  cursor: pointer;
-  color: #b30000;
 }
 
 .table-wrapper {

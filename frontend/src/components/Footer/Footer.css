@@ -48,10 +48,10 @@
 }
 
 .footer-section ul li {
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 2px;
 }
 
 .footer-section ul li a {
