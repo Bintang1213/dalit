@@ -1,19 +1,10 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext } from 'react';
 import { StoreContext } from "../../context/StoreContext";
 import FoodItem from "../../components/FoodItem/FoodItem";
 import './Menu.css';
 
 const Menu = () => {
-  const { food_list, setLoading } = useContext(StoreContext);
-
-  // Simulasi proses load data menu
-  useEffect(() => {
-    setLoading(true); // mulai loading
-    // misalnya proses fetch data dari API
-    setTimeout(() => {
-      setLoading(false); // selesai loading
-    }, 1000); // delay 1 detik
-  }, [setLoading]);
+  const { food_list } = useContext(StoreContext);
 
   // Ambil kategori unik dari data menu
   const categories = [...new Set(food_list.map(item => item.category))];
