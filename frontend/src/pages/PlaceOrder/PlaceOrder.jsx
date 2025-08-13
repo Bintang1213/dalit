@@ -4,13 +4,15 @@ import { StoreContext } from '../../context/StoreContext';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import moment from 'moment-timezone';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const PlaceOrder = () => {
   const {
     cartItems,
     food_list,
     getTotalCartAmount,
-    clearCart, // pastikan fungsi ini ada di StoreContext
+    clearCart,
   } = useContext(StoreContext);
 
   const navigate = useNavigate();
@@ -39,47 +41,40 @@ const PlaceOrder = () => {
   const handleOrder = async (e) => {
     e.preventDefault();
 
-    // Validasi Nama (hanya huruf dan spasi)
-    // Validasi Nama (huruf, spasi, titik, dan koma)
-  const nameRegex = /^[A-Za-z\s.,']+$/;
-  if (!formData.name || !nameRegex.test(formData.name)) {
-    alert("Nama hanya boleh berisi huruf, spasi, titik (.), dan koma (,).");
-    return;
-  }
-
-    // Validasi Nomor Meja jika Makan di Tempat (hanya angka)
-    if (method === "Makan di Tempat") {
-      const tableRegex = /^[0-9]+$/;
-      if (!formData.tableNumber || !tableRegex.test(formData.tableNumber)) {
-        alert("Nomor Meja hanya boleh berisi angka.");
-        return;
-      }
-    }
-
-    // Validasi jika Diantar
-    if (method === "Diantar") {
-      const phoneRegex = /^[0-9]{10,15}$/;
-      if (!formData.phone || !phoneRegex.test(formData.phone)) {
-        alert("Nomor Telepon harus berupa angka dan terdiri dari 10-15 digit.");
-        return;
-      }
-
-      if (!formData.address || formData.address.trim().length < 5) {
-        alert("Alamat harus diisi dengan minimal 5 karakter.");
-        return;
-      }
-    }
-
-    // Validasi metode pembayaran
-    if (!formData.payment) {
-      alert("Silakan pilih metode pembayaran terlebih dahulu.");
+    const nameRegex = /^[A-Za-z\s.,']+$/;
+    if (!formData.name || !nameRegex.test(formData.name)) {
+      toast.error("Nama hanya boleh huruf, spasi dan karakter.", { style: { background: 'white', color: 'black', fontWeight: 'bold' } });
       return;
     }
 
-    // Validasi login
+    if (method === "Makan di Tempat") {
+      const tableRegex = /^[0-9]+$/;
+      if (!formData.tableNumber || !tableRegex.test(formData.tableNumber)) {
+        toast.error("Nomor Meja hanya boleh angka.", { style: { background: 'white', color: 'black', fontWeight: 'bold' } });
+        return;
+      }
+    }
+
+    if (method === "Diantar") {
+      const phoneRegex = /^[0-9]{10,15}$/;
+      if (!formData.phone || !phoneRegex.test(formData.phone)) {
+        toast.error("Nomor Telepon harus angka 10-15 digit.", { style: { background: 'white', color: 'black', fontWeight: 'bold' } });
+        return;
+      }
+      if (!formData.address || formData.address.trim().length < 5) {
+        toast.error("Alamat minimal 5 karakter.", { style: { background: 'white', color: 'black', fontWeight: 'bold' } });
+        return;
+      }
+    }
+
+    if (!formData.payment) {
+      toast.error("Pilih metode pembayaran.", { style: { background: 'white', color: 'black', fontWeight: 'bold' } });
+      return;
+    }
+
     const token = localStorage.getItem('token');
     if (!token) {
-      alert("Anda harus login terlebih dahulu.");
+      toast.error("Harus login terlebih dahulu.", { style: { background: 'white', color: 'black', fontWeight: 'bold' } });
       return;
     }
 
@@ -102,15 +97,12 @@ const PlaceOrder = () => {
 
     try {
       const response = await axios.post('http://localhost:4000/api/order', orderData, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
+        headers: { Authorization: `Bearer ${token}` }
       });
 
-      console.log('Pesanan berhasil:', response.data);
-
-      // RESET keranjang setelah berhasil order
       clearCart();
+
+      toast.success("Pesanan berhasil dibuat!", { style: { background: 'white', color: 'black', fontWeight: 'bold' } });
 
       if (formData.payment === "Non-Tunai" && response.data.redirect_url) {
         window.location.href = response.data.redirect_url;
@@ -120,7 +112,7 @@ const PlaceOrder = () => {
 
     } catch (error) {
       console.error('Gagal mengirim pesanan:', error);
-      alert('Terjadi kesalahan saat mengirim pesanan.');
+      toast.error('Terjadi kesalahan saat mengirim pesanan.', { style: { background: 'white', color: 'black', fontWeight: 'bold' } });
     }
   };
 
@@ -133,6 +125,7 @@ const PlaceOrder = () => {
 
   return (
     <div className="place-order-page">
+      <ToastContainer position="top-center" />
       <div className="back-button">
         <span className="back-arrow" onClick={() => navigate("/cart")}>&larr;</span>
         <h2>Kembali</h2>
@@ -142,52 +135,20 @@ const PlaceOrder = () => {
         <div className="place-order-left">
           <p className="title">Informasi Pemesanan ({method})</p>
 
-          <input
-            type="text"
-            placeholder="Nama Lengkap"
-            name="name"
-            value={formData.name}
-            onChange={handleInputChange}
-            required
-          />
+          <input type="text" placeholder="Nama Lengkap" name="name" value={formData.name} onChange={handleInputChange} required />
 
           {method === "Makan di Tempat" && (
-            <input
-              type="text"
-              placeholder="Nomor Meja"
-              name="tableNumber"
-              value={formData.tableNumber}
-              onChange={handleInputChange}
-              required
-            />
+            <input type="text" placeholder="Nomor Meja" name="tableNumber" value={formData.tableNumber} onChange={handleInputChange} required />
           )}
 
           {method === "Diantar" && (
             <>
-              <input
-                type="text"
-                placeholder="Nomor Telepon Aktif"
-                name="phone"
-                value={formData.phone}
-                onChange={handleInputChange}
-                required
-              />
-              <textarea
-                placeholder="Alamat Lengkap"
-                name="address"
-                value={formData.address}
-                onChange={handleInputChange}
-                required
-              />
+              <input type="text" placeholder="Nomor Telepon Aktif" name="phone" value={formData.phone} onChange={handleInputChange} required />
+              <textarea placeholder="Alamat Lengkap" name="address" value={formData.address} onChange={handleInputChange} required />
             </>
           )}
 
-          <textarea
-            placeholder="Catatan untuk pesanan (Opsional)"
-            name="note"
-            value={formData.note}
-            onChange={handleInputChange}
-          />
+          <textarea placeholder="Catatan untuk pesanan (Opsional)" name="note" value={formData.note} onChange={handleInputChange} />
         </div>
 
         <div className="place-order-right">
@@ -224,24 +185,10 @@ const PlaceOrder = () => {
 
           <p className='payment-label'>Pilih Metode Pembayaran</p>
           <div className="radio-options">
-            <input
-              type="radio"
-              id="tunai"
-              name="payment"
-              value="Tunai"
-              checked={formData.payment === "Tunai"}
-              onChange={handleInputChange}
-            />
+            <input type="radio" id="tunai" name="payment" value="Tunai" checked={formData.payment === "Tunai"} onChange={handleInputChange} />
             <label htmlFor="tunai">Tunai</label>
 
-            <input
-              type="radio"
-              id="nontunai"
-              name="payment"
-              value="Non-Tunai"
-              checked={formData.payment === "Non-Tunai"}
-              onChange={handleInputChange}
-            />
+            <input type="radio" id="nontunai" name="payment" value="Non-Tunai" checked={formData.payment === "Non-Tunai"} onChange={handleInputChange} />
             <label htmlFor="nontunai">Non-Tunai</label>
           </div>
 

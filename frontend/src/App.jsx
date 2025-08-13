@@ -13,6 +13,8 @@ import About from './pages/About/About';
 import Midtrans from './pages/Midtrans/Midtrans';
 import Struk from './components/Struk/Struk';
 import Menu from './pages/Menu/Menu';
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const App = () => {
   const [showLogin, setShowLogin] = useState(false);
@@ -20,121 +22,129 @@ const App = () => {
 
   return (
     <>
-      {showLogin ? <LoginPopup setShowLogin={setShowLogin} /> : null}
-      <div className='app'>
-        {location.pathname !== '/cart' && location.pathname !== '/order' && location.pathname !== '/struk' &&(
+      {showLogin && <LoginPopup setShowLogin={setShowLogin} />}
+
+      <div className="app">
+        {location.pathname !== '/cart' &&
+         location.pathname !== '/order' &&
+         location.pathname !== '/struk' && (
           <Navbar setShowLogin={setShowLogin} />
         )}
-        <AnimatePresence mode="wait">
-          <Routes location={location} key={location.pathname}>
-            <Route 
-              path='/' 
-              element={
-                <motion.div
-                  initial={{ opacity: 0, x: -50 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 50 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  <Home />
-                </motion.div>
-              } 
-            />
-            <Route 
-              path='/Menu' 
-              element={
-                <motion.div
-                  initial={{ opacity: 0, x: -50 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 50 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  <Menu />
-                </motion.div>
-              } 
-            />
-            <Route 
-              path='/cart' 
-              element={
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  <Cart />
-                </motion.div>
-              } 
-            />
-            <Route 
-              path='/order' 
-              element={
-                <motion.div
-                  initial={{ opacity: 0, y: 50 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -50 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  <PlaceOrder />
-                </motion.div>
-              } 
-            />
-            <Route 
-              path='/struk' 
-              element={
-                <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -30 }}
-                  transition={{ duration: 0.4 }}
-                >
-                  <Struk />
-                </motion.div>
-              } 
-            />
-            <Route 
-              path='/riwayat' 
-              element={
-                <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -30 }}
-                  transition={{ duration: 0.4 }}
-                >
-                  <OrderHistory />
-                </motion.div>
-              }
-            />
-            <Route 
-              path='/tentang-kami' // ✅ Rute baru
-              element={
-                <motion.div
-                  initial={{ opacity: 0, x: 30 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -30 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  <About />
-                </motion.div>
-              }
-            />
-            <Route 
-              path='/midtrans-simulator' 
-              element={
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  <Midtrans />
-                </motion.div>
-              }
-            />
-          </Routes>
-        </AnimatePresence>
+
+        <div>
+          <AnimatePresence mode="wait">
+            <Routes location={location} key={location.pathname}>
+              <Route 
+                path='/' 
+                element={
+                  <motion.div
+                    initial={{ opacity: 0, x: -50 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 50 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <Home />
+                  </motion.div>
+                } 
+              />
+              <Route 
+                path='/Menu' 
+                element={
+                  <motion.div
+                    initial={{ opacity: 0, x: -50 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 50 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <Menu />
+                  </motion.div>
+                } 
+              />
+              <Route 
+                path='/cart' 
+                element={
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <Cart />
+                  </motion.div>
+                } 
+              />
+              <Route 
+                path='/order' 
+                element={
+                  <motion.div
+                    initial={{ opacity: 0, y: 50 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -50 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <PlaceOrder />
+                  </motion.div>
+                } 
+              />
+              <Route 
+                path='/struk' 
+                element={
+                  <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -30 }}
+                    transition={{ duration: 0.4 }}
+                  >
+                    <Struk />
+                  </motion.div>
+                } 
+              />
+              <Route 
+                path='/riwayat' 
+                element={
+                  <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -30 }}
+                    transition={{ duration: 0.4 }}
+                  >
+                    <OrderHistory />
+                  </motion.div>
+                }
+              />
+              <Route 
+                path='/tentang-kami'
+                element={
+                  <motion.div
+                    initial={{ opacity: 0, x: 30 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -30 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <About />
+                  </motion.div>
+                }
+              />
+              <Route 
+                path='/midtrans-simulator' 
+                element={
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <Midtrans />
+                  </motion.div>
+                }
+              />
+            </Routes>
+          </AnimatePresence>
+        </div>
       </div>
+
       <Footer />
+      <ToastContainer position="top-right" autoClose={3000} />
     </>
   );
 };
