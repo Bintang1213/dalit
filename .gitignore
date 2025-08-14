@@ -1,1 +1,9 @@
+# Dependency directories
 node_modules/
+# Vite and other build artifacts
+dist/
+.vite/
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
