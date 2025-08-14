@@ -1,5 +1,6 @@
 /* Judul kategori */
 .menu-category-title {
+  margin-top: 20px;
   font-size: 20px;
   font-weight: 700;
   text-transform: uppercase;

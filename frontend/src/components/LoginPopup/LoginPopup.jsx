@@ -4,19 +4,16 @@ import { assets } from "../../assets/assets";
 import { StoreContext } from "../../context/StoreContext";
 import axios from "axios";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-const LoginPopup = ({ setShowLogin }) => {
+const LoginPopup = ({ setShowLogin, onLoginSuccess }) => {
   const { url, setToken } = useContext(StoreContext);
 
   const [currState, setCurrState] = useState("Login");
-  const [data, setData] = useState({
-    name: "",
-    email: "",
-    password: "",
-  });
-
+  const [data, setData] = useState({ name: "", email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false); // state loading baru
+  const [loading, setLoading] = useState(false);
 
   const onChangeHandler = (event) => {
     const { name, value } = event.target;
@@ -25,9 +22,10 @@ const LoginPopup = ({ setShowLogin }) => {
 
   const onLogin = async (event) => {
     event.preventDefault();
-    setLoading(true); // mulai loading
+    setLoading(true);
 
-    let newUrl = url + (currState === "Login" ? "/api/user/login" : "/api/user/register");
+    const newUrl =
+      url + (currState === "Login" ? "/api/user/login" : "/api/user/register");
 
     try {
       const response = await axios.post(newUrl, data);
@@ -36,29 +34,52 @@ const LoginPopup = ({ setShowLogin }) => {
         if (currState === "Login") {
           setToken(response.data.token);
           localStorage.setItem("token", response.data.token);
-          setShowLogin(false);
+
+          // Toast sukses login dengan durasi 2500ms
+          toast.success("Anda berhasil login", {
+            position: "top-center",
+            autoClose: 2500,
+            onClose: () => {
+              setShowLogin(false);         // popup hilang setelah toast selesai
+              onLoginSuccess?.();          // panggil callback dropdown akun
+            },
+          });
         } else {
-          alert("Registrasi berhasil! Silakan login.");
+          toast.success("Registrasi berhasil! Silakan login.", {
+            position: "top-center",
+            autoClose: 2500,
+          });
           setCurrState("Login");
           setData({ name: "", email: "", password: "" });
         }
       } else {
-        alert(response.data.message);
+        toast.error(response.data.message, {
+          position: "top-center",
+          autoClose: 2500,
+        });
       }
     } catch (error) {
-      alert("Terjadi kesalahan. Silakan coba lagi.");
+      toast.error("Terjadi kesalahan. Silakan coba lagi.", {
+        position: "top-center",
+        autoClose: 2500,
+      });
       console.error(error);
     } finally {
-      setLoading(false); // stop loading setelah selesai
+      setLoading(false);
     }
   };
 
   return (
     <div className="login-popup">
+      <ToastContainer />
       <form onSubmit={onLogin} className="login-popup-container">
         <div className="login-popup-title">
           <h2>{currState === "Login" ? "Masuk" : "Daftar"}</h2>
-          <img src={assets.cross_icon} alt="Tutup" onClick={() => setShowLogin(false)} />
+          <img
+            src={assets.cross_icon}
+            alt="Tutup"
+            onClick={() => setShowLogin(false)}
+          />
         </div>
 
         <div className="login-popup-inputs">
@@ -72,7 +93,6 @@ const LoginPopup = ({ setShowLogin }) => {
               required
             />
           )}
-
           <input
             type="email"
             name="email"
@@ -81,7 +101,6 @@ const LoginPopup = ({ setShowLogin }) => {
             onChange={onChangeHandler}
             required
           />
-
           <div style={{ position: "relative" }}>
             <input
               type={showPassword ? "text" : "password"}
@@ -117,14 +136,21 @@ const LoginPopup = ({ setShowLogin }) => {
           <div className="login-popup-condition">
             <input type="checkbox" required />
             <p>
-              Dengan melanjutkan, saya menyetujui ketentuan penggunaan & kebijakan privasi
+              Dengan melanjutkan, saya menyetujui ketentuan penggunaan & kebijakan
+              privasi
             </p>
           </div>
         )}
+
         {currState === "Login" && (
           <p
             style={{ marginTop: "10px", color: "#007bff", cursor: "pointer" }}
-            onClick={() => alert("Fitur lupa password belum tersedia. Hubungi admin.")}
+            onClick={() =>
+              toast.info(
+                "Fitur lupa password belum tersedia. Hubungi admin.",
+                { position: "top-center", autoClose: 2500 }
+              )
+            }
           >
             Lupa kata sandi?
           </p>

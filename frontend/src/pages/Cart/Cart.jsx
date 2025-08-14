@@ -1,8 +1,10 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import "./Cart.css";
 import { StoreContext } from "../../context/StoreContext";
 import { useNavigate } from "react-router-dom";
 import LoginPopup from "../../components/LoginPopup/LoginPopup";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Cart = () => {
   const {
@@ -20,35 +22,71 @@ const Cart = () => {
   const navigate = useNavigate();
 
   const handleConfirm = () => {
-    if (!orderMethod) {
-      alert("Silakan pilih metode pemesanan terlebih dahulu.");
-      return;
-    }
+  if (!orderMethod) {
+    toast.warning("Silakan pilih metode pemesanan terlebih dahulu.", { 
+      style: { 
+        background: 'white',
+        color: 'black', 
+        fontWeight: 'bold', 
+        zIndex: 9999
+      },
+      autoClose: 2000
+    });
+    return;
+  }
 
-    if (!token) {
-      alert("Silakan login terlebih dahulu.");
+  if (!token) {
+    toast.error("Silakan login terlebih dahulu.", { 
+      style: { 
+        background: 'white', 
+        color: 'black', 
+        fontWeight: 'bold', 
+        zIndex: 9999
+      },
+      autoClose: 2000
+    });
+
+    // delay popup supaya toast terlihat dulu
+    setTimeout(() => {
       setLoading(true);
       setTimeout(() => {
         setLoading(false);
         setShowLogin(true);
-      }, 1000); // loading 1 detik sebelum popup muncul
-    } else {
-      navigate("/order", { state: { method: orderMethod } });
-    }
-  };
+      }, 500);
+    }, 100);
+    
+    return;
+  }
+
+  navigate("/order", { state: { method: orderMethod } });
+};
 
   return (
     <div className="cart">
+      {/* 🔹 ToastContainer diatur supaya semua alert default posisi tengah */}
+      <ToastContainer
+        position="top-center"
+        autoClose={25000}
+        hideProgressBar={false}
+        newestOnTop={true}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
+
       {loading && (
         <div className="loading-overlay">
           <div className="spinner"></div>
-          <p>Memuat...</p>
         </div>
       )}
       {showLogin && <LoginPopup setShowLogin={setShowLogin} />}
 
       <div className="back-button">
-        <span className="back-arrow" onClick={() => navigate("/")}>&larr;</span>
+        <span className="back-arrow" onClick={() => navigate("/")}>
+          &larr;
+        </span>
         <h2>Keranjang</h2>
       </div>
 
@@ -71,13 +109,19 @@ const Cart = () => {
                   <img
                     src={url + "/images/" + item.image}
                     alt={item.name}
-                    onError={(e) => (e.target.src = url + "/images/default.png")}
+                    onError={(e) =>
+                      (e.target.src = url + "/images/default.png")
+                    }
                   />
                   <p>{item.name}</p>
                   <p>{item.price}</p>
                   <p>{cartItems[item._id]}</p>
                   <p>Rp{item.price * cartItems[item._id]}</p>
-                  <p onClick={() => removeFromCart(item._id)} className="cross" style={{ cursor: "pointer" }}>
+                  <p
+                    onClick={() => removeFromCart(item._id)}
+                    className="cross"
+                    style={{ cursor: "pointer" }}
+                  >
                     <i className="bi bi-trash"></i>
                   </p>
                 </div>
@@ -133,7 +177,6 @@ const Cart = () => {
             <button
               className="confirm-btn"
               onClick={handleConfirm}
-              disabled={!orderMethod}
             >
               Konfirmasi Pesanan
             </button>

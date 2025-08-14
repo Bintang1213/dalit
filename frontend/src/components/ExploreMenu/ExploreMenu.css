@@ -1,9 +1,10 @@
 .explore-menu {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    align-items: center;
-    text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+  text-align: center;
+  margin-top: 80px; 
 }
 
 .explore-menu h1 {
