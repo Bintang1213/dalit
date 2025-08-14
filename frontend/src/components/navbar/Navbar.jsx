@@ -24,8 +24,8 @@ const Navbar = ({ setShowLogin }) => {
 
   const logout = () => {
     localStorage.removeItem("token");
-    setToken(""); // update state token
-    setShowProfileDropdown(false); // sembunyikan dropdown
+    setToken(""); 
+    setShowProfileDropdown(false); 
     toast.success("Anda berhasil logout ✅", { position: "top-center", autoClose: 2500 });
   };
 
