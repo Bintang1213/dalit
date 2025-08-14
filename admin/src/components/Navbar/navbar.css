@@ -7,22 +7,10 @@
   font-size: 20px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   padding: 0 20px;
-  margin-left: 250px; /* <-- Kasih ruang biar gak ketiban sidebar */
+  margin-left: 250px; /* ruang untuk sidebar */
   box-sizing: border-box;
   position: relative;
-  z-index: 10; /* biar di atas konten lain */
-}
-.navbar-logo {
-  width: 180px;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start; /* <--- Dari center ke flex-start */
-  padding-left: 10px; /* Tambahan opsional biar gak mentok */
-}
-.logo {
-  height: 60px;
-  object-fit: contain;
+  z-index: 10;
 }
 
 /* Kanan: isi navbar */
@@ -73,10 +61,6 @@
     margin-left: 180px;
   }
 
-  .logo {
-    height: 50px;
-  }
-
   .sticky-note {
     padding: 8px 16px;
     font-size: 15px;
@@ -86,10 +70,6 @@
 @media screen and (max-width: 768px) {
   .navbar {
     margin-left: 150px;
-  }
-
-  .logo {
-    height: 40px;
   }
 
   .sticky-note {

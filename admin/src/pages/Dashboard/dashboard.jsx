@@ -1,3 +1,4 @@
+// Dashboard.jsx
 import React, { useEffect, useState } from 'react';
 import Axios from 'axios';
 import { Bar } from 'react-chartjs-2';
@@ -24,7 +25,6 @@ const Dashboard = () => {
     pemasukanBulan: Array(12).fill(0)
   });
   const [loading, setLoading] = useState(true);
-  const targetPenjualan = 1000;
 
   const cardColors = [
     { bg: '#FFD700', iconBg: '#FFF8DC', iconColor: '#B8860B' },
@@ -129,32 +129,8 @@ const Dashboard = () => {
     }
   };
 
-  const progressPercentage = Math.min(
-    (dashboardData.jumlahPenjualan / targetPenjualan) * 100,
-    100
-  );
-
   return (
-    <div style={{ display: 'flex' }}>
-      {/* Sidebar */}
-      <div style={{
-        width: '250px',
-        backgroundColor: '#b30000',
-        color: 'white',
-        minHeight: '100vh',
-        padding: '1rem',
-        boxSizing: 'border-box'
-      }}>
-        <h2 style={{ color: 'white' }}>Sidebar</h2>
-        <ul style={{ listStyle: 'none', padding: 0 }}>
-          <li><a href="/dashboard" style={{ color: 'white' }}>Dashboard</a></li>
-          <li><a href="/kelolamenu" style={{ color: 'white' }}>Kelola Menu</a></li>
-          <li><a href="/kelolapesanan" style={{ color: 'white' }}>Kelola Pesanan</a></li>
-          <li><a href="/kelolakeuangan" style={{ color: 'white' }}>Kelola Keuangan</a></li>
-        </ul>
-      </div>
-
-      {/* Main Dashboard */}
+    <div className="dashboard-wrapper">
       <div className="dashboard-container">
         <div className="dashboard-header">
           <h1>Dashboard</h1>
@@ -186,18 +162,6 @@ const Dashboard = () => {
                   </div>
                 </div>
               ))}
-            </div>
-
-            <div className="target-section">
-              <h2>Target Penjualan Bulan Ini</h2>
-              <div className="progress-container">
-                <div className="progress-bar">
-                  <div className="progress-fill" style={{ width: `${progressPercentage}%` }}></div>
-                </div>
-                <div className="progress-text">
-                  {dashboardData.jumlahPenjualan} / {targetPenjualan} ({progressPercentage.toFixed(1)}%)
-                </div>
-              </div>
             </div>
 
             <div className="chart-section">
