@@ -33,8 +33,8 @@ body {
 
 .navbar-logo {
   width: 120px;
-  margin-right: 20px; 
-  margin-top: 0; 
+  margin-left: 40px; /* geser 20px ke kanan */
+  margin-top: 10px;
 }
 
 
@@ -63,9 +63,8 @@ body {
 .navbar-right {
   display: flex;
   align-items: center;
-  gap: 50px; 
-  margin-right: 0;
-  padding-right: 30px; 
+  gap: 20px;
+  margin-right: 75px;
 }
 
 .navbar-search-icon {
