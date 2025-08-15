@@ -1,9 +1,11 @@
 .container-pesanan {
-  margin-left: 250px;
-  padding: 19px;
+  
+  padding: 30px;
+  padding-left: 280px;
   box-sizing: border-box;
-  background-color: #f7f7f7;
+ 
   min-height: 100vh;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
 .judul {
@@ -14,12 +16,13 @@
 }
 
 .tabel-pesanan {
-  width: 100%;
+   width: 100%;
   border-collapse: collapse;
   background: white;
   border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  border: 1px solid #ddd;
 
 }
 

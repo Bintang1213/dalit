@@ -3,7 +3,7 @@
   top: 0;
   left: 0;
   width: 270px;
-  background-color: #b30000;
+  background: linear-gradient(180deg, #800000, #a83232); /* Senada dengan navbar */
   color: white;
   height: 100vh;
   display: flex;
@@ -35,7 +35,7 @@
   position: absolute;
   top: 20px;
   right: -18px;
-  background-color: #b30000;
+  background: linear-gradient(180deg, #800000, #a83232); /* Sama seperti sidebar */
   color: white;
   border: none;
   cursor: pointer;
@@ -69,15 +69,15 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  border-radius: 12px; /* Cembung */
+  border-radius: 12px;
   transition: all 0.3s ease;
 }
 
 .sidebar-option:hover {
   background-color: white;
   color: #b30000;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1); /* bayangan halus */
-  transform: translateY(-1px); /* sedikit mengangkat */
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  transform: translateY(-1px);
 }
 
 .menu-icon {
