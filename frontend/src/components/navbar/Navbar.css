@@ -63,8 +63,9 @@ body {
 .navbar-right {
   display: flex;
   align-items: center;
-  gap: 20px;
-  margin-right: 75px;
+  gap: 50px; 
+  margin-right: 0;
+  padding-right: 30px; 
 }
 
 .navbar-search-icon {
