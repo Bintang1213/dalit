@@ -142,9 +142,19 @@ const App = () => {
           </AnimatePresence>
         </div>
       </div>
-
       <Footer />
-      <ToastContainer position="top-right" autoClose={3000} />
+      <ToastContainer
+        position="top-right"   // ✅ ganti ke yang valid
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}    // ✅ biar urut normal
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        style={{ zIndex: 99999 }}  // ✅ pakai style, bukan toastStyle (toastStyle dipakai per-toast)
+      />
     </>
   );
 };
