@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState } from "react";
 import "./Cart.css";
 import { StoreContext } from "../../context/StoreContext";
 import { useNavigate } from "react-router-dom";
@@ -22,58 +22,127 @@ const Cart = () => {
   const navigate = useNavigate();
 
   const handleConfirm = () => {
-  if (!orderMethod) {
-    toast.warning("Silakan pilih metode pemesanan terlebih dahulu.", { 
-      style: { 
-        background: 'white',
-        color: 'black', 
-        fontWeight: 'bold', 
-        zIndex: 9999
-      },
-      autoClose: 2000
-    });
-    return;
-  }
+    if (!orderMethod) {
+      toast.warning("Silakan pilih metode pemesanan terlebih dahulu.", {
+        style: {
+          background: "white",
+          color: "black",
+          zIndex: 99999,
+        },
+        autoClose: 2000,
+      });
+      return;
+    }
 
-  if (!token) {
-    toast.error("Silakan login terlebih dahulu.", { 
-      style: { 
-        background: 'white', 
-        color: 'black', 
-        fontWeight: 'bold', 
-        zIndex: 9999
-      },
-      autoClose: 2000
-    });
+    if (!token) {
+      toast.error("Silakan login terlebih dahulu.", {
+        style: {
+          background: "white",
+          color: "black",
+          fontWeight: "bold",
+          zIndex: 99999,
+        },
+        autoClose: 2000,
+      });
 
-    // delay popup supaya toast terlihat dulu
-    setTimeout(() => {
-      setLoading(true);
+      // delay popup supaya toast terlihat dulu
       setTimeout(() => {
-        setLoading(false);
-        setShowLogin(true);
-      }, 500);
-    }, 100);
-    
-    return;
-  }
+        setLoading(true);
+        setTimeout(() => {
+          setLoading(false);
+          setShowLogin(true);
+        }, 500);
+      }, 100);
 
-  navigate("/order", { state: { method: orderMethod } });
-};
+      return;
+    }
+
+    navigate("/order", { state: { method: orderMethod } });
+  };
+
+  // 🔹 Handler hapus dengan konfirmasi pakai toast (hapus semua qty)
+  const handleRemove = (id, name) => {
+    toast(
+      ({ closeToast }) => (
+        <div style={{ textAlign: "center" }}>
+          <p>
+            Apakah Anda yakin ingin menghapus
+            <br /> <b>"{name}"</b> dari keranjang?
+          </p>
+          <div
+            style={{
+              marginTop: "10px",
+              display: "flex",
+              gap: "10px",
+              justifyContent: "center",
+            }}
+          >
+            <button
+              onClick={() => {
+                const qty = cartItems[id] || 0;
+                // panggil removeFromCart sebanyak qty agar item benar-benar habis
+                for (let i = 0; i < qty; i++) {
+                  removeFromCart(id);
+                }
+                toast.success(`"${name}" Berhasil dihapus dari keranjang.`, {
+                  style: { background: "white", color: "black" },
+                  autoClose: 2000,
+                });
+                closeToast();
+              }}
+              style={{
+                padding: "5px 12px",
+                background: "#dc3545",
+                color: "white",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer",
+              }}
+            >
+              Ya
+            </button>
+            <button
+              onClick={closeToast}
+              style={{
+                padding: "5px 12px",
+                background: "gray",
+                color: "white",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer",
+              }}
+            >
+              Batal
+            </button>
+          </div>
+        </div>
+      ),
+      {
+        style: {
+          background: "white",
+          color: "black",
+          zIndex: 99999,
+        },
+        autoClose: false, // tunggu pilihan user
+        closeOnClick: false,
+      }
+    );
+  };
 
   return (
     <div className="cart">
-      {/* 🔹 ToastContainer diatur supaya semua alert default posisi tengah */}
+      {/* 🔹 ToastContainer fix: pojok kanan atas dan di atas popup */}
       <ToastContainer
-        position="top-center"
-        autoClose={25000}
+        position="top-right"
+        autoClose={2500}
         hideProgressBar={false}
         newestOnTop={true}
-        closeOnClick
+        closeOnClick={false}
         rtl={false}
         pauseOnFocusLoss
         draggable
         pauseOnHover
+        style={{ zIndex: 99999 }}
       />
 
       {loading && (
@@ -109,16 +178,14 @@ const Cart = () => {
                   <img
                     src={url + "/images/" + item.image}
                     alt={item.name}
-                    onError={(e) =>
-                      (e.target.src = url + "/images/default.png")
-                    }
+                    onError={(e) => (e.target.src = url + "/images/default.png")}
                   />
                   <p>{item.name}</p>
                   <p>{item.price}</p>
                   <p>{cartItems[item._id]}</p>
                   <p>Rp{item.price * cartItems[item._id]}</p>
                   <p
-                    onClick={() => removeFromCart(item._id)}
+                    onClick={() => handleRemove(item._id, item.name)}
                     className="cross"
                     style={{ cursor: "pointer" }}
                   >
@@ -174,10 +241,7 @@ const Cart = () => {
               <h3>Rp. {getTotalCartAmount().toLocaleString()}</h3>
             </div>
 
-            <button
-              className="confirm-btn"
-              onClick={handleConfirm}
-            >
+            <button className="confirm-btn" onClick={handleConfirm}>
               Konfirmasi Pesanan
             </button>
           </div>

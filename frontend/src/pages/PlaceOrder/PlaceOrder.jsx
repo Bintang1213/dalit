@@ -33,6 +33,13 @@ const PlaceOrder = () => {
   const deliveryFee = method === "Diantar" ? 10000 : 0;
   const total = subtotal + serviceFee + deliveryFee;
 
+  // ===== Util style toast konsisten (putih, teks hitam, aksen warna) =====
+  const baseToast = { background: 'white', color: 'black', zIndex: 99999 };
+  const s = (accent) => ({ ...baseToast, borderLeft: `6px solid ${accent}` });
+  const GREEN = '#16a34a';   // sukses
+  const RED   = '#dc3545';   // error
+  const ORANGE= '#f59e0b';   // warning
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -43,14 +50,14 @@ const PlaceOrder = () => {
 
     const nameRegex = /^[A-Za-z\s.,']+$/;
     if (!formData.name || !nameRegex.test(formData.name)) {
-      toast.error("Nama hanya boleh huruf, spasi dan karakter.", { style: { background: 'white', color: 'black', fontWeight: 'bold' } });
+      toast.error("Nama hanya boleh huruf, spasi dan karakter.", { style: s(RED), autoClose: 2500 });
       return;
     }
 
     if (method === "Makan di Tempat") {
       const tableRegex = /^[0-9]+$/;
       if (!formData.tableNumber || !tableRegex.test(formData.tableNumber)) {
-        toast.error("Nomor Meja hanya boleh angka.", { style: { background: 'white', color: 'black', fontWeight: 'bold' } });
+        toast.error("Nomor Meja hanya boleh angka.", { style: s(RED), autoClose: 2500 });
         return;
       }
     }
@@ -58,23 +65,24 @@ const PlaceOrder = () => {
     if (method === "Diantar") {
       const phoneRegex = /^[0-9]{10,15}$/;
       if (!formData.phone || !phoneRegex.test(formData.phone)) {
-        toast.error("Nomor Telepon harus angka 10-15 digit.", { style: { background: 'white', color: 'black', fontWeight: 'bold' } });
+        toast.error("Nomor Telepon harus angka 10-15 digit.", { style: s(RED), autoClose: 2500 });
         return;
       }
       if (!formData.address || formData.address.trim().length < 5) {
-        toast.error("Alamat minimal 5 karakter.", { style: { background: 'white', color: 'black', fontWeight: 'bold' } });
+        toast.error("Alamat minimal 5 karakter.", { style: s(RED), autoClose: 2500 });
         return;
       }
     }
 
+    // 🔔 Alert khusus kalau lupa memilih metode pembayaran
     if (!formData.payment) {
-      toast.error("Pilih metode pembayaran.", { style: { background: 'white', color: 'black', fontWeight: 'bold' } });
+      toast.error("Silakan pilih metode pembayaran.", { style: s(RED), autoClose: 2500 });
       return;
     }
 
     const token = localStorage.getItem('token');
     if (!token) {
-      toast.error("Harus login terlebih dahulu.", { style: { background: 'white', color: 'black', fontWeight: 'bold' } });
+      toast.error("Harus login terlebih dahulu.", { style: s(RED), autoClose: 2500 });
       return;
     }
 
@@ -102,7 +110,7 @@ const PlaceOrder = () => {
 
       clearCart();
 
-      toast.success("Pesanan berhasil dibuat!", { style: { background: 'white', color: 'black', fontWeight: 'bold' } });
+      toast.success("Pesanan berhasil dibuat!", { style: s(GREEN), autoClose: 2500 });
 
       if (formData.payment === "Non-Tunai" && response.data.redirect_url) {
         window.location.href = response.data.redirect_url;
@@ -112,20 +120,36 @@ const PlaceOrder = () => {
 
     } catch (error) {
       console.error('Gagal mengirim pesanan:', error);
-      toast.error('Terjadi kesalahan saat mengirim pesanan.', { style: { background: 'white', color: 'black', fontWeight: 'bold' } });
+      toast.error('Terjadi kesalahan saat mengirim pesanan.', { style: s(RED), autoClose: 2500 });
     }
   };
 
+  // ⛳ Tombol disabled TIDAK lagi bergantung pada payment,
+  //    supaya user bisa klik dan dapat alert "Pilih metode pembayaran".
   const isFormIncomplete = () => {
-    if (!formData.name || !formData.payment) return true;
+    if (!formData.name) return true;
     if (method === "Makan di Tempat" && !formData.tableNumber) return true;
     if (method === "Diantar" && (!formData.phone || !formData.address)) return true;
+    // JANGAN cek payment di sini
     return false;
   };
 
   return (
     <div className="place-order-page">
-      <ToastContainer position="top-center" />
+      {/* Semua toast pojok kanan atas, selalu di atas popup */}
+      <ToastContainer
+        position="top-right"
+        autoClose={2500}
+        hideProgressBar={false}
+        newestOnTop={true}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        style={{ zIndex: 99999 }}
+      />
+
       <div className="back-button">
         <span className="back-arrow" onClick={() => navigate("/cart")}>&larr;</span>
         <h2>Kembali</h2>
