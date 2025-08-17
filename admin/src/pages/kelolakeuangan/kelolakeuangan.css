@@ -1,6 +1,6 @@
 .container-keuangan {
   width: calc(100% - 260px); /* 260px untuk sidebar + margin kecil */
-  margin-left: 260px; /* geser ke kanan supaya tidak tertutup sidebar */
+  margin-left: 270px; /* geser ke kanan supaya tidak tertutup sidebar */
   padding: 30px;
   background-color: #f7f7f7;
   font-family: 'Poppins', sans-serif;
@@ -41,7 +41,7 @@
   background: white;
   border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
   margin-top: 1px;
   border: 1px solid #ddd;
 }

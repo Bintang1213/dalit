@@ -1,11 +1,13 @@
+
+
 .kelola-menu-content {
-  width: 100%;
+  width: calc(100% - 260px); /* 260px untuk sidebar + margin kecil */
+  margin-left: 260px; /* geser ke kanan supaya tidak tertutup sidebar */
   padding: 30px;
-  padding-left: 270px; /* <--- ini tambahan penting */
-  box-sizing: border-box;
-  background-color: #f7f7f7;
+  
   font-family: 'Poppins', sans-serif;
-  min-height: 100vh;
+  padding-bottom: 300px;
+  position: relative;
 }
 
 

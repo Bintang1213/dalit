@@ -3,14 +3,22 @@
   display: flex;
   align-items: center;
   height: 90px;
-  background-color: white;
+  background: linear-gradient(90deg, #800000, #a83232); /* Maroon → merah tua */
   font-size: 20px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   padding: 0 20px;
-  margin-left: 250px; /* ruang untuk sidebar */
+  width: 100%;
   box-sizing: border-box;
-  position: relative;
+  position: fixed; /* Tetap di atas layar */
+  top: 0;
+  left: 0;
+  right: 0;
   z-index: 10;
+}
+
+/* Supaya konten tidak ketiban navbar */
+body {
+  padding-top: 90px; /* sama dengan tinggi navbar */
 }
 
 /* Kanan: isi navbar */
@@ -57,10 +65,6 @@
 
 /* Responsif */
 @media screen and (max-width: 992px) {
-  .navbar {
-    margin-left: 180px;
-  }
-
   .sticky-note {
     padding: 8px 16px;
     font-size: 15px;
@@ -68,10 +72,6 @@
 }
 
 @media screen and (max-width: 768px) {
-  .navbar {
-    margin-left: 150px;
-  }
-
   .sticky-note {
     padding: 6px 12px;
     font-size: 13px;
