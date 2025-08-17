@@ -21,16 +21,18 @@ const port = process.env.PORT || 4000;
 
 // Konfigurasi CORS yang lebih fleksibel
 const allowedOrigins = [
-  'http://localhost:5173', // Vite default port
-  'http://localhost:5174', // Port lain yang mungkin digunakan
+  'http://localhost:5173', 
+  'http://localhost:5174', 
   'https://1sj70g49-5173.asse.devtunnels.ms',
   'https://1sj70g49-5173.asse.devtunnels.ms',
-  process.env.FRONTEND_URL // Jika ada environment variable
+  'http://192.168.1.6:4000', 
+  'http://localhost:8081', 
+  process.env.FRONTEND_URL 
 ].filter(Boolean);
 
 const corsOptions = {
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
+    
     if (!origin) return callback(null, true);
 
     if (allowedOrigins.indexOf(origin) !== -1) {

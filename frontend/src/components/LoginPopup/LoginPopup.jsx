@@ -35,34 +35,25 @@ const LoginPopup = ({ setShowLogin, onLoginSuccess }) => {
           setToken(response.data.token);
           localStorage.setItem("token", response.data.token);
 
-          // Toast sukses login dengan durasi 2500ms
           toast.success("Anda berhasil login", {
-            position: "top-center",
             autoClose: 2500,
             onClose: () => {
-              setShowLogin(false);         // popup hilang setelah toast selesai
-              onLoginSuccess?.();          // panggil callback dropdown akun
+              setShowLogin(false);
+              onLoginSuccess?.();
             },
           });
         } else {
           toast.success("Registrasi berhasil! Silakan login.", {
-            position: "top-center",
             autoClose: 2500,
           });
           setCurrState("Login");
           setData({ name: "", email: "", password: "" });
         }
       } else {
-        toast.error(response.data.message, {
-          position: "top-center",
-          autoClose: 2500,
-        });
+        toast.error(response.data.message, { autoClose: 2500 });
       }
     } catch (error) {
-      toast.error("Terjadi kesalahan. Silakan coba lagi.", {
-        position: "top-center",
-        autoClose: 2500,
-      });
+      toast.error("Terjadi kesalahan. Silakan coba lagi.", { autoClose: 2500 });
       console.error(error);
     } finally {
       setLoading(false);
@@ -71,7 +62,20 @@ const LoginPopup = ({ setShowLogin, onLoginSuccess }) => {
 
   return (
     <div className="login-popup">
-      <ToastContainer />
+      {/* 🔹 Tambahin ToastContainer sekali aja di sini */}
+      <ToastContainer
+        position="top-right"
+        autoClose={2500}
+        hideProgressBar={false}
+        newestOnTop={true}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        toastStyle={{ background: "white", color: "black" }}
+      />
+
       <form onSubmit={onLogin} className="login-popup-container">
         <div className="login-popup-title">
           <h2>{currState === "Login" ? "Masuk" : "Daftar"}</h2>
@@ -146,10 +150,9 @@ const LoginPopup = ({ setShowLogin, onLoginSuccess }) => {
           <p
             style={{ marginTop: "10px", color: "#007bff", cursor: "pointer" }}
             onClick={() =>
-              toast.info(
-                "Fitur lupa password belum tersedia. Hubungi admin.",
-                { position: "top-center", autoClose: 2500 }
-              )
+              toast.info("Fitur lupa password belum tersedia. Hubungi admin.", {
+                autoClose: 2500,
+              })
             }
           >
             Lupa kata sandi?

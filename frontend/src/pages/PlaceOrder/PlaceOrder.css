@@ -54,10 +54,10 @@
   
   .payment-label {
     font-weight: bold;
+    font-size: 23px;
     margin: 20px 0 10px;
     margin-top: 10%;
   }
-  
   .payment-options {
     display: flex;
     gap: 30px;

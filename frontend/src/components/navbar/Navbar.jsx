@@ -22,12 +22,19 @@ const Navbar = ({ setShowLogin }) => {
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem("token");
-    setToken(""); 
-    setShowProfileDropdown(false); 
-    toast.success("Anda berhasil logout ✅", { position: "top-center", autoClose: 2500 });
-  };
+  const handleLogout = () => {
+  localStorage.removeItem("token");
+  setToken(""); // reset token di context juga biar langsung ke-update
+
+  toast.success("Anda berhasil logout", {
+    style: { background: "white", color: "black" }
+  });
+
+  // kasih delay dikit supaya toast sempet muncul sebelum login form tampil
+  setTimeout(() => {
+    setShowLogin(true);
+  }, 300);
+};
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -91,9 +98,9 @@ const Navbar = ({ setShowLogin }) => {
                   <li className="dropdown-item email">
                     <i className="bi bi-envelope"></i> {user?.email}
                   </li>
-                  <li className="dropdown-item logout" onClick={logout}>
-                    <i className="bi bi-box-arrow-right"></i> Keluar
-                  </li>
+                  <li className="dropdown-item logout" onClick={handleLogout}>
+                  <i className="bi bi-box-arrow-right"></i> Keluar
+                </li>
                 </ul>
               )}
             </div>
