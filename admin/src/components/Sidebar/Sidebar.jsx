@@ -1,8 +1,15 @@
 import React, { useState } from 'react';
 import './sidebar.css';
 import { NavLink } from 'react-router-dom';
-import { FaTachometerAlt, FaUtensils, FaClipboardList, FaUsers, FaMoneyBillWave, FaSignOutAlt } from 'react-icons/fa';
-import tengkoLogo from '../../assets/tengko.png'; // Pastikan path ini sesuai dengan struktur folder kamu
+import {
+  FaTachometerAlt,
+  FaUtensils,
+  FaClipboardList,
+  FaUsers,
+  FaMoneyBillWave,
+  FaSignOutAlt,
+} from 'react-icons/fa';
+import tengkoLogo from '../../assets/tengko.png';
 
 const Sidebar = () => {
   const [isClosed, setIsClosed] = useState(false);
@@ -13,17 +20,17 @@ const Sidebar = () => {
 
   return (
     <div className={`sidebar ${isClosed ? 'closed' : ''}`}>
-      {/* Logo Utama */}
-      <div className="sidebar-header">
-        <img src={tengkoLogo} alt="Logo Wartiyem" className="sidebar-logo" />
-      </div>
-
-      {/* Tombol Toggle */}
+      {/* Tombol Toggle di luar header dan menu */}
       <button className="toggle-btn" onClick={toggleSidebar}>
         {isClosed ? '☰' : '⮜'}
       </button>
 
-      {/* Menu */}
+      {/* Logo (hanya muncul jika sidebar terbuka) */}
+      <div className="sidebar-header">
+        <img src={tengkoLogo} alt="Logo Wartiyem" className="sidebar-logo" />
+      </div>
+
+      {/* Menu Options */}
       <div className="sidebar-options">
         <NavLink to="/dashboard" className="sidebar-option" activeclassname="active">
           <FaTachometerAlt className="menu-icon" />

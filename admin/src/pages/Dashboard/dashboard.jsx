@@ -1,4 +1,3 @@
-// Dashboard.jsx
 import React, { useEffect, useState } from 'react';
 import Axios from 'axios';
 import { Bar } from 'react-chartjs-2';
@@ -147,11 +146,11 @@ const Dashboard = () => {
             <div className="stats-section">
               {[
                 { icon: '🍽️', title: 'Jumlah Menu', value: dashboardData.jumlahMenu, link: '/kelolamenu' },
-                { icon: '👥', title: 'Jumlah Pelanggan', value: dashboardData.jumlahPelanggan, link: '/kelolapesanan' },
+                { icon: '👥', title: 'Jumlah Pelanggan', value: dashboardData.jumlahPelanggan, link: '/kelolapengguna' },
                 { icon: '💰', title: 'Penjualan Bulan Ini', value: dashboardData.jumlahPenjualan, link: '/kelolapesanan' },
                 { icon: '📊', title: 'Pemasukan Bulan Ini', value: `Rp ${dashboardData.totalPemasukan.toLocaleString('id-ID')}`, link: '/kelolakeuangan' }
               ].map((card, index) => (
-                <div key={index} className="stat-card" style={{ backgroundColor: cardColors[index].bg }}>
+                <div key={index} className={`stat-card card-${index}`} style={{ backgroundColor: cardColors[index].bg }}>
                   <div className="stat-icon" style={{ backgroundColor: cardColors[index].iconBg, color: cardColors[index].iconColor }}>
                     {card.icon}
                   </div>
