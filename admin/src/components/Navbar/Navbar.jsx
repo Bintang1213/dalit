@@ -9,7 +9,7 @@ const Navbar = () => {
     <div className="navbar">
       <div className="navbar-content">
         <div className="sticky-note">
-          <span>Hi, {adminName}</span>
+          <span>Hi {adminName}</span>
           <FaUser />
         </div>
       </div>
