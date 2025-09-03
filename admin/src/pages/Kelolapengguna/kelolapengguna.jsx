@@ -14,7 +14,8 @@ const KelolaPengguna = () => {
 
   const getPengguna = async () => {
     try {
-      const res = await axios.get("http://localhost:4000/api/user/all");
+      // 🔹 Ubah endpoint dari /all ke /
+      const res = await axios.get("http://localhost:4000/api/user/");
       if (res.data.success) {
         setPengguna(res.data.data);
       } else {
@@ -91,8 +92,8 @@ const KelolaPengguna = () => {
         </tbody>
       </table>
 
-       {/* Pagination */}
-       <div className="pagination-controls">
+      {/* Pagination */}
+      <div className="pagination-controls">
         <span
           className="pagination-arrow"
           onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
