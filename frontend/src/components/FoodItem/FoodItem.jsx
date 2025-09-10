@@ -5,12 +5,11 @@ import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { FaPlus, FaMinus } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 
-const FoodItem = ({ id, name, price, description, image }) => {
+const FoodItem = ({ id, name, price, description, image, status }) => {
   const { cartItems, addToCart, removeFromCart, url } = useContext(StoreContext);
 
   const handleAdd = () => {
     addToCart(id);
-    // Gunakan toast ID unik agar tidak menumpuk untuk menu yang sama
     toast.success(`${name} berhasil ditambahkan ke keranjang!`, {
       toastId: `add-${id}`,
       position: "top-right",
@@ -62,9 +61,15 @@ const FoodItem = ({ id, name, price, description, image }) => {
         <p className="food-item-name">{name}</p>
         <p className="food-item-desc">{description}</p>
         <p className="food-item-price">Rp. {price}</p>
+        <p className="food-item-status">
+          Status:{" "}
+          <span className={status === "Aktif" ? "status-aktif" : "status-nonaktif"}>
+            {status || "Tidak Diketahui"}
+          </span>
+        </p>
       </div>
     </div>
   );
-}
+};
 
 export default FoodItem;

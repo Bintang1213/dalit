@@ -20,14 +20,15 @@ const Menu = () => {
             <div className="menu-category-line"></div>
             <div className="menu-items">
               {items.map((item) => (
-                <FoodItem
-                  key={item._id}
-                  id={item._id}
-                  name={item.name}
-                  description={item.description}
-                  price={item.price}
-                  image={item.image}
-                />
+               <FoodItem
+               key={item._id}
+               id={item._id}
+               name={item.name}
+               description={item.description}
+               price={item.price}
+               image={item.image}
+               status={item.status}  
+             />             
               ))}
             </div>
           </div>

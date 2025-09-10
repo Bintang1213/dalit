@@ -250,3 +250,28 @@
     height: 60px;
   }
 }
+
+/* Badge Status */
+.status-badge {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.status-tersedia {
+  background-color: #4caf50;
+  color: white;
+}
+
+.status-habis {
+  background-color: #f44336;
+  color: white;
+}
+
+.status-badge:hover {
+  opacity: 0.8;
+}

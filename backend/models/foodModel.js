@@ -5,7 +5,8 @@ const foodSchema = new mongoose.Schema({
     description: { type: String, required: true },
     price: { type: Number, required: true }, // Menggunakan Number untuk harga
     image: { type: String, required: true },
-    category: { type: String, required: true }
+    category: { type: String, required: true },
+    status: { type: String, enum: ["Tersedia", "Habis"], default: "Tersedia" } // ✅ field baru
 });
 
 const foodModel = mongoose.models.food || mongoose.model("food", foodSchema);
