@@ -176,3 +176,18 @@
   transform: translateY(-5px);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.874);
 }
+ 
+.food-item-status {
+  font-size: 0.9rem;
+  margin-top: 4px;
+}
+
+.status-aktif {
+  color: green;
+  font-weight: bold;
+}
+
+.status-nonaktif {
+  color: red;
+  font-weight: bold;
+}

@@ -3,8 +3,8 @@ import fs from 'fs';
 
 // add food item
 const addFood = async (req, res) => {
-  console.log("REQ.FILE:", req.file); // Debug file upload
-  console.log("REQ.BODY:", req.body); // Debug data input
+  console.log("REQ.FILE:", req.file); 
+  console.log("REQ.BODY:", req.body); 
 
   try {
     if (!req.file) {
@@ -21,6 +21,7 @@ const addFood = async (req, res) => {
       description: req.body.description,
       price: req.body.price,
       category: req.body.category,
+      status: req.body.status || "Tersedia",   // ✅ simpan status
       image: image_filename
     });
 
@@ -67,7 +68,7 @@ const removeFood = async (req,res) => {
 // edit food item
 const editFood = async (req, res) => {
   try {
-    const { id, name, description, price, category } = req.body;
+    const { id, name, description, price, category, status } = req.body;
 
     const food = await foodModel.findById(id);
     if (!food) {
@@ -78,11 +79,10 @@ const editFood = async (req, res) => {
     food.description = description;
     food.price = price;
     food.category = category;
+    food.status = status || food.status;   // ✅ update status
 
     if (req.file) {
-      // Jika ada gambar baru diunggah
       if (food.image) {
-        // Hapus gambar lama jika ada
         fs.unlink(`uploads/${food.image}`, (err) => {
           if (err) {
             console.error("Gagal menghapus gambar lama:", err);

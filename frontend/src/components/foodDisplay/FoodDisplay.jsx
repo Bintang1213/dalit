@@ -12,15 +12,18 @@ const FoodDisplay = ({ category }) => {
   const listRef = useRef(null);
 
   useEffect(() => {
-    gsap.fromTo(listRef.current, 
-      { opacity: 0, y: 50 }, 
+    gsap.fromTo(
+      listRef.current,
+      { opacity: 0, y: 50 },
       {
-        opacity: 1, y: 0, duration: 0.8, 
+        opacity: 1,
+        y: 0,
+        duration: 0.8,
         scrollTrigger: {
           trigger: listRef.current,
-          start: "top 80%",
-          toggleActions: "play none none none"
-        }
+          start: 'top 80%',
+          toggleActions: 'play none none none',
+        },
       }
     );
   }, []);
@@ -31,7 +34,15 @@ const FoodDisplay = ({ category }) => {
       <div className="food-display-list" ref={listRef}>
         {food_list.map((item, index) => (
           (category === "All" || category === item.category) && (
-            <FoodItem key={index} id={item._id} name={item.name} description={item.description} price={item.price} image={item.image} />
+            <FoodItem
+              key={index}
+              id={item._id}
+              name={item.name}
+              description={item.description}
+              price={item.price}
+              image={item.image}
+              status={item.status ? item.status : "Tidak diketahui"} 
+            />
           )
         ))}
       </div>

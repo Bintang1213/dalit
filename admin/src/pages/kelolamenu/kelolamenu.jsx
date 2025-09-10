@@ -65,6 +65,25 @@ const Kelolamenu = ({ url }) => {
     setShowEditPopup(true);
   };
 
+  // Toggle Status
+  const toggleStatus = async (item) => {
+    try {
+      const newStatus = item.status === "Tersedia" ? "Habis" : "Tersedia";
+      const response = await axios.post(`${url}/api/food/update-status`, {
+        id: item._id,
+        status: newStatus,
+      });
+      if (response.data.succes) {
+        toast.success("Status berhasil diperbarui");
+        fetchList();
+      } else {
+        toast.error("Gagal memperbarui status");
+      }
+    } catch (err) {
+      toast.error("Terjadi kesalahan server");
+    }
+  };
+
   useEffect(() => {
     fetchList();
   }, []);
@@ -83,6 +102,7 @@ const Kelolamenu = ({ url }) => {
             <th>Nama</th>
             <th>Kategori</th>
             <th>Harga</th>
+            <th>Status</th>
             <th>Aksi</th>
           </tr>
         </thead>
@@ -93,6 +113,14 @@ const Kelolamenu = ({ url }) => {
               <td>{item.name}</td>
               <td>{item.category}</td>
               <td>{item.price}</td>
+              <td>
+                <span
+                  className={`status-badge ${item.status === "Tersedia" ? "status-tersedia" : "status-habis"}`}
+                  onClick={() => toggleStatus(item)}
+                >
+                  {item.status || "Tersedia"}
+                </span>
+              </td>
               <td className='aksi-buttons'>
                 <button onClick={() => handleEditClick(item)} className="edit-btn">Edit</button>
                 <button onClick={() => handleDeleteClick(item._id)} className="delete-btn">Hapus</button>

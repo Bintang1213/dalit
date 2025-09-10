@@ -13,6 +13,7 @@ const Add = ({ url, onClose, editData }) => {
     description: '',
     price: '',
     category: 'Paket Nasi Liwet',
+    status: 'Tersedia', // ✅ default status
   });
 
   useEffect(() => {
@@ -22,6 +23,7 @@ const Add = ({ url, onClose, editData }) => {
         description: editData.description,
         price: editData.price,
         category: editData.category,
+        status: editData.status || 'Tersedia', // ✅ ambil status lama
       });
     } else {
       setData({
@@ -29,6 +31,7 @@ const Add = ({ url, onClose, editData }) => {
         description: '',
         price: '',
         category: 'Paket Nasi Liwet',
+        status: 'Tersedia',
       });
       setImage(null);
     }
@@ -46,6 +49,7 @@ const Add = ({ url, onClose, editData }) => {
     formData.append('description', data.description);
     formData.append('price', Number(data.price));
     formData.append('category', data.category);
+    formData.append('status', data.status); // ✅ kirim status
 
     if (image) {
       formData.append('image', image);
@@ -81,6 +85,7 @@ const Add = ({ url, onClose, editData }) => {
             {editData ? 'EDIT MENU' : 'TAMBAH MENU'}
           </h2>
 
+          {/* Upload Gambar */}
           <div className="add-img-upload">
             <p>Upload Gambar</p>
             <label htmlFor="image">
@@ -113,6 +118,7 @@ const Add = ({ url, onClose, editData }) => {
             />
           </div>
 
+          {/* Nama Produk */}
           <div className="add-product-nama">
             <p>Nama Produk</p>
             <input
@@ -125,6 +131,7 @@ const Add = ({ url, onClose, editData }) => {
             />
           </div>
 
+          {/* Deskripsi Produk */}
           <div className="add-product-description">
             <p>Deskripsi Produk</p>
             <textarea
@@ -137,6 +144,7 @@ const Add = ({ url, onClose, editData }) => {
             ></textarea>
           </div>
 
+          {/* Kategori */}
           <div className="add-category">
             <p>Kategori</p>
             <select onChange={onChangeHandler} name="category" value={data.category}>
@@ -148,6 +156,7 @@ const Add = ({ url, onClose, editData }) => {
             </select>
           </div>
 
+          {/* Harga */}
           <div className="add-category-price">
             <p>Harga</p>
             <input
@@ -158,6 +167,15 @@ const Add = ({ url, onClose, editData }) => {
               placeholder="Rp."
               required
             />
+          </div>
+
+          {/* Status Menu */}
+          <div className="add-status">
+            <p>Status Menu</p>
+            <select onChange={onChangeHandler} name="status" value={data.status}>
+              <option value="Tersedia">Tersedia</option>
+              <option value="Habis">Habis</option>
+            </select>
           </div>
 
           <button type="submit" className="add-btn">
