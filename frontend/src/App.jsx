@@ -1,18 +1,19 @@
-import { motion } from 'framer-motion'; 
-import Navbar from './components/navbar/Navbar';
-import { Route, Routes, useLocation } from 'react-router-dom';
-import Home from './pages/Home/Home';
-import Cart from './pages/Cart/Cart';
-import PlaceOrder from './pages/PlaceOrder/PlaceOrder';
-import Footer from './components/Footer/Footer';
-import LoginPopup from './components/LoginPopup/LoginPopup';
-import { useState } from 'react';
-import { AnimatePresence } from 'framer-motion'; 
-import OrderHistory from './pages/OrderHistory/OrderHistory';
-import About from './pages/About/About';
-import Midtrans from './pages/Midtrans/Midtrans';
-import Struk from './components/Struk/Struk';
-import Menu from './pages/Menu/Menu';
+import { motion } from "framer-motion";
+import Navbar from "./components/navbar/Navbar";
+import { Route, Routes, useLocation } from "react-router-dom";
+import Home from "./pages/Home/Home";
+import Cart from "./pages/Cart/Cart";
+import PlaceOrder from "./pages/PlaceOrder/PlaceOrder";
+import Footer from "./components/Footer/Footer";
+import LoginPopup from "./components/LoginPopup/LoginPopup";
+import { useState } from "react";
+import { AnimatePresence } from "framer-motion";
+import OrderHistory from "./pages/OrderHistory/OrderHistory";
+import About from "./pages/About/About";
+import Midtrans from "./pages/Midtrans/Midtrans";
+import Struk from "./components/Struk/Struk";
+import Menu from "./pages/Menu/Menu";
+import Chat from "./pages/Chat/Chat";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -23,19 +24,18 @@ const App = () => {
   return (
     <>
       {showLogin && <LoginPopup setShowLogin={setShowLogin} />}
-
       <div className="app">
-        {location.pathname !== '/cart' &&
-         location.pathname !== '/order' &&
-         location.pathname !== '/struk' && (
-          <Navbar setShowLogin={setShowLogin} />
-        )}
+        {location.pathname !== "/cart" &&
+          location.pathname !== "/order" &&
+          location.pathname !== "/struk" && (
+            <Navbar setShowLogin={setShowLogin} />
+          )}
 
         <div>
           <AnimatePresence mode="wait">
             <Routes location={location} key={location.pathname}>
-              <Route 
-                path='/' 
+              <Route
+                path="/"
                 element={
                   <motion.div
                     initial={{ opacity: 0, x: -50 }}
@@ -45,10 +45,10 @@ const App = () => {
                   >
                     <Home />
                   </motion.div>
-                } 
+                }
               />
-              <Route 
-                path='/Menu' 
+              <Route
+                path="/menu"
                 element={
                   <motion.div
                     initial={{ opacity: 0, x: -50 }}
@@ -58,10 +58,10 @@ const App = () => {
                   >
                     <Menu />
                   </motion.div>
-                } 
+                }
               />
-              <Route 
-                path='/cart' 
+              <Route
+                path="/cart"
                 element={
                   <motion.div
                     initial={{ opacity: 0, scale: 0.8 }}
@@ -71,10 +71,10 @@ const App = () => {
                   >
                     <Cart />
                   </motion.div>
-                } 
+                }
               />
-              <Route 
-                path='/order' 
+              <Route
+                path="/order"
                 element={
                   <motion.div
                     initial={{ opacity: 0, y: 50 }}
@@ -84,10 +84,10 @@ const App = () => {
                   >
                     <PlaceOrder />
                   </motion.div>
-                } 
+                }
               />
-              <Route 
-                path='/struk' 
+              <Route
+                path="/struk"
                 element={
                   <motion.div
                     initial={{ opacity: 0, y: 30 }}
@@ -97,10 +97,10 @@ const App = () => {
                   >
                     <Struk />
                   </motion.div>
-                } 
+                }
               />
-              <Route 
-                path='/riwayat' 
+              <Route
+                path="/riwayat"
                 element={
                   <motion.div
                     initial={{ opacity: 0, y: 30 }}
@@ -112,8 +112,8 @@ const App = () => {
                   </motion.div>
                 }
               />
-              <Route 
-                path='/tentang-kami'
+              <Route
+                path="/tentang-kami"
                 element={
                   <motion.div
                     initial={{ opacity: 0, x: 30 }}
@@ -125,8 +125,8 @@ const App = () => {
                   </motion.div>
                 }
               />
-              <Route 
-                path='/midtrans-simulator' 
+              <Route
+                path="/midtrans-simulator"
                 element={
                   <motion.div
                     initial={{ opacity: 0, scale: 0.8 }}
@@ -138,22 +138,35 @@ const App = () => {
                   </motion.div>
                 }
               />
+              <Route
+                path="/chat"
+                element={
+                  <motion.div
+                    initial={{ opacity: 0, y: 50 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -50 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <Chat />
+                  </motion.div>
+                }
+              />
             </Routes>
           </AnimatePresence>
         </div>
       </div>
       <Footer />
       <ToastContainer
-        position="top-right"   // ✅ ganti ke yang valid
+        position="top-right"
         autoClose={3000}
         hideProgressBar={false}
-        newestOnTop={false}    // ✅ biar urut normal
+        newestOnTop={false}
         closeOnClick
         rtl={false}
         pauseOnFocusLoss
         draggable
         pauseOnHover
-        style={{ zIndex: 99999 }}  // ✅ pakai style, bukan toastStyle (toastStyle dipakai per-toast)
+        style={{ zIndex: 99999 }}
       />
     </>
   );

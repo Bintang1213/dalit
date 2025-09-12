@@ -1,0 +1,125 @@
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  height: 80vh;
+  max-width: 700px;
+  margin: 2rem auto;
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.chat-title {
+  font-size: 20px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 12px;
+  color: #222;
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  background: #fff;
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.chat-message {
+  display: flex;
+  max-width: 70%;
+}
+
+.chat-message.user {
+  justify-content: flex-end;
+  margin-left: auto;
+}
+
+.chat-message.server {
+  justify-content: flex-start;
+  margin-right: auto;
+}
+
+.chat-bubble {
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.4;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+.chat-message.user .chat-bubble {
+  background: crimson;
+  color: #fff;
+  border-bottom-right-radius: 4px;
+}
+
+.chat-message.server .chat-bubble {
+  background: #e9ecef;
+  color: #333;
+  border-bottom-left-radius: 4px;
+}
+
+.chat-sender {
+  font-size: 11px;
+  font-weight: bold;
+  margin-bottom: 4px;
+  opacity: 0.8;
+}
+
+.chat-empty {
+  text-align: center;
+  color: #777;
+  margin: auto 0;
+}
+
+.chat-input-container {
+  display: flex;
+}
+
+.chat-input {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-right: none;
+  border-radius: 8px 0 0 8px;
+  outline: none;
+  font-size: 14px;
+  transition: border-color 0.3s ease;
+}
+
+.chat-input:focus {
+  border-color: crimson;
+}
+
+.chat-send-btn {
+  background: crimson;
+  color: #fff;
+  border: none;
+  padding: 0 20px;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 0 8px 8px 0;
+  transition: background 0.3s ease;
+}
+
+.chat-send-btn:hover {
+  background: crimson;
+}
+
+.chat-error {
+  padding: 20px;
+  text-align: center;
+  color: #d9534f;
+}
+
+.chat-loading {
+  padding: 20px;
+  text-align: center;
+  color: #555;
+}
