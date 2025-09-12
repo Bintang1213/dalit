@@ -141,8 +141,6 @@ const AdminChat = () => {
     const getSenderDisplayName = (msg) => {
         if (!msg) return '';
         if (msg.senderType === 'Admin') return 'Anda';
-        // ✅ Perbaikan: Gunakan `msg.senderName` jika tersedia, jika tidak, gunakan `selectedConversation.userName`.
-        // Ini memastikan nama dari daftar chat (contoh: "om") akan digunakan sebagai fallback.
         if (msg.senderName) {
             return msg.senderName;
         }

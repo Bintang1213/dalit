@@ -111,7 +111,7 @@ io.on('connection', (socket) => {
       if (!chat) {
         chat = new chatModel({
           conversationId,
-          // Gunakan senderName jika ada, jika tidak, gunakan "Pengguna"
+          
           userName: senderType === 'User' ? senderName : 'Admin'
         });
       }
