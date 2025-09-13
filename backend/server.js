@@ -15,6 +15,9 @@ import chatRouter from "./routes/chatRoutes.js";
 import chatModel from "./models/chatModel.js";
 import jwt from "jsonwebtoken";
 
+// ✅ Tambahan voucher router
+import voucherRouter from "./routes/voucherRoutes.js";
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -94,8 +97,15 @@ app.use("/api/food", foodRouter);
 app.use("/api/user", userRouter);
 app.use("/api/cart", cartRouter);
 app.use("/api/admin", adminRouter);
+
+
+// ✅ Perbaikan: pakai /api/order (plural) biar konsisten
 app.use("/api/order", orderRouter);
+
 app.use("/api/chat", chatRouter);
+
+// ✅ Tambahan route voucher
+app.use("/api/vouchers", voucherRouter);
 
 app.get("/", (req, res) => {
   res.send("API Working");

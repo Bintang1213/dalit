@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
 import Sidebar from './components/Sidebar/Sidebar';
 import Navbar from './components/Navbar/Navbar';
 import Add from './pages/Add/Add';
@@ -17,6 +16,10 @@ import Login from './pages/login/login';
 import Logout from './pages/logout';
 import PrivateRoute from './components/PrivateRoute';
 import AdminChat from './pages/AdminChat/AdminChat';
+
+
+// 👉 Tambahin import baru untuk Kelola Voucher
+import Kelolavoucher from './pages/Kelolavoucher/kelolavoucher';
 
 const App = () => {
   const url = "http://localhost:4000";
@@ -80,6 +83,9 @@ const App = () => {
           <Route path="/kelolapesanan" element={<PrivateRoute><Kelolapesanan url={url} /></PrivateRoute>} />
           <Route path="/kelolapengguna" element={<PrivateRoute><Kelolapengguna url={url} /></PrivateRoute>} />
           <Route path="/kelolakeuangan" element={<PrivateRoute><Kelolakeuangan url={url} /></PrivateRoute>} />
+
+          {/* 👉 Rute baru untuk Kelola Voucher */}
+          <Route path="/kelolavoucher" element={<PrivateRoute><Kelolavoucher url={url} /></PrivateRoute>} />
 
           {/* Chat admin */}
           <Route path="/chat" element={<PrivateRoute><AdminChat /></PrivateRoute>} />
