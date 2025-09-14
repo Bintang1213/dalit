@@ -1,63 +1,106 @@
-import React, { useContext, useState } from 'react';
-import './PlaceOrder.css';
-import { StoreContext } from '../../context/StoreContext';
-import { useLocation, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import moment from 'moment-timezone';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import React, { useContext, useState, useEffect } from "react";
+import "./PlaceOrder.css";
+import { StoreContext } from "../../context/StoreContext";
+import { useLocation, useNavigate } from "react-router-dom";
+import axios from "axios";
+import moment from "moment-timezone";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const PlaceOrder = () => {
-  const {
-    cartItems,
-    food_list,
-    getTotalCartAmount,
-    clearCart,
-  } = useContext(StoreContext);
+  const { cartItems, food_list, getTotalCartAmount, clearCart } =
+    useContext(StoreContext);
 
   const navigate = useNavigate();
   const location = useLocation();
   const method = location.state?.method || "Makan di Tempat";
 
   const [formData, setFormData] = useState({
-    name: '',
-    tableNumber: '',
-    phone: '',
-    address: '',
-    note: '',
-    payment: ''
+    name: "",
+    tableNumber: "",
+    phone: "",
+    address: "",
+    note: "",
+    payment: "",
   });
+
+  const [voucherList, setVoucherList] = useState([]);
+  const [voucherApplied, setVoucherApplied] = useState(null);
+  const [discountAmount, setDiscountAmount] = useState(0);
 
   const subtotal = getTotalCartAmount();
   const serviceFee = subtotal * 0.1;
   const deliveryFee = method === "Diantar" ? 10000 : 0;
-  const total = subtotal + serviceFee + deliveryFee;
+  const total = subtotal + serviceFee + deliveryFee - discountAmount;
 
-  // ===== Util style toast konsisten (putih, teks hitam, aksen warna) =====
-  const baseToast = { background: 'white', color: 'black', zIndex: 99999 };
-  const s = (accent) => ({ ...baseToast, borderLeft: `6px solid ${accent}` });
-  const GREEN = '#16a34a';   // sukses
-  const RED   = '#dc3545';   // error
-  const ORANGE= '#f59e0b';   // warning
+  // 🔹 Ambil voucher dari backend
+  useEffect(() => {
+    const fetchVouchers = async () => {
+      try {
+        const res = await axios.get("http://localhost:4000/api/vouchers");
+        setVoucherList(res.data || []);
+      } catch (err) {
+        console.error("Gagal fetch voucher:", err);
+        toast.error("Tidak bisa mengambil data voucher.");
+      }
+    };
+    fetchVouchers();
+  }, [subtotal]);
 
+ // 🔹 Terapkan voucher (ke DB + hitung diskon)
+const applyVoucher = async (voucher) => {
+  try {
+    const token = localStorage.getItem("token"); // pake token, bukan userId langsung
+    if (!token) {
+      toast.error("Harus login untuk pakai voucher.");
+      return;
+    }
+
+    const res = await axios.post(
+      "http://localhost:4000/api/vouchers/apply",
+      { voucherId: voucher._id }, // cukup kirim voucherId aja
+      { headers: { Authorization: `Bearer ${token}` } } // userId auto dari token
+    );
+
+    const data = res.data.voucher;
+    let discount = 0;
+
+    if (data.discountType === "percent") {
+      discount = (data.discountValue / 100) * subtotal;
+    } else {
+      discount = data.discountValue;
+    }
+
+    setVoucherApplied(voucher);
+    setDiscountAmount(discount);
+    toast.success("Voucher berhasil digunakan!");
+  } catch (err) {
+    console.error("Gagal apply voucher:", err);
+    toast.error(err.response?.data?.message || "Voucher tidak bisa digunakan");
+  }
+};
+
+
+  // 🔹 Input handler
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // 🔹 Kirim pesanan
   const handleOrder = async (e) => {
     e.preventDefault();
 
     const nameRegex = /^[A-Za-z\s.,']+$/;
     if (!formData.name || !nameRegex.test(formData.name)) {
-      toast.error("Nama hanya boleh huruf, spasi dan karakter.", { style: s(RED), autoClose: 2500 });
+      toast.error("Nama hanya boleh huruf, spasi dan karakter.");
       return;
     }
 
     if (method === "Makan di Tempat") {
       const tableRegex = /^[0-9]+$/;
       if (!formData.tableNumber || !tableRegex.test(formData.tableNumber)) {
-        toast.error("Nomor Meja hanya boleh angka.", { style: s(RED), autoClose: 2500 });
+        toast.error("Nomor Meja hanya boleh angka.");
         return;
       }
     }
@@ -65,128 +108,195 @@ const PlaceOrder = () => {
     if (method === "Diantar") {
       const phoneRegex = /^[0-9]{10,15}$/;
       if (!formData.phone || !phoneRegex.test(formData.phone)) {
-        toast.error("Nomor Telepon harus angka 10-15 digit.", { style: s(RED), autoClose: 2500 });
+        toast.error("Nomor Telepon harus angka 10-15 digit.");
         return;
       }
       if (!formData.address || formData.address.trim().length < 5) {
-        toast.error("Alamat minimal 5 karakter.", { style: s(RED), autoClose: 2500 });
+        toast.error("Alamat minimal 5 karakter.");
         return;
       }
     }
 
-    // 🔔 Alert khusus kalau lupa memilih metode pembayaran
     if (!formData.payment) {
-      toast.error("Silakan pilih metode pembayaran.", { style: s(RED), autoClose: 2500 });
+      toast.error("Silakan pilih metode pembayaran.");
       return;
     }
 
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (!token) {
-      toast.error("Harus login terlebih dahulu.", { style: s(RED), autoClose: 2500 });
+      toast.error("Harus login terlebih dahulu.");
       return;
     }
 
     const orderedItems = food_list
-      .filter(item => cartItems[item._id] > 0)
-      .map(item => ({
+      .filter((item) => cartItems[item._id] > 0)
+      .map((item) => ({
         _id: item._id,
         name: item.name,
         quantity: cartItems[item._id],
-        price: item.price
+        price: item.price,
       }));
 
     const orderData = {
       ...formData,
       method,
       items: orderedItems,
+      subtotal,
+      discount: discountAmount,
       totalAmount: total,
-      createdAt: moment().tz('Asia/Jakarta').format()
+      voucherType: voucherApplied ? voucherApplied.discountType : null,
+      voucherValue: voucherApplied ? voucherApplied.discountValue : null,
+      createdAt: moment().tz("Asia/Jakarta").format(),
     };
 
     try {
-      const response = await axios.post('http://localhost:4000/api/order', orderData, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await axios.post(
+        "http://localhost:4000/api/order",
+        orderData,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
       clearCart();
-
-      toast.success("Pesanan berhasil dibuat!", { style: s(GREEN), autoClose: 2500 });
+      toast.success("Pesanan berhasil dibuat!");
 
       if (formData.payment === "Non-Tunai" && response.data.redirect_url) {
         window.location.href = response.data.redirect_url;
       } else {
-        navigate('/struk', { state: { order: response.data.order } });
+        navigate("/struk", { state: { order: orderData } });
       }
-
     } catch (error) {
-      console.error('Gagal mengirim pesanan:', error);
-      toast.error('Terjadi kesalahan saat mengirim pesanan.', { style: s(RED), autoClose: 2500 });
+      console.error("Gagal mengirim pesanan:", error);
+      toast.error("Terjadi kesalahan saat mengirim pesanan.");
     }
   };
 
-  // ⛳ Tombol disabled TIDAK lagi bergantung pada payment,
-  //    supaya user bisa klik dan dapat alert "Pilih metode pembayaran".
   const isFormIncomplete = () => {
     if (!formData.name) return true;
     if (method === "Makan di Tempat" && !formData.tableNumber) return true;
-    if (method === "Diantar" && (!formData.phone || !formData.address)) return true;
-    // JANGAN cek payment di sini
+    if (method === "Diantar" && (!formData.phone || !formData.address))
+      return true;
     return false;
   };
 
   return (
     <div className="place-order-page">
-      {/* Semua toast pojok kanan atas, selalu di atas popup */}
-      <ToastContainer
-        position="top-right"
-        autoClose={2500}
-        hideProgressBar={false}
-        newestOnTop={true}
-        closeOnClick={false}
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        style={{ zIndex: 99999 }}
-      />
+      <ToastContainer />
 
       <div className="back-button">
-        <span className="back-arrow" onClick={() => navigate("/cart")}>&larr;</span>
+        <span className="back-arrow" onClick={() => navigate("/cart")}>
+          &larr;
+        </span>
         <h2>Kembali</h2>
       </div>
 
-      <form className='place-order' onSubmit={handleOrder}>
+      <form className="place-order" onSubmit={handleOrder}>
         <div className="place-order-left">
           <p className="title">Informasi Pemesanan ({method})</p>
 
-          <input type="text" placeholder="Nama Lengkap" name="name" value={formData.name} onChange={handleInputChange} required />
+          <input
+            type="text"
+            placeholder="Nama Lengkap"
+            name="name"
+            value={formData.name}
+            onChange={handleInputChange}
+            required
+          />
 
           {method === "Makan di Tempat" && (
-            <input type="text" placeholder="Nomor Meja" name="tableNumber" value={formData.tableNumber} onChange={handleInputChange} required />
+            <input
+              type="text"
+              placeholder="Nomor Meja"
+              name="tableNumber"
+              value={formData.tableNumber}
+              onChange={handleInputChange}
+              required
+            />
           )}
 
           {method === "Diantar" && (
             <>
-              <input type="text" placeholder="Nomor Telepon Aktif" name="phone" value={formData.phone} onChange={handleInputChange} required />
-              <textarea placeholder="Alamat Lengkap" name="address" value={formData.address} onChange={handleInputChange} required />
+              <input
+                type="text"
+                placeholder="Nomor Telepon Aktif"
+                name="phone"
+                value={formData.phone}
+                onChange={handleInputChange}
+                required
+              />
+              <textarea
+                placeholder="Alamat Lengkap"
+                name="address"
+                value={formData.address}
+                onChange={handleInputChange}
+                required
+              />
             </>
           )}
 
-          <textarea placeholder="Catatan untuk pesanan (Opsional)" name="note" value={formData.note} onChange={handleInputChange} />
+          <textarea
+            placeholder="Catatan untuk pesanan (Opsional)"
+            name="note"
+            value={formData.note}
+            onChange={handleInputChange}
+          />
+
+          {/* Voucher Section */}
+          <div className="voucher-section">
+            <p className="voucher-title">Voucher Tersedia</p>
+            <div className="voucher-list">
+              {voucherList.map((v) => {
+                const notEnough = subtotal < v.minPurchase;
+                const disabled = notEnough;
+                const isApplied = voucherApplied?._id === v._id;
+
+                return (
+                  <div
+                    key={v._id}
+                    className={`voucher-card ${
+                      disabled ? "disabled" : ""
+                    } ${isApplied ? "applied" : ""}`}
+                  >
+                    <div className="voucher-info">
+                      <h4>
+                        {v.discountType === "percent"
+                          ? `Diskon ${v.discountValue}%`
+                          : `Diskon Rp ${v.discountValue.toLocaleString()}`}
+                      </h4>
+                      <p className="voucher-min">
+                        Min. order Rp {v.minPurchase.toLocaleString()}
+                      </p>
+                    </div>
+
+                    <button
+                      type="button"
+                      className="voucher-btn"
+                      onClick={() => !disabled && applyVoucher(v)}
+                      disabled={disabled}
+                    >
+                      {isApplied ? "Dipakai" : "Pakai"}
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </div>
 
         <div className="place-order-right">
-          <h2 className='title'>Ringkasan Pemesanan</h2>
+          <h2 className="title">Ringkasan Pemesanan</h2>
           <hr className="summary-line" />
 
-          {food_list.map((item) =>
-            cartItems[item._id] > 0 && (
-              <div className="summary-line" key={item._id}>
-                <p>{item.name}</p>
-                <div>x{cartItems[item._id]}</div>
-                <p>Rp. {(item.price * cartItems[item._id]).toLocaleString()}</p>
-              </div>
-            )
+          {food_list.map(
+            (item) =>
+              cartItems[item._id] > 0 && (
+                <div className="summary-line" key={item._id}>
+                  <p>{item.name}</p>
+                  <div>x{cartItems[item._id]}</div>
+                  <p>
+                    Rp. {(item.price * cartItems[item._id]).toLocaleString()}
+                  </p>
+                </div>
+              )
           )}
 
           <div className="summary-line">
@@ -201,22 +311,52 @@ const PlaceOrder = () => {
             </div>
           )}
 
+          {voucherApplied && (
+            <div className="summary-line discount">
+              <p>
+                Diskon Voucher{" "}
+                {voucherApplied.discountType === "percent"
+                  ? `${voucherApplied.discountValue}%`
+                  : `Rp ${voucherApplied.discountValue.toLocaleString()}`}
+              </p>
+              <p>- Rp. {discountAmount.toLocaleString()}</p>
+            </div>
+          )}
+
           <hr />
           <div className="summary-total">
             <b>Total</b>
             <b>Rp. {total.toLocaleString()}</b>
           </div>
 
-          <p className='payment-label'>Pilih Metode Pembayaran</p>
+          <p className="payment-label">Pilih Metode Pembayaran</p>
           <div className="radio-options">
-            <input type="radio" id="tunai" name="payment" value="Tunai" checked={formData.payment === "Tunai"} onChange={handleInputChange} />
+            <input
+              type="radio"
+              id="tunai"
+              name="payment"
+              value="Tunai"
+              checked={formData.payment === "Tunai"}
+              onChange={handleInputChange}
+            />
             <label htmlFor="tunai">Tunai</label>
 
-            <input type="radio" id="nontunai" name="payment" value="Non-Tunai" checked={formData.payment === "Non-Tunai"} onChange={handleInputChange} />
+            <input
+              type="radio"
+              id="nontunai"
+              name="payment"
+              value="Non-Tunai"
+              checked={formData.payment === "Non-Tunai"}
+              onChange={handleInputChange}
+            />
             <label htmlFor="nontunai">Non-Tunai</label>
           </div>
 
-          <button type="submit" className="order-button" disabled={isFormIncomplete()}>
+          <button
+            type="submit"
+            className="order-button"
+            disabled={isFormIncomplete()}
+          >
             Pesan
           </button>
         </div>

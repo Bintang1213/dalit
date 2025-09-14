@@ -77,6 +77,10 @@
 .btn-delete:hover {
   background: #cc0000;
 }
+.voucher-table td {
+  word-wrap: break-word;
+  white-space: normal;
+}
 
 /* Responsive */
 @media (max-width: 768px) {

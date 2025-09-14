@@ -5,60 +5,73 @@ import "./kelolavoucher.css";
 const KelolaVoucher = () => {
   const [vouchers, setVouchers] = useState([]);
 
-  // State form
-  const [code, setCode] = useState("");
+  // State form tambah
   const [discountType, setDiscountType] = useState("percent");
   const [discountValue, setDiscountValue] = useState("");
   const [minPurchase, setMinPurchase] = useState("");
   const [maxUsagePerUser, setMaxUsagePerUser] = useState("");
-  const [maxDailyUsage, setMaxDailyUsage] = useState(""); // Baru: batas voucher per hari
+  const [maxUsagePerDay, setMaxUsagePerDay] = useState("");
   const [autoApply, setAutoApply] = useState(false);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
-  useEffect(() => {
-    fetchVouchers();
-  }, []);
+  const token = localStorage.getItem("token");
 
-  const fetchVouchers = async () => {
-    try {
-      const res = await axios.get("http://localhost:4000/api/vouchers");
-      setVouchers(res.data);
-    } catch (err) {
-      console.error(err);
-    }
+  // reset form tambah
+  const resetForm = () => {
+    setDiscountType("percent");
+    setDiscountValue("");
+    setMinPurchase("");
+    setMaxUsagePerUser("");
+    setMaxUsagePerDay("");
+    setAutoApply(false);
+    setStartDate("");
+    setEndDate("");
   };
 
+  // Ambil data voucher + usage
+const fetchVoucherUsage = async () => {
+  try {
+    const res = await axios.get("http://localhost:4000/api/vouchers", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    setVouchers(res.data);
+  } catch (err) {
+    console.error("Gagal ambil voucher:", err.response?.data || err.message);
+  }
+};
+
+
+  useEffect(() => {
+    fetchVoucherUsage();
+  }, []);
+
   const handleAddVoucher = async () => {
-    if (!code || !discountValue || !startDate || !endDate) {
+    if (!discountValue || !startDate || !endDate) {
       alert("Lengkapi semua field wajib!");
       return;
     }
     try {
-      await axios.post("http://localhost:4000/api/vouchers", {
-        code,
-        discountType,
-        discountValue,
-        minPurchase,
-        maxUsagePerUser,
-        maxDailyUsage, // Kirim ke backend
-        autoApply,
-        startDate,
-        endDate,
-      });
-      fetchVouchers();
-      // Reset form
-      setCode("");
-      setDiscountType("percent");
-      setDiscountValue("");
-      setMinPurchase("");
-      setMaxUsagePerUser("");
-      setMaxDailyUsage("");
-      setAutoApply(false);
-      setStartDate("");
-      setEndDate("");
+      await axios.post(
+        "http://localhost:4000/api/vouchers",
+        {
+          discountType,
+          discountValue: Number(discountValue),
+          minPurchase: Number(minPurchase) || 0,
+          maxUsagePerUser: Number(maxUsagePerUser) || 1,
+          maxUsagePerDay: Number(maxUsagePerDay) || 0,
+          autoApply,
+          startDate,
+          endDate,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      fetchVoucherUsage();
+      resetForm();
     } catch (err) {
-      console.error(err);
+      console.error("Tambah voucher error:", err.response?.data || err.message);
       alert("Gagal menambahkan voucher");
     }
   };
@@ -66,10 +79,12 @@ const KelolaVoucher = () => {
   const handleDeleteVoucher = async (id) => {
     if (window.confirm("Yakin ingin menghapus voucher ini?")) {
       try {
-        await axios.delete(`http://localhost:4000/api/vouchers/${id}`);
-        fetchVouchers();
+        await axios.delete(`http://localhost:4000/api/vouchers/${id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        fetchVoucherUsage();
       } catch (err) {
-        console.error(err);
+        console.error("Hapus voucher error:", err.response?.data || err.message);
       }
     }
   };
@@ -79,14 +94,8 @@ const KelolaVoucher = () => {
       <div className="voucher-container">
         <h2>Kelola Voucher</h2>
 
+        {/* Form tambah voucher */}
         <div className="voucher-form">
-          <input
-            type="text"
-            placeholder="Kode Voucher"
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-          />
-
           <select
             value={discountType}
             onChange={(e) => setDiscountType(e.target.value)}
@@ -119,8 +128,8 @@ const KelolaVoucher = () => {
           <input
             type="number"
             placeholder="Maks. Pemakaian/Hari (0 = unlimited)"
-            value={maxDailyUsage}
-            onChange={(e) => setMaxDailyUsage(e.target.value)}
+            value={maxUsagePerDay}
+            onChange={(e) => setMaxUsagePerDay(e.target.value)}
           />
 
           <label className="checkbox">
@@ -148,14 +157,16 @@ const KelolaVoucher = () => {
           </button>
         </div>
 
+        {/* Tabel voucher */}
         <table className="voucher-table">
           <thead>
             <tr>
-              <th>Kode</th>
-              <th>Diskon</th>
+              <th>Jenis Diskon</th>
+              <th>Nilai Diskon</th>
               <th>Minimal Belanja</th>
               <th>Maks. User</th>
               <th>Maks. Per Hari</th>
+              <th>Sisa Hari Ini</th>
               <th>Auto Apply</th>
               <th>Tanggal Mulai</th>
               <th>Tanggal Berakhir</th>
@@ -166,15 +177,24 @@ const KelolaVoucher = () => {
             {vouchers.length > 0 ? (
               vouchers.map((v) => (
                 <tr key={v._id}>
-                  <td>{v.code}</td>
+                  <td>
+                    {v.discountType === "percent"
+                      ? "Persentase (%)"
+                      : "Nominal (Rp)"}
+                  </td>
                   <td>
                     {v.discountType === "percent"
                       ? `${v.discountValue}%`
                       : `Rp ${v.discountValue}`}
                   </td>
                   <td>Rp {v.minPurchase}</td>
-                  <td>{v.maxUsagePerUser}</td>
-                  <td>{v.maxDailyUsage || "Unlimited"}</td>
+                  <td>{v.maxUsagePerUser ?? "-"}</td>
+                  <td>
+                    {v.maxUsagePerDay === 0
+                      ? "Unlimited"
+                      : v.maxUsagePerDay ?? "-"}
+                  </td>
+                  <td>{v.sisaHariIni ?? "-"}</td>
                   <td>{v.autoApply ? "Ya" : "Tidak"}</td>
                   <td>{new Date(v.startDate).toLocaleDateString()}</td>
                   <td>{new Date(v.endDate).toLocaleDateString()}</td>
@@ -190,7 +210,7 @@ const KelolaVoucher = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="9" style={{ textAlign: "center" }}>
+                <td colSpan="10" style={{ textAlign: "center" }}>
                   Belum ada voucher
                 </td>
               </tr>
