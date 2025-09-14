@@ -16,10 +16,7 @@ import Login from './pages/login/login';
 import Logout from './pages/logout';
 import PrivateRoute from './components/PrivateRoute';
 import AdminChat from './pages/AdminChat/AdminChat';
-
-
-// 👉 Tambahin import baru untuk Kelola Voucher
-import Kelolavoucher from './pages/Kelolavoucher/kelolavoucher';
+import Kelolavoucher from './pages/Kelolavoucher/Kelolavoucher';
 
 const App = () => {
   const url = "http://localhost:4000";
