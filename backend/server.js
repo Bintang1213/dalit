@@ -15,6 +15,10 @@ import chatRouter from "./routes/chatRoutes.js";
 import chatModel from "./models/chatModel.js";
 import jwt from "jsonwebtoken";
 
+// ✅ Tambahan voucher router
+import voucherRouter from "./routes/voucherRoutes.js";
+import voucherUsageRouter from "./routes/voucherUsageRoute.js";
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -90,12 +94,23 @@ app.use(
 
 connectDB();
 
+// Daftarin semua route
 app.use("/api/food", foodRouter);
 app.use("/api/user", userRouter);
 app.use("/api/cart", cartRouter);
 app.use("/api/admin", adminRouter);
+
+// ✅ Route voucher usage (log pemakaian voucher)
+app.use("/api/voucher-usage", voucherUsageRouter);
+
+// ✅ Route order
 app.use("/api/order", orderRouter);
+
+// ✅ Route chat
 app.use("/api/chat", chatRouter);
+
+// ✅ Route voucher
+app.use("/api/vouchers", voucherRouter);
 
 app.get("/", (req, res) => {
   res.send("API Working");

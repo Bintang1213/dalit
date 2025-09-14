@@ -169,4 +169,104 @@
     outline-color: crimson;
     font-size: 16px;
   }
-  
+ .voucher-section {
+  margin-top: 20px;
+}
+
+.voucher-title {
+  font-weight: bold;
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+
+.voucher-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.voucher-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1.5px solid #9a0505;
+  border-radius: 12px;
+  padding: 14px 18px;
+  background: #ffffffbd;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  transition: all 0.25s ease;
+}
+
+.voucher-card:hover {
+  border-color: #9a0505;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.voucher-card.applied {
+  border-color: #16a34a;
+  background: #f0fdf4;
+}
+
+.voucher-card.disabled {
+  opacity: 0.6;
+  background: #f9f9f9;
+  border-color: #ccc;
+}
+
+.voucher-info h4 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #222;
+}
+
+.voucher-info p {
+  margin: 4px 0 0;
+  font-size: 14px;
+  color: #555;
+}
+
+.voucher-min {
+  font-size: 13px;
+  color: #777;
+}
+
+.voucher-btn {
+  padding: 7px 16px;
+  border-radius: 8px;
+  border: none;
+  background: #9a0505;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.voucher-btn:hover {
+  background: #9a0505;
+}
+
+.voucher-card.applied .voucher-btn {
+  background: #16a34a;
+}
+
+.voucher-btn:disabled {
+  background: #aaa;
+  cursor: not-allowed;
+}
+/* 🔹 Status Voucher */
+.voucher-status {
+  font-size: 13px;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+.voucher-status.used {
+  color: #555;   /* abu-abu kalau sudah dipakai */
+  font-style: italic;
+}
+
+.voucher-status.habis {
+  color: #d91b42; /* merah kalau habis */
+  font-weight: bold;
+}

@@ -44,7 +44,7 @@ const Footer = () => {
             <h2>NAVIGASI</h2>
             <ul>
               <li><i className="fas fa-home"></i> <a href="/">Beranda</a></li>
-              <li><i className="fas fa-utensils"></i> <a href="/#explore-menu">Menu</a></li>
+              <li><i className="fas fa-utensils"></i> <a href="/menu">Menu</a></li>
               <li><i className="fas fa-utensils"></i> <a href="/riwayat">Pesanan</a></li>
               <li><i className="fas fa-info-circle"></i> <a href="/tentang-kami">Tentang Kami</a></li>
             </ul>

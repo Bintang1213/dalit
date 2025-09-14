@@ -13,7 +13,6 @@ const Struk = () => {
   const handleDownload = () => {
     const strukElement = document.getElementById('struk-download');
 
-    // Sembunyikan tombol sebelum ambil screenshot
     const buttons = strukElement.querySelector('.btn-actions');
     if (buttons) buttons.style.display = 'none';
 
@@ -23,7 +22,6 @@ const Struk = () => {
       link.href = canvas.toDataURL();
       link.click();
 
-      // Tampilkan kembali tombol setelah unduh
       if (buttons) buttons.style.display = 'flex';
     });
   };
@@ -39,11 +37,17 @@ const Struk = () => {
     );
   }
 
-  const subtotal = order.items.reduce((acc, item) => acc + item.price * item.quantity, 0);
-  const serviceFee = subtotal * 0.1;
-  const deliveryFee = order.method === "Diantar" ? 10000 : 0;
-  const total = subtotal + serviceFee + deliveryFee;
-  const totalQty = order.items.reduce((acc, item) => acc + item.quantity, 0);
+// ambil data sesuai dengan PlaceOrder (langsung pakai dari order, kalau gak ada hitung manual)
+const subtotal = order.subtotal ?? order.items.reduce((acc, item) => acc + item.price * item.quantity, 0);
+const serviceFee = (order.serviceFee !== undefined && order.serviceFee !== null) 
+  ? order.serviceFee 
+  : subtotal * 0.1;
+const deliveryFee = order.deliveryFee ?? (order.method === "Diantar" ? 10000 : 0);
+const discount = order.discount ?? 0;
+const total = order.totalAmount ?? (subtotal + serviceFee + deliveryFee - discount);
+const totalQty = order.items.reduce((acc, item) => acc + item.quantity, 0);
+
+
 
   return (
     <div className="struk-wrapper">
@@ -98,6 +102,12 @@ const Struk = () => {
           <div className="item"><span>Biaya Layanan (10%)</span><span>Rp. {serviceFee.toLocaleString()}</span></div>
           {deliveryFee > 0 && (
             <div className="item"><span>Ongkos Kirim</span><span>Rp. {deliveryFee.toLocaleString()}</span></div>
+          )}
+          {discount > 0 && (
+            <div className="item">
+              <span>Diskon</span>
+              <span>- Rp. {discount.toLocaleString()}</span>
+            </div>
           )}
           <div className="item total"><span>TOTAL</span><span>Rp. {total.toLocaleString()}</span></div>
         </div>

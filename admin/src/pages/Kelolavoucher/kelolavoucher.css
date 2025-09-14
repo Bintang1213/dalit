@@ -1,0 +1,90 @@
+.main-content {
+  flex: 1;
+  padding: 20px;
+}
+.container {
+  max-width: 100%;
+}
+.voucher-container {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.voucher-container h2 {
+  margin-bottom: 20px;
+  font-size: 22px;
+  font-weight: bold;
+  color: #800000;
+}
+
+.voucher-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.voucher-form input {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  flex: 1;
+}
+
+.btn-add {
+  background: #b30000;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn-add:hover {
+  background: #800000;
+}
+
+.voucher-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.voucher-table th,
+.voucher-table td {
+  border: 1px solid #eee;
+  padding: 12px;
+  text-align: center;
+}
+
+.voucher-table th {
+  background: #f8f8f8;
+  font-weight: 600;
+}
+
+.btn-delete {
+  background: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-delete:hover {
+  background: #cc0000;
+}
+.voucher-table td {
+  word-wrap: break-word;
+  white-space: normal;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .voucher-form {
+    flex-direction: column;
+  }
+}
