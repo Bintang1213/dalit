@@ -9,6 +9,7 @@ import {
   FaMoneyBillWave,
   FaSignOutAlt,
   FaComments, 
+  FaStar,
 } from 'react-icons/fa';
 import tengkoLogo from '../../assets/tengko.png';
 
@@ -53,6 +54,16 @@ const Sidebar = () => {
           <FaMoneyBillWave className="menu-icon" />
           <p>Laporan Keuangan</p>
         </NavLink>
+        
+ <NavLink 
+ to="/kelolaulasan" 
+ className={({ isActive }) => isActive ? 'sidebar-option active' : 'sidebar-option'}
+>
+ <FaStar className="menu-icon" />
+ <p>Kelola Ulasan</p>
+</NavLink>
+
+
         <NavLink to="/chat" className="sidebar-option" activeclassname="active">
           <FaComments className="menu-icon" />
           <p>Dukungan Chat</p>

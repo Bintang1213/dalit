@@ -1,18 +1,43 @@
+/* --- Container Utama --- */
 .order-history {
-  padding: 1px;
+  padding: 16px;
   font-family: 'Poppins', sans-serif;
   background-color: #f8f8f8;
   margin-top: 35px;
+  min-height: 100vh;
+  color: #333;
 }
 
-.order-history__header {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  font-size: 20px;
-  margin-bottom: 1rem;
+/* --- Rekomendasi Menu (Baru) --- */
+.recommendation-section {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: #fff7f7;
+  border: 1px solid #f5c2c7;
+  border-radius: 8px;
+  box-shadow: 0 0 6px rgba(0,0,0,0.05);
 }
 
+.recommendation-section h3 {
+  margin-bottom: 0.75rem;
+  color: #b30000;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.recommendation-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.recommendation-section li {
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #333;
+}
+
+/* --- Tabel Pesanan --- */
 .table-wrapper {
   width: 100%;
   overflow-x: auto;
@@ -21,10 +46,11 @@
 .order-table {
   width: 100%;
   border-collapse: collapse;
-  table-layout: fixed; /* Biar semua kolom terbagi rata */
+  table-layout: fixed;
   box-shadow: 0 0 8px rgba(0,0,0,0.1);
   border-radius: 8px;
   overflow: hidden;
+  background: #fff;
 }
 
 .order-table th,
@@ -35,6 +61,7 @@
   vertical-align: middle;
   word-wrap: break-word;
   white-space: normal;
+  font-size: 0.9rem;
 }
 
 .order-table th {
@@ -50,19 +77,22 @@
   white-space: nowrap;
 }
 
+/* --- Tombol Lihat Detail --- */
 .view-detail-btn {
   background-color: crimson;
   color: white;
   padding: 6px 12px;
   border: none;
   border-radius: 4px;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   cursor: pointer;
+  transition: 0.2s ease;
 }
 .view-detail-btn:hover {
   background-color: darkred;
 }
 
+/* --- Status Pesanan --- */
 .status-menunggu {
   color: gray;
   font-weight: bold;
@@ -84,6 +114,7 @@
   font-weight: bold;
 }
 
+/* --- Pagination --- */
 .pagination {
   display: flex;
   justify-content: center;
@@ -97,6 +128,12 @@
   background-color: #eee;
   border-radius: 4px;
   cursor: pointer;
+  font-size: 0.85rem;
+  transition: 0.2s ease;
+}
+
+.pagination button:hover {
+  background-color: #ffd6d6;
 }
 
 .pagination button.active {
@@ -104,38 +141,76 @@
   color: white;
   font-weight: bold;
 }
-.order-message {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 60vh;
-  text-align: center;
-  color: #555;
-  font-family: 'Poppins', sans-serif;
-  padding: 2rem;
+
+/* --- Review Section --- */
+.review-section {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
 }
 
-.order-message.not-logged-in img {
-  width: 180px;
-  margin-bottom: 1.5rem;
+.review-section h4 {
+  font-size: 16px;
+  margin-bottom: 0.75rem;
+  color: #333;
 }
 
-.order-loader {
-  width: 40px;
-  height: 40px;
-  border: 4px solid #ccc;
-  border-top: 4px solid crimson;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
+.review-form {
   margin-bottom: 1rem;
+  padding: 0.75rem;
+  border: 1px solid #eee;
+  border-radius: 6px;
+  background: #fafafa;
 }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+.review-form p {
+  margin: 0 0 0.5rem;
+  font-weight: 500;
 }
 
+.review-form .rating {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 0.5rem;
+  font-size: 1.3rem;
+}
+
+.review-form textarea {
+  width: 100%;
+  min-height: 60px;
+  resize: vertical;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  margin-bottom: 0.5rem;
+}
+
+.review-form textarea:focus {
+  border-color: crimson;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(220, 20, 60, 0.2);
+}
+
+.review-form button {
+  background-color: crimson;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.review-form button:hover {
+  background-color: darkred;
+}
+
+/* --- Responsive --- */
 @media (max-width: 768px) {
   .order-table {
     font-size: 12px;
@@ -144,9 +219,5 @@
   .view-detail-btn {
     padding: 4px 8px;
     font-size: 12px;
-  }
-
-  .order-history__header h2 {
-    font-size: 1.2rem;
   }
 }

@@ -1,7 +1,14 @@
-import express from 'express';
-import { addFood, listFood, removeFood, editFood } from '../controllers/foodController.js';
-import multer from 'multer';
-import fs from 'fs';
+// backend/routes/foodRoutes.js
+import express from "express";
+import {
+  addFood,
+  listFood,
+  removeFood,
+  editFood,
+} from "../controllers/foodController.js";
+import Food from "../models/foodModel.js"; // ✅ untuk rekomendasi
+import multer from "multer";
+import fs from "fs";
 
 const foodRouter = express.Router();
 
@@ -18,7 +25,7 @@ const storage = multer.diskStorage({
   },
   filename: (req, file, cb) => {
     cb(null, `${Date.now()}-${file.originalname}`);
-  }
+  },
 });
 
 const upload = multer({ storage: storage });
@@ -30,18 +37,33 @@ const uploadMiddleware = (req, res, next) => {
       console.error("Multer Error:", err);
       return res.status(400).json({
         success: false,
-        message: "File upload error: " + err.message
+        message: "File upload error: " + err.message,
       });
     }
     next();
   });
 };
 
-// Routes
-foodRouter.post('/add', uploadMiddleware, addFood);
+// ======================
+// Routes CRUD makanan
+// ======================
+foodRouter.post("/add", uploadMiddleware, addFood);
 foodRouter.get("/", listFood);
 foodRouter.get("/list", listFood);
 foodRouter.post("/remove", removeFood);
-foodRouter.post('/edit', uploadMiddleware, editFood); // Pastikan route ini ada
+foodRouter.post("/edit", uploadMiddleware, editFood);
+
+// ======================
+// Routes rekomendasi menu
+// ======================
+// Ambil semua menu yang ditandai isRecommended = true
+foodRouter.get("/recommendations", async (req, res) => {
+  try {
+    const recommendedMenus = await Food.find({ isRecommended: true });
+    res.status(200).json(recommendedMenus);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 
 export default foodRouter;

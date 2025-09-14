@@ -17,6 +17,9 @@ import Chat from "./pages/Chat/Chat";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+// import halaman ReviewList
+import ReviewList from "./pages/ReviewList/ReviewList";
+
 const App = () => {
   const [showLogin, setShowLogin] = useState(false);
   const location = useLocation();
@@ -148,6 +151,20 @@ const App = () => {
                     transition={{ duration: 0.5 }}
                   >
                     <Chat />
+                  </motion.div>
+                }
+              />
+              {/* route baru untuk ReviewList */}
+              <Route
+                path="/reviews"
+                element={
+                  <motion.div
+                    initial={{ opacity: 0, y: 50 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -50 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <ReviewList />
                   </motion.div>
                 }
               />

@@ -12,11 +12,14 @@ import Dashboard from './pages/Dashboard/dashboard';
 import Kelolamenu from './pages/Kelolamenu/kelolamenu';
 import Kelolapesanan from './pages/Kelolapesanan/kelolapesanan';
 import Kelolapengguna from './pages/Kelolapengguna/kelolapengguna';
-import Kelolakeuangan from './pages/kelolakeuangan/kelolakeuangan';
+import Kelolakeuangan from './pages/Kelolakeuangan/kelolakeuangan';
 import Login from './pages/login/login';
 import Logout from './pages/logout';
 import PrivateRoute from './components/PrivateRoute';
 import AdminChat from './pages/AdminChat/AdminChat';
+
+// ✅ konsisten: folder KelolaUlasan, file kelolaUlasan.jsx
+import KelolaUlasan from './pages/KelolaUlasan/kelolaUlasan';
 
 const App = () => {
   const url = "http://localhost:4000";
@@ -24,20 +27,17 @@ const App = () => {
   const navigate = useNavigate();
   const isLoginPage = location.pathname === '/login';
 
-  // Cek autentikasi saat pertama render dan ketika lokasi berubah
   useEffect(() => {
     const checkAuth = () => {
       const token = localStorage.getItem('authToken');
       console.log('Current token in App.js:', token);
 
-      // Jika bukan halaman login dan tidak ada token, redirect ke login
       if (!isLoginPage && !token) {
         console.log('No token found, redirecting to login');
         navigate('/login');
         return;
       }
 
-      // Jika ada token, verifikasi validitasnya
       if (token) {
         try {
           const payload = JSON.parse(atob(token.split('.')[1]));
@@ -80,6 +80,9 @@ const App = () => {
           <Route path="/kelolapesanan" element={<PrivateRoute><Kelolapesanan url={url} /></PrivateRoute>} />
           <Route path="/kelolapengguna" element={<PrivateRoute><Kelolapengguna url={url} /></PrivateRoute>} />
           <Route path="/kelolakeuangan" element={<PrivateRoute><Kelolakeuangan url={url} /></PrivateRoute>} />
+
+          {/* ✅ Halaman baru: Kelola Ulasan */}
+          <Route path="/kelolaulasan" element={<PrivateRoute><KelolaUlasan url={url} /></PrivateRoute>} />
 
           {/* Chat admin */}
           <Route path="/chat" element={<PrivateRoute><AdminChat /></PrivateRoute>} />
