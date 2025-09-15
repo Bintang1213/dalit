@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import "./Kelolaulasan.css";
+import "./kelolaulasan.css";
 
 const API_BASE = "http://localhost:4000/api/reviews";
 
