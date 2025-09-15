@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
 import Sidebar from './components/Sidebar/Sidebar';
 import Navbar from './components/Navbar/Navbar';
 import Add from './pages/Add/Add';
@@ -17,9 +16,9 @@ import Login from './pages/login/login';
 import Logout from './pages/logout';
 import PrivateRoute from './components/PrivateRoute';
 import AdminChat from './pages/AdminChat/AdminChat';
+import Kelolavoucher from './pages/Kelolavoucher/Kelolavoucher';
+import KelolaUlasan from './pages/KelolaUlasan/KelolaUlasan';
 
-// ✅ konsisten: folder KelolaUlasan, file kelolaUlasan.jsx
-import KelolaUlasan from './pages/KelolaUlasan/kelolaUlasan';
 
 const App = () => {
   const url = "http://localhost:4000";
@@ -80,11 +79,8 @@ const App = () => {
           <Route path="/kelolapesanan" element={<PrivateRoute><Kelolapesanan url={url} /></PrivateRoute>} />
           <Route path="/kelolapengguna" element={<PrivateRoute><Kelolapengguna url={url} /></PrivateRoute>} />
           <Route path="/kelolakeuangan" element={<PrivateRoute><Kelolakeuangan url={url} /></PrivateRoute>} />
-
-          {/* ✅ Halaman baru: Kelola Ulasan */}
-          <Route path="/kelolaulasan" element={<PrivateRoute><KelolaUlasan url={url} /></PrivateRoute>} />
-
-          {/* Chat admin */}
+          <Route path="/kelolaUlasan" element={<PrivateRoute><KelolaUlasan url={url} /></PrivateRoute>} />
+          <Route path="/kelolavoucher" element={<PrivateRoute><Kelolavoucher url={url} /></PrivateRoute>} />
           <Route path="/chat" element={<PrivateRoute><AdminChat /></PrivateRoute>} />
         </Routes>
       </div>
