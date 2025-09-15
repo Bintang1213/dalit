@@ -1,9 +1,9 @@
-// backend/controllers/reviewController.js
 import Review from "../models/reviewModel.js";
-import User from "../models/userModel.js";   // untuk populate user
-import Food from "../models/foodModel.js";   // untuk populate makanan
+import Food from "../models/foodModel.js";
 
+// ==============================
 // Tambah review (user)
+// ==============================
 export const addReview = async (req, res) => {
   try {
     const { userId, foodId, rating, comment } = req.body;
@@ -12,10 +12,9 @@ export const addReview = async (req, res) => {
       return res.status(400).json({ message: "userId, foodId, dan rating wajib diisi" });
     }
 
-    const review = new Review({ userId, foodId, rating, comment, approved: false }); // default belum approved
+    const review = new Review({ userId, foodId, rating, comment });
     await review.save();
 
-    console.log("Review saved:", review);
     res.status(201).json({ success: true, review });
   } catch (error) {
     console.error("Error adding review:", error);
@@ -23,7 +22,9 @@ export const addReview = async (req, res) => {
   }
 };
 
+// ==============================
 // Ambil semua review (admin)
+// ==============================
 export const getReviews = async (req, res) => {
   try {
     const reviews = await Review.find()
@@ -37,7 +38,9 @@ export const getReviews = async (req, res) => {
   }
 };
 
+// ==============================
 // Toggle rekomendasi menu (admin)
+// ==============================
 export const toggleMenuRecommendation = async (req, res) => {
   try {
     const { foodId } = req.params;
@@ -55,46 +58,50 @@ export const toggleMenuRecommendation = async (req, res) => {
   }
 };
 
-// Update status review (approve/tolak) (admin)
-export const updateReviewStatus = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { approved } = req.body; // boolean true/false
-
-    const review = await Review.findById(id);
-    if (!review) return res.status(404).json({ message: "Review tidak ditemukan" });
-
-    review.approved = approved;
-    await review.save();
-
-    res.json({ success: true, review });
-  } catch (error) {
-    console.error("Error updating review status:", error);
-    res.status(500).json({ message: error.message });
-  }
-};
-
-// Ambil menu top rated (global)
+// ==============================
+// Ambil menu top rated (global) dengan nama menu
+// ==============================
 export const getTopRatedMenus = async (req, res) => {
   try {
+    // Ambil aggregate rating semua review
     const topMenus = await Review.aggregate([
-      { $match: { approved: true } },
+      {
+        $match: { foodId: { $ne: null } }, // pastikan foodId valid
+      },
       {
         $group: {
           _id: "$foodId",
           avgRating: { $avg: "$rating" },
-          totalReviews: { $sum: 1 }
-        }
+          totalReviews: { $sum: 1 },
+        },
       },
       { $sort: { avgRating: -1 } },
-      { $limit: 10 }
+      { $limit: 10 },
     ]);
 
-    const foods = await Food.find({ _id: { $in: topMenus.map(t => t._id) } });
+    console.log("TopMenus Aggregate:", topMenus);
 
-    res.json({ topMenus, foods });
+    if (!topMenus.length) return res.json([]); // kalau kosong langsung return []
+
+    // Ambil detail nama dan status rekomendasi dari collection Food
+    const foodIds = topMenus.map((t) => t._id);
+    const foods = await Food.find({ _id: { $in: foodIds } });
+
+    // Merge hasil aggregate dengan data Food
+    const merged = topMenus.map((t) => {
+      const food = foods.find((f) => f._id.toString() === t._id.toString());
+      return {
+        _id: t._id,
+        name: food ? food.name : "Unknown",
+        avgRating: t.avgRating,
+        totalReviews: t.totalReviews,
+        isRecommended: food ? food.isRecommended : false,
+      };
+    });
+
+    res.json(merged);
   } catch (error) {
     console.error("Error fetching top menus:", error);
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: "Gagal ambil top menus", error: error.message });
   }
 };

@@ -70,10 +70,8 @@ const OrderHistory = () => {
       }
     };
 
-    // 🔥 Ambil rekomendasi menu dari backend
     const fetchRecommendations = async () => {
       try {
-        // ⬇️ ganti review -> reviews
         const res = await axios.get("http://localhost:4000/api/reviews/top");
         setRecommendations(res.data);
       } catch (error) {
@@ -102,6 +100,12 @@ const OrderHistory = () => {
     try {
       const token = localStorage.getItem("token");
       const review = reviews[orderId]?.[itemId];
+      const order = orders.find(o => o._id === orderId);
+
+      if (!order) {
+        alert("Order tidak ditemukan!");
+        return;
+      }
 
       if (!review?.rating) {
         alert("Harap isi rating!");
@@ -109,8 +113,8 @@ const OrderHistory = () => {
       }
 
       await axios.post("http://localhost:4000/api/reviews", {
-        userId: orders.find(o => o._id === orderId).userId,
-        menuId: itemId,
+        userId: order.userId,
+        foodId: itemId,
         rating: review.rating,
         comment: review.comment || ""
       }, {
@@ -118,8 +122,19 @@ const OrderHistory = () => {
       });
 
       alert("Review berhasil dikirim!");
+
+      // Reset review setelah submit
+      setReviews(prev => ({
+        ...prev,
+        [orderId]: {
+          ...prev[orderId],
+          [itemId]: { rating: 0, comment: "" }
+        }
+      }));
+
     } catch (error) {
-      alert("Gagal mengirim review");
+      console.error("Error kirim review:", error?.response?.data || error.message);
+      alert("Gagal mengirim review. Pastikan semua field sudah terisi.");
     }
   };
 
@@ -155,7 +170,6 @@ const OrderHistory = () => {
 
   return (
     <div className="order-history">
-      {/* 🔥 Rekomendasi menu */}
       {recommendations.length > 0 && (
         <div className="recommendation-section">
           <h3>🍽️ Rekomendasi Menu Untuk Anda</h3>
@@ -204,7 +218,6 @@ const OrderHistory = () => {
                   </td>
                 </tr>
 
-                {/* Review muncul hanya jika status selesai */}
                 {order.status.toLowerCase() === "selesai" && (
                   <tr>
                     <td colSpan="7">

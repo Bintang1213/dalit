@@ -4,14 +4,11 @@ import "./kelolaulasan.css";
 
 const API_BASE = "http://localhost:4000/api/reviews";
 
-const KelolaUlasan = () => {
+const KelolaUlasan = ({ isSidebarCollapsed }) => {
   const [reviews, setReviews] = useState([]);
   const [topMenus, setTopMenus] = useState([]);
   const [favorite, setFavorite] = useState(null);
 
-  // ==============================
-  // Fetch semua review
-  // ==============================
   useEffect(() => {
     const fetchReviews = async () => {
       try {
@@ -26,10 +23,10 @@ const KelolaUlasan = () => {
     const fetchTopMenus = async () => {
       try {
         const res = await axios.get(`${API_BASE}/top`);
-        setTopMenus(Array.isArray(res.data) ? res.data : []);
-        if (Array.isArray(res.data) && res.data.length > 0) {
-          setFavorite(res.data[0]);
-        }
+        const menus = Array.isArray(res.data) ? res.data : [];
+        setTopMenus(menus);
+
+        if (menus.length > 0) setFavorite(menus[0]);
       } catch (error) {
         console.error("Error fetch top menus:", error);
         setTopMenus([]);
@@ -41,35 +38,40 @@ const KelolaUlasan = () => {
     fetchTopMenus();
   }, []);
 
-  // ==============================
-  // Toggle rekomendasi menu favorit
-  // ==============================
   const toggleRecommendation = async () => {
     if (!favorite) return;
+
     try {
-      const newStatus = !favorite.isRecommended;
       const res = await axios.put(
-        `${API_BASE}/menu/${favorite._id}/recommendation`,
-        { isRecommended: newStatus }
+        `${API_BASE}/menu/${favorite._id}/recommendation`
       );
+
       setFavorite((prev) => ({
         ...prev,
-        isRecommended: res.data.menu.isRecommended,
+        isRecommended: res.data.food.isRecommended,
       }));
+
+      setTopMenus((prev) =>
+        prev.map((m) =>
+          m._id === favorite._id
+            ? { ...m, isRecommended: res.data.food.isRecommended }
+            : m
+        )
+      );
     } catch (error) {
       console.error("Gagal update rekomendasi:", error);
     }
   };
 
   return (
-    <div className="container-keuangan">
-      <div className="kelola-keuangan-header">
+    <div className={`container-ulasan ${isSidebarCollapsed ? "sidebar-collapsed" : ""}`}>
+      <div className="kelola-ulasan-header">
         <h2>Kelola Ulasan</h2>
       </div>
 
       {/* Tabel review */}
       <div className="table-container">
-        <table className="tabel-keuangan">
+        <table className="tabel-ulasan">
           <thead>
             <tr>
               <th>Nama User</th>
@@ -80,43 +82,51 @@ const KelolaUlasan = () => {
             </tr>
           </thead>
           <tbody>
-            {Array.isArray(reviews) &&
-              reviews.map((rev) => (
-                <tr key={rev._id}>
-                  <td>{rev.userId?.name || "Anonim"}</td>
-                  <td>{rev.menuId?.name || "-"}</td>
-                  <td>{"⭐".repeat(rev.rating)}</td>
-                  <td>{rev.comment}</td>
-                  <td>{new Date(rev.createdAt).toLocaleDateString()}</td>
-                </tr>
-              ))}
+            {reviews.map((rev) => (
+              <tr key={rev._id}>
+                <td>{rev.userId?.name || "Anonim"}</td>
+                <td>{rev.foodId?.name || "-"}</td>
+                <td>{"⭐".repeat(rev.rating)}</td>
+                <td className="comment-cell">{rev.comment}</td>
+                <td>{new Date(rev.createdAt).toLocaleDateString()}</td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
 
       {/* Rangkuman top menus */}
-      <div className="summary-section" style={{ marginTop: "30px" }}>
+      <div className="summary-section">
         <h3>Rangkuman Rating per Menu</h3>
-        <ul>
+        <div className="summary-cards">
           {topMenus.map((menu) => (
-            <li key={menu._id}>
-              {menu._id} ⭐ {menu.avgRating?.toFixed(1)} ({menu.totalReviews} ulasan)
-            </li>
+            <div key={menu._id} className="summary-card">
+              <div className="menu-name">{menu.name}</div>
+              <div className="menu-rating">
+                ⭐ {menu.avgRating?.toFixed(1)} <span>({menu.totalReviews} ulasan)</span>
+              </div>
+            </div>
           ))}
-        </ul>
+        </div>
       </div>
 
       {/* Menu terfavorit */}
       {favorite && (
-        <div className="favorite-section" style={{ marginTop: "30px" }}>
+        <div className="favorite-section">
           <h3>Menu Terfavorit</h3>
-          <p>
-            {favorite._id} ⭐ {favorite.avgRating?.toFixed(1)} ({favorite.totalReviews} ulasan)
-          </p>
-          <button onClick={toggleRecommendation}>
-            {favorite.isRecommended ? "Nonaktifkan Rekomendasi" : "Aktifkan Rekomendasi"}
-          </button>
-          {favorite.isRecommended && <p>✅ Menu ini sedang direkomendasikan</p>}
+          <div className="favorite-card">
+            <div className="menu-name">{favorite.name}</div>
+            <div className="menu-rating">
+              ⭐ {favorite.avgRating?.toFixed(1)} ({favorite.totalReviews} ulasan)
+            </div>
+            <button
+              className={`btn-recommend ${favorite.isRecommended ? "active" : ""}`}
+              onClick={toggleRecommendation}
+            >
+              {favorite.isRecommended ? "Nonaktifkan Rekomendasi" : "Aktifkan Rekomendasi"}
+            </button>
+            {favorite.isRecommended && <p className="recommended-text">✅ Menu ini sedang direkomendasikan</p>}
+          </div>
         </div>
       )}
     </div>

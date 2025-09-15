@@ -1,10 +1,8 @@
-// backend/routes/reviewRoutes.js
 import express from "express";
 import {
   addReview,
   getReviews,
   toggleMenuRecommendation,
-  updateReviewStatus,
   getTopRatedMenus,
 } from "../controllers/reviewController.js";
 
@@ -16,13 +14,10 @@ router.post("/", addReview);
 // ✅ Ambil semua ulasan (admin)
 router.get("/", getReviews);
 
-// ✅ Update status review (approve/tolak)
-router.put("/:id/status", updateReviewStatus);
-
 // ✅ Toggle rekomendasi menu (admin)
-router.put("/menu/:foodId/recommend", toggleMenuRecommendation);
+router.put("/menu/:foodId/recommendation", toggleMenuRecommendation);
 
 // ✅ Ambil menu top rated
-router.get("/top-rated", getTopRatedMenus);
+router.get("/top", getTopRatedMenus);
 
 export default router;

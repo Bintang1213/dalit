@@ -1,15 +1,16 @@
+// reviewModel.js
 import mongoose from "mongoose";
 
 const reviewSchema = new mongoose.Schema(
   {
     userId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User", // relasi ke User
+      ref: "User",
       required: true,
     },
     foodId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Food", // relasi ke Food (bukan Menu)
+      ref: "Food",
       required: true,
     },
     rating: {
@@ -26,7 +27,6 @@ const reviewSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Review =
-  mongoose.models.Review || mongoose.model("Review", reviewSchema);
+const Review = mongoose.models.Review || mongoose.model("Review", reviewSchema);
 
 export default Review;
