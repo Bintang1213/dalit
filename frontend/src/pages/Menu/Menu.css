@@ -1,3 +1,5 @@
+/* ==================== KATEGORI MENU ==================== */
+
 /* Judul kategori */
 .menu-category-title {
   margin-top: 20px;
@@ -42,4 +44,150 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 30px;
+}
+
+/* ==================== LAYOUT MENU + FILTER ==================== */
+.menu-page {
+  display: grid;
+  grid-template-columns: 3fr 1fr; /* kiri 3 bagian, kanan 1 bagian */
+  gap: 30px;
+  align-items: flex-start;
+}
+
+/* Kiri: daftar menu */
+.menu-left {
+  width: 100%;
+}
+
+/* Filter sidebar tanpa card feel */
+.menu-right {
+  padding: 25px 20px;
+  min-height: 100vh;
+  position: sticky;
+  top: 82px;
+  
+}
+
+/* Judul filter */
+.filter-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: crimson;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #f1f1f1;
+}
+
+.filter-title .filter-icon {
+  color: crimson;
+  font-size: 18px;
+}
+
+/* Bagian filter */
+.filter-section {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.filter-section label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #444;
+  margin-bottom: 8px;
+}
+
+/* Dropdown */
+.filter-section select {
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.filter-section select:hover {
+  border: 1px solid #ccc;
+  background: #fafafa;
+}
+
+.filter-section select:focus {
+  border: 1px solid crimson;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(220,20,60,0.15);
+}
+/* Filter Rating */
+.rating-filter {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+  font-size: 14px;
+  color: #444;
+}
+
+.rating-filter .star {
+  color: #ccc;
+  font-size: 16px;
+}
+
+.rating-filter .star.filled {
+  color: #f59e0b; /* gold */
+}
+
+.rating-filter:hover {
+  transform: translateX(4px);
+  color: crimson;
+}
+
+.rating-filter.active {
+  font-weight: bold;
+  color: crimson;
+}
+
+.reset-btn {
+  margin-top: 12px;
+  padding: 8px 18px;
+  background: crimson;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  align-self: flex-start; /* biar rata kiri */
+}
+
+.reset-btn:hover {
+  background: #a50f2d; /* crimson lebih gelap */
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+/* Checkbox / radio style */
+.checkbox-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+.checkbox-option input[type="radio"] {
+  accent-color: crimson;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.checkbox-option label {
+  font-size: 14px;
+  color: #444;
+  cursor: pointer;
 }
