@@ -191,3 +191,30 @@
   color: red;
   font-weight: bold;
 }
+/* Menu nonaktif (habis / off) */
+.food-item-disabled .food-item-image {
+  filter: grayscale(70%) brightness(0.7);
+}
+
+/* Tombol disable */
+.disabled-button {
+  opacity: 0.7;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.disabled-button.add-icon-wrapper {
+  background-color: #424242 !important; /* abu-abu */
+  color: #fff !important;
+}
+
+.disabled-button.food-item-counter {
+  background-color: #a1a1a1 !important;
+  box-shadow: none;
+}
+
+.disabled-button .counter-icon.plus,
+.disabled-button .counter-icon.minus {
+  color: #888 !important;
+  background-color: transparent !important;
+}
