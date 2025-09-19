@@ -109,7 +109,7 @@ const LoginPopup = ({ setShowLogin, onLoginSuccess }) => {
             <input
               type={showPassword ? "text" : "password"}
               name="password"
-              placeholder="Buat Password"
+              placeholder="Password Akun"
               value={data.password}
               onChange={onChangeHandler}
               required
