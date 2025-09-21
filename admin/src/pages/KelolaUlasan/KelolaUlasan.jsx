@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./kelolaulasan.css";
+import { toast } from "react-toastify"; // Pastikan Anda mengimpor toast
 
-const API_BASE = "http://localhost:4000/api/reviews";
+const API_BASE = "http://localhost:4000/api/reviews"; // Ini rute untuk ulasan
+const FOOD_API = "http://localhost:4000/api/food"; // Kita butuh rute baru untuk makanan
 
 const KelolaUlasan = ({ isSidebarCollapsed }) => {
   const [reviews, setReviews] = useState([]);
   const [topMenus, setTopMenus] = useState([]);
-  const [favorite, setFavorite] = useState(null);
 
   useEffect(() => {
     const fetchReviews = async () => {
@@ -24,13 +25,11 @@ const KelolaUlasan = ({ isSidebarCollapsed }) => {
       try {
         const res = await axios.get(`${API_BASE}/top`);
         const menus = Array.isArray(res.data) ? res.data : [];
-        setTopMenus(menus);
-
-        if (menus.length > 0) setFavorite(menus[0]);
+        // ✅ Ambil hingga 5 menu teratas
+        setTopMenus(menus.slice(0, 5));
       } catch (error) {
         console.error("Error fetch top menus:", error);
         setTopMenus([]);
-        setFavorite(null);
       }
     };
 
@@ -38,28 +37,32 @@ const KelolaUlasan = ({ isSidebarCollapsed }) => {
     fetchTopMenus();
   }, []);
 
-  const toggleRecommendation = async () => {
-    if (!favorite) return;
-
+  const toggleRecommendation = async (menu) => {
     try {
-      const res = await axios.put(
-        `${API_BASE}/menu/${favorite._id}/recommendation`
-      );
+      const currentIsRecommended = menu.isRecommended;
+      const newIsRecommended = !currentIsRecommended;
 
-      setFavorite((prev) => ({
-        ...prev,
-        isRecommended: res.data.food.isRecommended,
-      }));
+      const res = await axios.post(`${FOOD_API}/update-recommendation`, {
+        id: menu._id,
+        isRecommended: newIsRecommended,
+      });
 
-      setTopMenus((prev) =>
-        prev.map((m) =>
-          m._id === favorite._id
-            ? { ...m, isRecommended: res.data.food.isRecommended }
-            : m
-        )
-      );
+      if (res.data.success) {
+        toast.success(`Status rekomendasi berhasil diubah.`);
+        // ✅ Perbarui status di frontend tanpa memuat ulang seluruh data
+        setTopMenus((prev) =>
+          prev.map((m) =>
+            m._id === menu._id
+              ? { ...m, isRecommended: newIsRecommended }
+              : m
+          )
+        );
+      } else {
+        toast.error("Gagal update rekomendasi.");
+      }
     } catch (error) {
       console.error("Gagal update rekomendasi:", error);
+      toast.error("Gagal update rekomendasi. Coba lagi nanti.");
     }
   };
 
@@ -111,21 +114,26 @@ const KelolaUlasan = ({ isSidebarCollapsed }) => {
       </div>
 
       {/* Menu terfavorit */}
-      {favorite && (
+      {/* ✅ Logika baru: Tampilkan semua menu terfavorit yang diambil */}
+      {topMenus.length > 0 && (
         <div className="favorite-section">
           <h3>Menu Terfavorit</h3>
-          <div className="favorite-card">
-            <div className="menu-name">{favorite.name}</div>
-            <div className="menu-rating">
-              ⭐ {favorite.avgRating?.toFixed(1)} ({favorite.totalReviews} ulasan)
-            </div>
-            <button
-              className={`btn-recommend ${favorite.isRecommended ? "active" : ""}`}
-              onClick={toggleRecommendation}
-            >
-              {favorite.isRecommended ? "Nonaktifkan Rekomendasi" : "Aktifkan Rekomendasi"}
-            </button>
-            {favorite.isRecommended && <p className="recommended-text">✅ Menu ini sedang direkomendasikan</p>}
+          <div className="favorite-cards">
+            {topMenus.map((menu) => (
+              <div key={menu._id} className="favorite-card">
+                <div className="menu-name">{menu.name}</div>
+                <div className="menu-rating">
+                  ⭐ {menu.avgRating?.toFixed(1)} ({menu.totalReviews} ulasan)
+                </div>
+                <button
+                  className={`btn-recommend ${menu.isRecommended ? "active" : ""}`}
+                  onClick={() => toggleRecommendation(menu)}
+                >
+                  {menu.isRecommended ? "Nonaktifkan Rekomendasi" : "Aktifkan Rekomendasi"}
+                </button>
+                {menu.isRecommended && <p className="recommended-text">✅ Menu ini sedang direkomendasikan</p>}
+              </div>
+            ))}
           </div>
         </div>
       )}

@@ -12,6 +12,7 @@ const FoodDisplay = ({ category }) => {
   const listRef = useRef(null);
 
   useEffect(() => {
+    // Logika animasi yang sudah ada, tidak diubah
     gsap.fromTo(
       listRef.current,
       { opacity: 0, y: 50 },
@@ -33,6 +34,7 @@ const FoodDisplay = ({ category }) => {
       <h2>Menu Rekomendasi</h2>
       <div className="food-display-list" ref={listRef}>
         {food_list.map((item, index) => (
+          // Logika filter kategori yang sudah ada, tidak diubah
           (category === "All" || category === item.category) && (
             <FoodItem
               key={index}
@@ -41,7 +43,9 @@ const FoodDisplay = ({ category }) => {
               description={item.description}
               price={item.price}
               image={item.image}
-              status={item.status ? item.status : "Tidak diketahui"} 
+              // Baris ini yang saya perbaiki.
+              // Cukup berikan status dari item, biarkan komponen FoodItem yang menanganinya.
+              status={item.status} 
             />
           )
         ))}

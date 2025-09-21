@@ -5,8 +5,11 @@ import {
   listFood,
   removeFood,
   editFood,
+  updateStatus,
+  updateRecommendationStatus,
+  getFoodDetailsById,
 } from "../controllers/foodController.js";
-import Food from "../models/foodModel.js"; // ✅ untuk rekomendasi
+import Food from "../models/foodModel.js";
 import multer from "multer";
 import fs from "fs";
 
@@ -52,18 +55,30 @@ foodRouter.get("/", listFood);
 foodRouter.get("/list", listFood);
 foodRouter.post("/remove", removeFood);
 foodRouter.post("/edit", uploadMiddleware, editFood);
+foodRouter.post("/update-status", updateStatus);
+foodRouter.post("/update-recommendation", updateRecommendationStatus); // Rute baru untuk rekomendasi
 
 // ======================
 // Routes rekomendasi menu
 // ======================
-// Ambil semua menu yang ditandai isRecommended = true
 foodRouter.get("/recommendations", async (req, res) => {
   try {
     const recommendedMenus = await Food.find({ isRecommended: true });
-    res.status(200).json(recommendedMenus);
+    res.status(200).json({
+      success: true,
+      data: recommendedMenus,
+    });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
   }
 });
+
+// ======================
+// Rute untuk debugging
+// ======================
+foodRouter.get("/:id/details", getFoodDetailsById);
 
 export default foodRouter;

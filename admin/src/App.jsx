@@ -8,7 +8,7 @@ import Add from './pages/Add/Add';
 import List from './pages/List/List';
 import Orders from './pages/Orders/Orders';
 import Dashboard from './pages/Dashboard/dashboard';
-import Kelolamenu from './pages/Kelolamenu/kelolamenu';
+import Kelolamenu from './pages/kelolamenu/kelolamenu';
 import Kelolapesanan from './pages/Kelolapesanan/kelolapesanan';
 import Kelolapengguna from './pages/Kelolapengguna/kelolapengguna';
 import Kelolakeuangan from './pages/Kelolakeuangan/kelolakeuangan';

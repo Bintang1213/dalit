@@ -167,3 +167,26 @@
     max-width: 200px;
   }
 }
+
+/* src/components/KelolaUlasan/kelolaulasan.css */
+
+/* ...kode CSS lain yang sudah ada */
+
+.favorite-cards {
+  display: flex;
+  gap: 20px; /* Memberi jarak antar kartu */
+  flex-wrap: wrap; /* Memastikan kartu pindah ke baris baru di layar kecil */
+  justify-content: flex-start; /* Menata kartu dari kiri */
+  margin-top: 20px;
+}
+
+.favorite-card {
+  /* Atur tampilan setiap kartu di sini */
+  flex: 0 0 auto; /* Mencegah kartu memanjang */
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  background-color: #fff;
+  text-align: center;
+}

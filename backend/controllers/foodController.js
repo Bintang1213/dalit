@@ -1,103 +1,153 @@
+// backend/controllers/foodController.js
 import foodModel from "../models/foodModel.js";
 import fs from 'fs';
 
-// add food item
+// Fungsi untuk menambahkan menu baru
 const addFood = async (req, res) => {
-  console.log("REQ.FILE:", req.file); 
-  console.log("REQ.BODY:", req.body); 
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: "Gambar tidak ditemukan!" });
+    }
 
-  try {
-    if (!req.file) {
-      return res.status(400).json({
-        success: false,
-        message: "Gambar tidak ditemukan! Pastikan Anda mengunggah file."
-      });
-    }
+    const image_filename = req.file.filename;
 
-    let image_filename = req.file.filename;
+    const food = new foodModel({
+      name: req.body.name,
+      description: req.body.description,
+      price: req.body.price,
+      category: req.body.category,
+      status: req.body.status || "Tersedia",
+      image: image_filename,
+      isRecommended: req.body.isRecommended || false // Default isRecommended ke false
+    });
 
-    const food = new foodModel({
-      name: req.body.name,
-      description: req.body.description,
-      price: req.body.price,
-      category: req.body.category,
-      status: req.body.status || "Tersedia",   // ✅ simpan status
-      image: image_filename
-    });
+    await food.save();
+    res.json({ success: true, message: "Menu berhasil ditambahkan" });
 
-    await food.save();
-    res.json({ success: true, message: "Food added successfully" });
-
-  } catch (error) {
-    console.error("Error:", error);
-    res.status(500).json({ success: false, message: "Server error" });
-  }
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
 };
 
-// all food list
-const listFood = async (req,res) => {
-  try {
-    const foods = await foodModel.find({});
-    res.json({succes:true,data:foods})
-  } catch (error) {
-    console.log(error);
-    res.json({success:false,message:"Error"})
-  }
-}
+// Fungsi untuk mendapatkan semua menu
+const listFood = async (req, res) => {
+  try {
+    const foods = await foodModel.find({});
+    res.json({ success: true, data: foods });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: "Error" });
+  }
+};
 
-// remove food item
-const removeFood = async (req,res) => {
-  try {
-    const food = await foodModel.findById(req.body.id);
-    if (food && food.image) {
-      fs.unlink(`uploads/${food.image}`, (err) => {
-        if (err) {
-          console.error("Gagal menghapus gambar:", err);
-        }
-      });
-    }
+// Fungsi untuk menghapus menu
+const removeFood = async (req, res) => {
+  try {
+    const food = await foodModel.findById(req.body.id);
+    if (food && food.image) {
+      fs.unlink(`uploads/${food.image}`, (err) => {
+        if (err) {
+          console.error("Gagal menghapus gambar:", err);
+        }
+      });
+    }
 
-    await foodModel.findByIdAndDelete(req.body.id);
-    res.json({succes:true,message:"Food removed"})
-  } catch (error) {
-    console.log(error);
-    res.json({succes:false,message:"error"})
-  }
-}
+    await foodModel.findByIdAndDelete(req.body.id);
+    res.json({ success: true, message: "Menu berhasil dihapus" });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: "error" });
+  }
+};
 
-// edit food item
+// Fungsi untuk mengedit menu
 const editFood = async (req, res) => {
-  try {
-    const { id, name, description, price, category, status } = req.body;
+  try {
+    const { id, name, description, price, category, status, isRecommended } = req.body; // ✅ Tambahkan isRecommended
 
-    const food = await foodModel.findById(id);
-    if (!food) {
-      return res.status(404).json({ success: false, message: "Food not found" });
-    }
+    const food = await foodModel.findById(id);
+    if (!food) {
+      return res.status(404).json({ success: false, message: "Menu tidak ditemukan" });
+    }
 
-    food.name = name;
-    food.description = description;
-    food.price = price;
-    food.category = category;
-    food.status = status || food.status;   // ✅ update status
+    food.name = name;
+    food.description = description;
+    food.price = price;
+    food.category = category;
+    food.status = status || food.status;
+    food.isRecommended = isRecommended !== undefined ? isRecommended : food.isRecommended; // ✅ Update isRecommended
 
-    if (req.file) {
-      if (food.image) {
-        fs.unlink(`uploads/${food.image}`, (err) => {
-          if (err) {
-            console.error("Gagal menghapus gambar lama:", err);
-          }
-        });
-      }
-      food.image = req.file.filename;
-    }
+    if (req.file) {
+      if (food.image) {
+        fs.unlink(`uploads/${food.image}`, (err) => {
+          if (err) {
+            console.error("Gagal menghapus gambar lama:", err);
+          }
+        });
+      }
+      food.image = req.file.filename;
+    }
 
-    await food.save();
-    res.json({ success: true, message: "Food updated successfully" });
-  } catch (error) {
-    console.error("Edit Error:", error);
-    res.status(500).json({ success: false, message: "Server error saat update" });
-  }
+    await food.save();
+    res.json({ success: true, message: "Menu berhasil diperbarui" });
+  } catch (error) {
+    console.error("Edit Error:", error);
+    res.status(500).json({ success: false, message: "Server error saat update" });
+  }
 };
 
-export { addFood, listFood, removeFood, editFood };
+// Fungsi untuk memperbarui status menu (Tersedia/Habis)
+const updateStatus = async (req, res) => {
+    try {
+        const { id, status } = req.body;
+        const food = await foodModel.findById(id);
+
+        if (!food) {
+            return res.status(404).json({ success: false, message: "Menu tidak ditemukan" });
+        }
+        
+        food.status = status;
+        await food.save();
+        res.json({ success: true, message: "Status berhasil diperbarui" });
+
+    } catch (error) {
+        console.error("Error saat memperbarui status:", error);
+        res.status(500).json({ success: false, message: "Server error saat update status" });
+    }
+};
+
+// Fungsi untuk memperbarui status rekomendasi
+const updateRecommendationStatus = async (req, res) => {
+    try {
+        const { id, isRecommended } = req.body;
+        const food = await foodModel.findById(id);
+
+        if (!food) {
+            return res.status(404).json({ success: false, message: "Menu tidak ditemukan" });
+        }
+
+        food.isRecommended = isRecommended;
+        await food.save();
+        res.json({ success: true, message: "Status rekomendasi berhasil diperbarui" });
+    } catch (error) {
+        console.error("Error saat memperbarui status rekomendasi:", error);
+        res.status(500).json({ success: false, message: "Server error saat update rekomendasi" });
+    }
+}
+
+// Fungsi untuk mendapatkan detail menu tunggal (untuk debugging)
+const getFoodDetailsById = async (req, res) => {
+    try {
+        const food = await foodModel.findById(req.params.id);
+        if (!food) {
+            return res.status(404).json({ success: false, message: "Menu tidak ditemukan" });
+        }
+        res.json({ success: true, data: food });
+    } catch (error) {
+        console.error("Error fetching food details:", error);
+        res.status(500).json({ success: false, message: "Server error" });
+    }
+};
+
+export { addFood, listFood, removeFood, editFood, updateStatus, updateRecommendationStatus, getFoodDetailsById };
