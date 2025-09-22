@@ -4,20 +4,24 @@ import {
   getReviews,
   toggleMenuRecommendation,
   getTopRatedMenus,
+  getReviewByOrder,
 } from "../controllers/reviewController.js";
 
 const router = express.Router();
 
-// ✅ Tambah ulasan (user)
+// User tambah review
 router.post("/", addReview);
 
-// ✅ Ambil semua ulasan (admin)
+// User lihat review berdasarkan order
+router.get("/order/:orderId", getReviewByOrder);
+
+// Admin ambil semua review
 router.get("/", getReviews);
 
-// ✅ Toggle rekomendasi menu (admin)
+// Admin toggle rekomendasi menu
 router.put("/menu/:foodId/recommendation", toggleMenuRecommendation);
 
-// ✅ Ambil menu top rated
+// Ambil menu top rated
 router.get("/top", getTopRatedMenus);
 
 export default router;

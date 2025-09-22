@@ -1,82 +1,84 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaStar } from "react-icons/fa";
 import axios from "axios";
-import "./ReviewForm.css"; // import css
+import "./ReviewForm.css";
 
-const ReviewForm = ({ menuId, userId, onReviewSubmitted }) => {
+const ReviewForm = ({ order, onReviewSubmitted, isReadOnly }) => {
   const [rating, setRating] = useState(0);
-  const [hover, setHover] = useState(null);
+  const [hover, setHover] = useState(0);
   const [comment, setComment] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchReview = async () => {
+      if (isReadOnly) {
+        try {
+          const res = await axios.get(`http://localhost:4000/api/reviews/order/${order._id}`);
+          setRating(res.data.rating);
+          setComment(res.data.comment || "");
+        } catch (err) {
+          console.error("Gagal ambil review:", err.response?.data || err.message);
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        setRating(0);
+        setComment("");
+        setLoading(false);
+      }
+    };
+    fetchReview();
+  }, [order, isReadOnly]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!rating) {
-      alert("Silakan beri rating terlebih dahulu ⭐");
-      return;
-    }
+    if (isReadOnly) return;
 
     try {
-      setLoading(true);
       await axios.post("http://localhost:4000/api/reviews", {
-        menuId,
-        userId,
+        userId: order.userId,
+        orderId: order._id,
         rating,
         comment,
       });
-      setRating(0);
-      setComment("");
-      if (onReviewSubmitted) onReviewSubmitted();
-    } catch (error) {
-      console.error("Error submitting review:", error);
-    } finally {
-      setLoading(false);
+      alert("✅ Rating berhasil dikirim");
+      onReviewSubmitted();
+    } catch (err) {
+      alert(err.response?.data?.message || "❌ Gagal kirim rating");
     }
   };
 
-  return (
-    <div className="review-form-container">
-      <h2 className="review-form-title">Beri Ulasan Menu 🍴</h2>
+  if (loading) return <div>Memuat...</div>;
 
-      {/* Rating Stars */}
-      <div className="review-stars">
-        {[...Array(5)].map((_, index) => {
-          const starValue = index + 1;
+  return (
+    <form className="review-form" onSubmit={handleSubmit}>
+      <h3>{isReadOnly ? "Rating Kamu" : "Beri Ulasan Pesanan"}</h3>
+      <div className="rating">
+        {[...Array(5)].map((_, i) => {
+          const starValue = i + 1;
           return (
             <FaStar
               key={starValue}
-              size={30}
-              className={
-                starValue <= (hover || rating)
-                  ? "star-active"
-                  : "star-inactive"
-              }
-              onClick={() => setRating(starValue)}
-              onMouseEnter={() => setHover(starValue)}
-              onMouseLeave={() => setHover(null)}
+              size={28}
+              color={starValue <= (hover || rating) ? "#ffc107" : "#e4e5e9"}
+              onMouseEnter={() => !isReadOnly && setHover(starValue)}
+              onMouseLeave={() => !isReadOnly && setHover(0)}
+              onClick={() => !isReadOnly && setRating(starValue)}
+              style={{ cursor: isReadOnly ? "default" : "pointer" }}
             />
           );
         })}
       </div>
 
-      {/* Comment Box */}
       <textarea
-        className="review-textarea"
-        rows="4"
-        placeholder="Tulis komentar kamu tentang menu ini..."
         value={comment}
+        placeholder="Tulis komentar..."
+        readOnly={isReadOnly}
         onChange={(e) => setComment(e.target.value)}
-      ></textarea>
+      />
 
-      {/* Submit Button */}
-      <button
-        onClick={handleSubmit}
-        disabled={loading}
-        className="review-submit-btn"
-      >
-        {loading ? "Mengirim..." : "Kirim Ulasan"}
-      </button>
-    </div>
+      {!isReadOnly && <button type="submit">Kirim Ulasan</button>}
+    </form>
   );
 };
 

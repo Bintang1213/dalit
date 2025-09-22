@@ -1,24 +1,68 @@
 import Review from "../models/reviewModel.js";
 import Food from "../models/foodModel.js";
+import Order from "../models/order.js";
 
 // ==============================
-// Tambah review (user)
+// Tambah review (user) - hanya sekali per order per user
 // ==============================
 export const addReview = async (req, res) => {
   try {
-    const { userId, foodId, rating, comment } = req.body;
+    const { userId, orderId, rating, comment } = req.body;
 
-    if (!userId || !foodId || !rating) {
-      return res.status(400).json({ message: "userId, foodId, dan rating wajib diisi" });
+    if (!userId || !orderId || !rating) {
+      return res
+        .status(400)
+        .json({ message: "userId, orderId, dan rating wajib diisi" });
     }
 
-    const review = new Review({ userId, foodId, rating, comment });
+    // cek sudah ada review dari user ini untuk order ini
+    const existingReview = await Review.findOne({ userId, orderId });
+    if (existingReview) {
+      return res
+        .status(400)
+        .json({ message: "Pesanan ini sudah diberi rating oleh user ini." });
+    }
+
+    // ambil pesanan
+    const order = await Order.findById(orderId);
+    if (!order) return res.status(404).json({ message: "Pesanan tidak ditemukan" });
+
+    // Ambil foodId pertama (atau sesuaikan kalau ada multi item)
+    const foodId = order.items[0]?._id;
+
+    const review = new Review({ userId, orderId, foodId, rating, comment });
     await review.save();
 
+    // tandai order sudah direview
+    order.reviewed = true;
+    await order.save();
+
     res.status(201).json({ success: true, review });
-  } catch (error) {
-    console.error("Error adding review:", error);
-    res.status(500).json({ success: false, message: error.message });
+  } catch (err) {
+    console.error("Error add review:", err);
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// ==============================
+// Ambil review berdasarkan orderId (untuk lihat rating user)
+// ==============================
+export const getReviewByOrder = async (req, res) => {
+  try {
+    const { orderId, userId } = req.params;
+
+    const review = await Review.findOne({ orderId, userId })
+      .populate("userId", "name email")
+      .populate("foodId", "name");
+
+    if (!review) {
+      return res.json({ reviewed: false, review: null });
+    }
+
+    res.json({ reviewed: true, review });
+  } catch (err) {
+    console.error("Error get review by order:", err);
+    res.status(500).json({ message: err.message });
   }
 };
 
@@ -32,9 +76,9 @@ export const getReviews = async (req, res) => {
       .populate("foodId", "name price");
 
     res.json(reviews);
-  } catch (error) {
-    console.error("Error fetching reviews:", error);
-    res.status(500).json({ message: "Gagal ambil review", error: error.message });
+  } catch (err) {
+    console.error("Error get reviews:", err);
+    res.status(500).json({ message: err.message });
   }
 };
 
@@ -45,29 +89,25 @@ export const toggleMenuRecommendation = async (req, res) => {
   try {
     const { foodId } = req.params;
     const food = await Food.findById(foodId);
-
     if (!food) return res.status(404).json({ message: "Menu tidak ditemukan" });
 
     food.isRecommended = !food.isRecommended;
     await food.save();
 
     res.json({ success: true, food });
-  } catch (error) {
-    console.error("Error toggling recommendation:", error);
-    res.status(500).json({ message: error.message });
+  } catch (err) {
+    console.error("Error toggle recommendation:", err);
+    res.status(500).json({ message: err.message });
   }
 };
 
 // ==============================
-// Ambil menu top rated (global) dengan nama menu
+// Ambil menu top rated (10 teratas)
 // ==============================
 export const getTopRatedMenus = async (req, res) => {
   try {
-    // Ambil aggregate rating semua review
     const topMenus = await Review.aggregate([
-      {
-        $match: { foodId: { $ne: null } }, // pastikan foodId valid
-      },
+      { $match: { foodId: { $ne: null } } },
       {
         $group: {
           _id: "$foodId",
@@ -79,15 +119,11 @@ export const getTopRatedMenus = async (req, res) => {
       { $limit: 10 },
     ]);
 
-    console.log("TopMenus Aggregate:", topMenus);
+    if (!topMenus.length) return res.json([]);
 
-    if (!topMenus.length) return res.json([]); // kalau kosong langsung return []
-
-    // Ambil detail nama dan status rekomendasi dari collection Food
     const foodIds = topMenus.map((t) => t._id);
     const foods = await Food.find({ _id: { $in: foodIds } });
 
-    // Merge hasil aggregate dengan data Food
     const merged = topMenus.map((t) => {
       const food = foods.find((f) => f._id.toString() === t._id.toString());
       return {
@@ -100,8 +136,8 @@ export const getTopRatedMenus = async (req, res) => {
     });
 
     res.json(merged);
-  } catch (error) {
-    console.error("Error fetching top menus:", error);
-    res.status(500).json({ message: "Gagal ambil top menus", error: error.message });
+  } catch (err) {
+    console.error("Error get top menus:", err);
+    res.status(500).json({ message: err.message });
   }
 };

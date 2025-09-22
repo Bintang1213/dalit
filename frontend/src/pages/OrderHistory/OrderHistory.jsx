@@ -1,24 +1,25 @@
-import React, { useEffect, useState } from 'react'; 
+import React, { useEffect, useState } from 'react';
 import "./OrderHistory.css";
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import moment from 'moment-timezone';
-import { FaClock, FaCogs, FaCheckCircle, FaTimesCircle, FaQuestionCircle, FaStar } from 'react-icons/fa';
+import { FaClock, FaCogs, FaCheckCircle, FaTimesCircle, FaQuestionCircle } from 'react-icons/fa';
+import ReviewForm from "../../components/ReviewForm/ReviewForm";
 
 const OrderHistory = () => {
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  // state untuk review
-  const [reviews, setReviews] = useState({}); 
-
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
-
-  // 🔥 state rekomendasi
   const [recommendations, setRecommendations] = useState([]);
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+
+  // ID pesanan yang sudah di-review
+  const [reviewedOrderIds, setReviewedOrderIds] = useState(new Set());
+  const [isReadOnly, setIsReadOnly] = useState(false);
 
   const formatCurrency = (number) => {
     return new Intl.NumberFormat('id-ID', {
@@ -62,7 +63,15 @@ const OrderHistory = () => {
           headers: { Authorization: `Bearer ${token}` }
         });
 
+        // Ambil ID pesanan yang sudah di-review, paksa ke string
+        const reviewedIds = new Set(response.data.data
+          .filter(order => order.reviewed)
+          .map(order => order._id.toString())
+        );
+
         setOrders(response.data.data);
+        setReviewedOrderIds(reviewedIds);
+
       } catch (err) {
         setError('Gagal memuat riwayat pesanan');
       } finally {
@@ -83,59 +92,24 @@ const OrderHistory = () => {
     fetchRecommendations();
   }, []);
 
-  const handleReviewChange = (orderId, itemId, field, value) => {
-    setReviews(prev => ({
-      ...prev,
-      [orderId]: {
-        ...prev[orderId],
-        [itemId]: {
-          ...prev[orderId]?.[itemId],
-          [field]: value
-        }
-      }
-    }));
+  const handleReviewClick = (order) => {
+    setSelectedOrder(order);
+    setShowReviewModal(true);
+    setIsReadOnly(false); // Mode beri rating
   };
 
-  const handleSubmitReview = async (orderId, itemId) => {
-    try {
-      const token = localStorage.getItem("token");
-      const review = reviews[orderId]?.[itemId];
-      const order = orders.find(o => o._id === orderId);
+  const handleViewRatingClick = (order) => {
+    setSelectedOrder(order);
+    setShowReviewModal(true);
+    setIsReadOnly(true); // Mode read-only
+  };
 
-      if (!order) {
-        alert("Order tidak ditemukan!");
-        return;
-      }
-
-      if (!review?.rating) {
-        alert("Harap isi rating!");
-        return;
-      }
-
-      await axios.post("http://localhost:4000/api/reviews", {
-        userId: order.userId,
-        foodId: itemId,
-        rating: review.rating,
-        comment: review.comment || ""
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
-      alert("Review berhasil dikirim!");
-
-      // Reset review setelah submit
-      setReviews(prev => ({
-        ...prev,
-        [orderId]: {
-          ...prev[orderId],
-          [itemId]: { rating: 0, comment: "" }
-        }
-      }));
-
-    } catch (error) {
-      console.error("Error kirim review:", error?.response?.data || error.message);
-      alert("Gagal mengirim review. Pastikan semua field sudah terisi.");
-    }
+  const onReviewSubmitted = () => {
+    // Update tombol secara realtime
+    setReviewedOrderIds(prev => new Set(prev).add(selectedOrder._id.toString()));
+    setShowReviewModal(false);
+    setSelectedOrder(null);
+    setIsReadOnly(false);
   };
 
   const indexOfLastOrder = currentPage * itemsPerPage;
@@ -170,19 +144,6 @@ const OrderHistory = () => {
 
   return (
     <div className="order-history">
-      {recommendations.length > 0 && (
-        <div className="recommendation-section">
-          <h3>🍽️ Rekomendasi Menu Untuk Anda</h3>
-          <ul>
-            {recommendations.map((menu, idx) => (
-              <li key={idx}>
-                {menu._id} ⭐ {menu.avgRating?.toFixed(1) || 0} ({menu.totalReviews} ulasan)
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
       <div className="table-wrapper">
         <table className="order-table">
           <thead>
@@ -197,62 +158,43 @@ const OrderHistory = () => {
             </tr>
           </thead>
           <tbody>
-            {currentOrders.map((order, index) => (
-              <React.Fragment key={index}>
-                <tr>
-                  <td>{moment(order.createdAt).format('DD/MM/YYYY HH:mm')}</td>
-                  <td className="ellipsis">{order.items.map(item => item.name).join(', ')}</td>
-                  <td>{order.payment}</td>
-                  <td>{order.method}</td>
-                  <td>{formatCurrency(order.totalAmount)}</td>
-                  <td className={getStatusClass(order.status)}>
-                    {getStatusIcon(order.status)} {order.status}
-                  </td>
-                  <td>
+            {currentOrders.map((order) => (
+              <tr key={order._id}>
+                <td>{moment(order.createdAt).format('DD/MM/YYYY HH:mm')}</td>
+                <td className="ellipsis">{order.items.map(item => item.name).join(', ')}</td>
+                <td>{order.payment}</td>
+                <td>{order.method}</td>
+                <td>{formatCurrency(order.totalAmount)}</td>
+                <td className={getStatusClass(order.status)}>
+                  {getStatusIcon(order.status)} {order.status}
+                </td>
+                <td style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  <button
+                    className="view-detail-btn"
+                    onClick={() => navigate('/struk', { state: { order } })}
+                  >
+                    Lihat Detail
+                  </button>
+
+                  {order.status.toLowerCase() === "selesai" && (
+                  reviewedOrderIds.has(order._id.toString()) ? (
                     <button
                       className="view-detail-btn"
-                      onClick={() => navigate('/struk', { state: { order } })}
+                      onClick={() => handleViewRatingClick(order)}
                     >
-                      Lihat Detail
+                      Lihat Rating
                     </button>
-                  </td>
-                </tr>
-
-                {order.status.toLowerCase() === "selesai" && (
-                  <tr>
-                    <td colSpan="7">
-                      <div className="review-section">
-                        <h4>Review Pesanan:</h4>
-                        {order.items.map(item => (
-                          <div key={item._id} className="review-form">
-                            <p><b>{item.name}</b></p>
-                            <div className="rating">
-                              {[1, 2, 3, 4, 5].map(star => (
-                                <FaStar
-                                  key={star}
-                                  onClick={() => handleReviewChange(order._id, item._id, "rating", star)}
-                                  style={{
-                                    cursor: "pointer",
-                                    color: (reviews[order._id]?.[item._id]?.rating || 0) >= star ? "gold" : "gray"
-                                  }}
-                                />
-                              ))}
-                            </div>
-                            <textarea
-                              placeholder="Tulis komentar..."
-                              value={reviews[order._id]?.[item._id]?.comment || ""}
-                              onChange={e => handleReviewChange(order._id, item._id, "comment", e.target.value)}
-                            />
-                            <button onClick={() => handleSubmitReview(order._id, item._id)}>
-                              Kirim Review
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    </td>
-                  </tr>
+                  ) : (
+                    <button
+                      className="rate-btn"
+                      onClick={() => handleReviewClick(order)}
+                    >
+                      Beri Rating
+                    </button>
+                  )
                 )}
-              </React.Fragment>
+                </td>
+              </tr>
             ))}
           </tbody>
         </table>
@@ -269,7 +211,30 @@ const OrderHistory = () => {
           </button>
         ))}
       </div>
-    </div>
+
+      {showReviewModal && (
+      <div className="modal-overlay">
+        <div className="modal-content">
+          <ReviewForm
+            // Kirim seluruh objek order
+            order={selectedOrder}
+            onReviewSubmitted={onReviewSubmitted}
+            isReadOnly={isReadOnly}
+          />
+          <button
+            className="close-modal"
+            onClick={() => {
+              setShowReviewModal(false);
+              setSelectedOrder(null);
+              setIsReadOnly(false);
+            }}
+          >
+            ✖
+          </button>
+        </div>
+      </div>
+          )}
+        </div>
   );
 };
 
