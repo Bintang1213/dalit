@@ -47,17 +47,25 @@ router.get("/", authMiddleware, async (req, res) => {
 // =============================
 router.get("/user", authMiddleware, async (req, res) => {
     try {
-        if (!req.userId) {
-            return errorResponse(res, 403, "Akses ditolak");
-        }
-
-        const orders = await Order.find({ userId: req.userId }).sort({ createdAt: -1 });
-        res.status(200).json({ success: true, count: orders.length, data: orders });
+      if (!req.userId) {
+        return errorResponse(res, 403, "Akses ditolak");
+      }
+  
+      const orders = await Order.find({ userId: req.userId }).sort({ createdAt: -1 }).lean();
+  
+      // Pastikan reviewed selalu ada (default false kalau undefined)
+      const data = orders.map(o => ({
+        ...o,
+        reviewed: o.reviewed || false,
+      }));
+  
+      res.status(200).json({ success: true, count: data.length, data });
     } catch (error) {
-        console.error("[ERROR] Failed to fetch user orders:", error);
-        errorResponse(res, 500, "Terjadi kesalahan server");
+      console.error("[ERROR] Failed to fetch user orders:", error);
+      errorResponse(res, 500, "Terjadi kesalahan server");
     }
-});
+  });
+  
 
 // =============================
 // GET order by ID

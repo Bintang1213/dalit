@@ -22,7 +22,7 @@ const Kelolamenu = ({ url }) => {
   const fetchList = async () => {
     try {
       const response = await axios.get(`${url}/api/food/list`);
-      if (response.data.succes) {
+      if (response.data.success) { // ✅ Perbaikan typo di sini
         setList(response.data.data);
       } else {
         toast.error("Error");
@@ -35,7 +35,7 @@ const Kelolamenu = ({ url }) => {
   const removeFood = async (foodId) => {
     try {
       const response = await axios.post(`${url}/api/food/remove`, { id: foodId });
-      if (response.data.succes) {
+      if (response.data.success) { // ✅ Perbaikan typo di sini
         toast.success(response.data.message);
         fetchList();
       } else {
@@ -73,7 +73,7 @@ const Kelolamenu = ({ url }) => {
         id: item._id,
         status: newStatus,
       });
-      if (response.data.succes) {
+      if (response.data.success) { // ✅ Perbaikan typo di sini
         toast.success("Status berhasil diperbarui");
         fetchList();
       } else {

@@ -1,18 +1,25 @@
 import React, { useEffect, useState } from 'react';
-import './OrderHistory.css';
+import "./OrderHistory.css";
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import moment from 'moment-timezone';
 import { FaClock, FaCogs, FaCheckCircle, FaTimesCircle, FaQuestionCircle } from 'react-icons/fa';
+import ReviewForm from "../../components/ReviewForm/ReviewForm";
 
 const OrderHistory = () => {
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
+  const [recommendations, setRecommendations] = useState([]);
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+
+  // ID pesanan yang sudah di-review
+  const [reviewedOrderIds, setReviewedOrderIds] = useState(new Set());
+  const [isReadOnly, setIsReadOnly] = useState(false);
 
   const formatCurrency = (number) => {
     return new Intl.NumberFormat('id-ID', {
@@ -56,7 +63,15 @@ const OrderHistory = () => {
           headers: { Authorization: `Bearer ${token}` }
         });
 
+        // Ambil ID pesanan yang sudah di-review, paksa ke string
+        const reviewedIds = new Set(response.data.data
+          .filter(order => order.reviewed)
+          .map(order => order._id.toString())
+        );
+
         setOrders(response.data.data);
+        setReviewedOrderIds(reviewedIds);
+
       } catch (err) {
         setError('Gagal memuat riwayat pesanan');
       } finally {
@@ -64,8 +79,38 @@ const OrderHistory = () => {
       }
     };
 
+    const fetchRecommendations = async () => {
+      try {
+        const res = await axios.get("http://localhost:4000/api/reviews/top");
+        setRecommendations(res.data);
+      } catch (error) {
+        console.error("Gagal ambil rekomendasi:", error?.response?.data || error.message);
+      }
+    };
+
     fetchOrders();
+    fetchRecommendations();
   }, []);
+
+  const handleReviewClick = (order) => {
+    setSelectedOrder(order);
+    setShowReviewModal(true);
+    setIsReadOnly(false); // Mode beri rating
+  };
+
+  const handleViewRatingClick = (order) => {
+    setSelectedOrder(order);
+    setShowReviewModal(true);
+    setIsReadOnly(true); // Mode read-only
+  };
+
+  const onReviewSubmitted = () => {
+    // Update tombol secara realtime
+    setReviewedOrderIds(prev => new Set(prev).add(selectedOrder._id.toString()));
+    setShowReviewModal(false);
+    setSelectedOrder(null);
+    setIsReadOnly(false);
+  };
 
   const indexOfLastOrder = currentPage * itemsPerPage;
   const indexOfFirstOrder = indexOfLastOrder - itemsPerPage;
@@ -74,7 +119,7 @@ const OrderHistory = () => {
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-    if (error) {
+  if (error) {
     return (
       <div className="order-history">
         <div style={{
@@ -113,8 +158,8 @@ const OrderHistory = () => {
             </tr>
           </thead>
           <tbody>
-            {currentOrders.map((order, index) => (
-              <tr key={index}>
+            {currentOrders.map((order) => (
+              <tr key={order._id}>
                 <td>{moment(order.createdAt).format('DD/MM/YYYY HH:mm')}</td>
                 <td className="ellipsis">{order.items.map(item => item.name).join(', ')}</td>
                 <td>{order.payment}</td>
@@ -123,13 +168,31 @@ const OrderHistory = () => {
                 <td className={getStatusClass(order.status)}>
                   {getStatusIcon(order.status)} {order.status}
                 </td>
-                <td>
+                <td style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                   <button
                     className="view-detail-btn"
                     onClick={() => navigate('/struk', { state: { order } })}
                   >
                     Lihat Detail
                   </button>
+
+                  {order.status.toLowerCase() === "selesai" && (
+                  reviewedOrderIds.has(order._id.toString()) ? (
+                    <button
+                      className="view-detail-btn"
+                      onClick={() => handleViewRatingClick(order)}
+                    >
+                      Lihat Rating
+                    </button>
+                  ) : (
+                    <button
+                      className="rate-btn"
+                      onClick={() => handleReviewClick(order)}
+                    >
+                      Beri Rating
+                    </button>
+                  )
+                )}
                 </td>
               </tr>
             ))}
@@ -148,7 +211,30 @@ const OrderHistory = () => {
           </button>
         ))}
       </div>
-    </div>
+
+      {showReviewModal && (
+      <div className="modal-overlay">
+        <div className="modal-content">
+          <ReviewForm
+            // Kirim seluruh objek order
+            order={selectedOrder}
+            onReviewSubmitted={onReviewSubmitted}
+            isReadOnly={isReadOnly}
+          />
+          <button
+            className="close-modal"
+            onClick={() => {
+              setShowReviewModal(false);
+              setSelectedOrder(null);
+              setIsReadOnly(false);
+            }}
+          >
+            ✖
+          </button>
+        </div>
+      </div>
+          )}
+        </div>
   );
 };
 

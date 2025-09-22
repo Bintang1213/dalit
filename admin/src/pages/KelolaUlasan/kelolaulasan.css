@@ -1,0 +1,192 @@
+.container-ulasan {
+  flex: 1;
+  margin-left: 260px;
+  padding: 30px;
+  font-family: 'Poppins', sans-serif;
+  background-color: #f9f9f9;
+  transition: margin-left 0.3s ease, width 0.3s ease;
+}
+
+.container-ulasan.sidebar-collapsed {
+  margin-left: 80px; /* kalau sidebar ditutup, konten tetap rapih */
+}
+
+.kelola-ulasan-header h2 {
+  font-size: 32px;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 20px;
+}
+
+.table-container {
+  overflow-x: auto;
+  margin-bottom: 40px;
+}
+
+.tabel-ulasan {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 14px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+  border: 1px solid #ddd;
+  overflow: hidden;
+}
+
+.tabel-ulasan th,
+.tabel-ulasan td {
+  padding: 14px;
+  text-align: center;
+  border-bottom: 1px solid #eee;
+  font-size: 15px;
+  vertical-align: top;
+}
+
+/* biar komentar panjang tetep rapih */
+.tabel-ulasan td.comment-cell {
+  max-width: 300px;
+  white-space: normal;
+  word-break: break-word;
+  text-align: left;
+}
+
+.tabel-ulasan th {
+  background-color: #b30000;
+  color: white;
+  font-weight: 600;
+}
+
+/* Summary Cards */
+.summary-section h3 {
+  font-size: 24px;
+  margin-bottom: 15px;
+}
+
+.summary-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.summary-card {
+  background: white;
+  padding: 20px;
+  border-radius: 14px;
+  flex: 1 1 200px;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.1);
+  text-align: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.summary-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.15);
+}
+
+.menu-name {
+  font-weight: 600;
+  margin-bottom: 8px;
+  font-size: 16px;
+}
+
+.menu-rating {
+  color: #ffb400;
+  font-weight: 500;
+  font-size: 15px;
+}
+
+.menu-rating span {
+  color: #555;
+  font-weight: 400;
+}
+
+/* Favorite Card */
+.favorite-section h3 {
+  font-size: 24px;
+  margin-bottom: 15px;
+}
+
+.favorite-card {
+  background: white;
+  padding: 25px;
+  border-radius: 14px;
+  max-width: 400px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.favorite-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+}
+
+.btn-recommend {
+  margin-top: 12px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  background-color: #b30000;
+  color: white;
+  transition: 0.3s;
+}
+
+.btn-recommend.active {
+  background-color: #444;
+}
+
+.btn-recommend:hover {
+  opacity: 0.9;
+}
+
+.recommended-text {
+  margin-top: 10px;
+  color: #28a745;
+  font-weight: 500;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container-ulasan {
+    margin-left: 0 !important;
+    padding: 15px;
+  }
+
+  .summary-cards {
+    flex-direction: column;
+  }
+
+  .tabel-ulasan th,
+  .tabel-ulasan td {
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  .tabel-ulasan td.comment-cell {
+    max-width: 200px;
+  }
+}
+
+/* src/components/KelolaUlasan/kelolaulasan.css */
+
+/* ...kode CSS lain yang sudah ada */
+
+.favorite-cards {
+  display: flex;
+  gap: 20px; /* Memberi jarak antar kartu */
+  flex-wrap: wrap; /* Memastikan kartu pindah ke baris baru di layar kecil */
+  justify-content: flex-start; /* Menata kartu dari kiri */
+  margin-top: 20px;
+}
+
+.favorite-card {
+  /* Atur tampilan setiap kartu di sini */
+  flex: 0 0 auto; /* Mencegah kartu memanjang */
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  background-color: #fff;
+  text-align: center;
+}

@@ -14,23 +14,20 @@ const orderSchema = new mongoose.Schema({
   note: { type: String },
   payment: { type: String, required: true },
   method: { type: String, required: true },
-  // Lebih spesifik untuk item_details agar konsisten dengan apa yang dikirim ke Midtrans
   items: [{
-    _id: { type: String, required: true }, // ID produk
+    _id: { type: String, required: true },
     name: { type: String, required: true },
     quantity: { type: Number, required: true },
     price: { type: Number, required: true },
   }],
   totalAmount: { type: Number, required: true },
-  // BARU: Tambahkan field untuk menyimpan biaya layanan dan ongkos kirim
   serviceFee: { type: Number, default: 0 },
   deliveryFee: { type: Number, default: 0 },
-  status: { type: String, default: 'menunggu' }, // Sesuaikan default jika diperlukan, contoh: 'pending'
-  // BARU: Tambahkan field untuk menyimpan data Midtrans
+  status: { type: String, default: 'menunggu' },
   midtransToken: { type: String },
   midtransRedirectUrl: { type: String },
+  reviewed: { type: Boolean, default: false }, // ✅ tambahin field ini
   createdAt: { type: Date, default: getLocalDate },
-  // BARU: Tambahkan field updatedAt jika Anda ingin melacak kapan order terakhir diperbarui
   updatedAt: { type: Date, default: getLocalDate },
 });
 

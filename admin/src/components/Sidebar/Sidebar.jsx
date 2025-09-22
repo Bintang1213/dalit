@@ -8,8 +8,9 @@ import {
   FaUsers,
   FaMoneyBillWave,
   FaSignOutAlt,
-  FaComments,
-  FaTags,   // ✅ icon voucher
+  FaComments, 
+  FaStar,
+  FaTags, 
 } from 'react-icons/fa';
 import tengkoLogo from '../../assets/tengko.png';
 
@@ -57,14 +58,18 @@ const Sidebar = () => {
         <NavLink to="/kelolakeuangan" className="sidebar-option" activeclassname="active">
           <FaMoneyBillWave className="menu-icon" />
           <p>Laporan Keuangan</p>
-        </NavLink>
-
-        {/* ✅ Kelola Voucher */}
+        </NavLink> 
+          <NavLink 
+          to="/kelolaulasan" 
+          className={({ isActive }) => isActive ? 'sidebar-option active' : 'sidebar-option'}
+          >
+          <FaStar className="menu-icon" />
+          <p>Kelola Ulasan</p>
+          </NavLink>
         <NavLink to="/kelolavoucher" className="sidebar-option" activeclassname="active">
           <FaTags className="menu-icon" />
           <p>Kelola Voucher</p>
         </NavLink>
-
         <NavLink to="/chat" className="sidebar-option" activeclassname="active">
           <FaComments className="menu-icon" />
           <p>Dukungan Chat</p>
