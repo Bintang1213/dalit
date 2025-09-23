@@ -133,7 +133,6 @@ router.post("/apply", authMiddleware, async (req, res) => {
       message: "Voucher berhasil digunakan",
       voucher: {
         id: voucher._id,
-        code: voucher.code,
         discountType: voucher.discountType,
         discountValue: voucher.discountValue,
         minPurchase: voucher.minPurchase,

@@ -29,18 +29,17 @@ const KelolaVoucher = () => {
     setEndDate("");
   };
 
-  // Ambil data voucher + usage
-const fetchVoucherUsage = async () => {
-  try {
-    const res = await axios.get("http://localhost:4000/api/vouchers", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    setVouchers(res.data);
-  } catch (err) {
-    console.error("Gagal ambil voucher:", err.response?.data || err.message);
-  }
-};
-
+  // Ambil data voucher
+  const fetchVoucherUsage = async () => {
+    try {
+      const res = await axios.get("http://localhost:4000/api/vouchers", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setVouchers(res.data);
+    } catch (err) {
+      console.error("Gagal ambil voucher:", err.response?.data || err.message);
+    }
+  };
 
   useEffect(() => {
     fetchVoucherUsage();
@@ -87,6 +86,15 @@ const fetchVoucherUsage = async () => {
         console.error("Hapus voucher error:", err.response?.data || err.message);
       }
     }
+  };
+
+  // Fungsi format tanggal DD/MM/YYYY
+  const formatTanggal = (dateStr) => {
+    const date = new Date(dateStr);
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
   };
 
   return (
@@ -166,7 +174,6 @@ const fetchVoucherUsage = async () => {
               <th>Minimal Belanja</th>
               <th>Maks. User</th>
               <th>Maks. Per Hari</th>
-              <th>Sisa Hari Ini</th>
               <th>Auto Apply</th>
               <th>Tanggal Mulai</th>
               <th>Tanggal Berakhir</th>
@@ -194,10 +201,9 @@ const fetchVoucherUsage = async () => {
                       ? "Unlimited"
                       : v.maxUsagePerDay ?? "-"}
                   </td>
-                  <td>{v.sisaHariIni ?? "-"}</td>
                   <td>{v.autoApply ? "Ya" : "Tidak"}</td>
-                  <td>{new Date(v.startDate).toLocaleDateString()}</td>
-                  <td>{new Date(v.endDate).toLocaleDateString()}</td>
+                  <td>{formatTanggal(v.startDate)}</td>
+                  <td>{formatTanggal(v.endDate)}</td>
                   <td>
                     <button
                       onClick={() => handleDeleteVoucher(v._id)}
@@ -210,7 +216,7 @@ const fetchVoucherUsage = async () => {
               ))
             ) : (
               <tr>
-                <td colSpan="10" style={{ textAlign: "center" }}>
+                <td colSpan="9" style={{ textAlign: "center" }}>
                   Belum ada voucher
                 </td>
               </tr>

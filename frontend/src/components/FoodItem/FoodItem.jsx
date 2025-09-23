@@ -2,10 +2,10 @@ import React, { useContext } from 'react';
 import './FoodItem.css';
 import { StoreContext } from '../../context/StoreContext';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
-import { FaPlus, FaMinus } from 'react-icons/fa';
+import { FaPlus, FaMinus, FaStar } from 'react-icons/fa';  // ⭐ ditambah
 import { toast } from 'react-toastify';
 
-const FoodItem = ({ id, name, price, description, image, status }) => {
+const FoodItem = ({ id, name, price, description, image, status, rating }) => {
   const { cartItems, addToCart, removeFromCart, url } = useContext(StoreContext);
 
   // ===== cek status aktif/nonaktif =====
@@ -56,6 +56,15 @@ const FoodItem = ({ id, name, price, description, image, status }) => {
   return (
     <div className={`food-item ${!isActive ? "food-item-disabled" : ""}`}>
       <div className="food-item-img-container">
+
+        {/* ⭐ Badge Rating */}
+        {rating !== undefined && (
+          <div className="food-rating-badge">
+            <FaStar className="star-icon" />
+            <span>{rating > 0 ? rating.toFixed(1) : "-"}</span>
+          </div>
+        )}
+
         <LazyLoadImage
           className='food-item-image'
           src={url + "/images/" + image}
@@ -92,7 +101,6 @@ const FoodItem = ({ id, name, price, description, image, status }) => {
         <p className="food-item-status">
           Status:{" "}
           <span className={isActive ? "status-aktif" : "status-nonaktif"}>
-            {/* Tampilkan teks status yang sudah diproses */}
             {statusText}
           </span>
         </p>
