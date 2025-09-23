@@ -177,22 +177,22 @@ const OrderHistory = () => {
                   </button>
 
                   {order.status.toLowerCase() === "selesai" && (
-                  reviewedOrderIds.has(order._id.toString()) ? (
-                    <button
-                      className="view-detail-btn"
-                      onClick={() => handleViewRatingClick(order)}
-                    >
-                      Lihat Rating
-                    </button>
-                  ) : (
-                    <button
-                      className="rate-btn"
-                      onClick={() => handleReviewClick(order)}
-                    >
-                      Beri Rating
-                    </button>
-                  )
-                )}
+                      reviewedOrderIds.has(order._id.toString()) ? (
+                        <button
+                          className="view-rating-btn"
+                          onClick={() => handleViewRatingClick(order)}
+                        >
+                          Lihat Rating
+                        </button>
+                      ) : (
+                        <button
+                          className="rate-btn"
+                          onClick={() => handleReviewClick(order)}
+                        >
+                          Beri Rating
+                        </button>
+                      )
+                    )}
                 </td>
               </tr>
             ))}

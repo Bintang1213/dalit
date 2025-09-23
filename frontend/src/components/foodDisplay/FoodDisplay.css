@@ -1,10 +1,9 @@
 
 .food-display{
-    margin-top: 30px;
+    margin-top: 10px;
 }
 .food-display h2{
-    font-size: max(2vw,24px);
-    font-weight: 600;
+    font-weight: 1000px;
     text-align: left;
     padding-left: 10px;
     padding-bottom: 20px;
@@ -13,7 +12,7 @@
   content: '';
   width: 222px;
   height: 3px;
-  background-color: crimson;
+  background-color: rgb(203, 0, 41);
   display: block;
   margin-top: 2px; /* sedikit jarak dari teks */
   border-radius: 2px;

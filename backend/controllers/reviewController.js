@@ -1,9 +1,10 @@
+// controllers/reviewController.js
 import Review from "../models/reviewModel.js";
 import Food from "../models/foodModel.js";
 import Order from "../models/order.js";
 
 // ==============================
-// Tambah review (user) - hanya sekali per order per user
+// Tambah review (user) - sekali per order, tapi berlaku ke semua menu dalam order
 // ==============================
 export const addReview = async (req, res) => {
   try {
@@ -27,17 +28,26 @@ export const addReview = async (req, res) => {
     const order = await Order.findById(orderId);
     if (!order) return res.status(404).json({ message: "Pesanan tidak ditemukan" });
 
-    // Ambil foodId pertama (atau sesuaikan kalau ada multi item)
-    const foodId = order.items[0]?._id;
+    if (!order.items || order.items.length === 0) {
+      return res.status(400).json({ message: "Pesanan tidak memiliki item" });
+    }
 
-    const review = new Review({ userId, orderId, foodId, rating, comment });
-    await review.save();
+    // buat review untuk setiap item di order
+    const reviewDocs = order.items.map((item) => ({
+      userId,
+      orderId,
+      foodId: item._id || item.foodId, // sesuaikan field yang dipakai di model Order
+      rating,
+      comment,
+    }));
+
+    const reviews = await Review.insertMany(reviewDocs);
 
     // tandai order sudah direview
     order.reviewed = true;
     await order.save();
 
-    res.status(201).json({ success: true, review });
+    res.status(201).json({ success: true, reviews });
   } catch (err) {
     console.error("Error add review:", err);
     res.status(500).json({ message: err.message });
@@ -45,21 +55,26 @@ export const addReview = async (req, res) => {
 };
 
 // ==============================
-// Ambil review berdasarkan orderId (untuk lihat rating user)
+// Ambil review berdasarkan orderId + userId
 // ==============================
 export const getReviewByOrder = async (req, res) => {
   try {
-    const { orderId, userId } = req.params;
+    const { orderId } = req.params;
+    const { userId } = req.query;
 
-    const review = await Review.findOne({ orderId, userId })
+    if (!userId) {
+      return res.status(400).json({ message: "userId wajib dikirim di query" });
+    }
+
+    const reviews = await Review.find({ orderId, userId })
       .populate("userId", "name email")
       .populate("foodId", "name");
 
-    if (!review) {
-      return res.json({ reviewed: false, review: null });
+    if (!reviews.length) {
+      return res.json({ reviewed: false, reviews: [] });
     }
 
-    res.json({ reviewed: true, review });
+    res.json({ reviewed: true, reviews });
   } catch (err) {
     console.error("Error get review by order:", err);
     res.status(500).json({ message: err.message });

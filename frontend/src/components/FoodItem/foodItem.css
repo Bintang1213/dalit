@@ -218,3 +218,24 @@
   color: #888 !important;
   background-color: transparent !important;
 }
+/* ⭐ Badge Rating */
+.food-rating-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: rgba(255, 200, 100, 0.9); /* oren kekuningan */
+  padding: 3px 7px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  box-shadow: 0px 2px 6px rgba(0,0,0,0.2);
+  z-index: 2;
+}
+
+.food-rating-badge .star-icon {
+  color: crimson;
+  font-size: 14px;
+}

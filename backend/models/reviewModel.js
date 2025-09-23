@@ -8,6 +8,11 @@ const reviewSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    orderId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Order",
+      required: true,
+    },
     foodId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Food",
