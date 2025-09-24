@@ -67,14 +67,29 @@ const KelolaUlasan = ({ isSidebarCollapsed }) => {
     }
   };
 
-  // --- Pagination logic ---
+  const handleDeleteReview = async (reviewId) => {
+    if (window.confirm("Apakah Anda yakin ingin menghapus ulasan ini?")) {
+      try {
+        const res = await axios.delete(`${API_BASE}/${reviewId}`);
+        if (res.status === 200) {
+          setReviews(reviews.filter((rev) => rev._id !== reviewId));
+          toast.success("Ulasan berhasil dihapus!");
+        } else {
+          toast.error("Gagal menghapus ulasan. Coba lagi.");
+        }
+      } catch (error) {
+        console.error("Error deleting review:", error);
+        toast.error("Gagal menghapus ulasan. Coba lagi nanti.");
+      }
+    }
+  };
+
   const totalPages = Math.ceil(reviews.length / reviewsPerPage);
   const startIndex = (currentPage - 1) * reviewsPerPage;
   const currentReviews = reviews.slice(startIndex, startIndex + reviewsPerPage);
 
   return (
     <div className={`container-ulasan ${isSidebarCollapsed ? "sidebar-collapsed" : ""}`}>
-      {/* 🔄 Posisi Rangkuman & Favorit dipindah ke atas */}
       <div className="summary-section">
         <h3>Rangkuman Rating per Menu</h3>
         <div className="summary-cards">
@@ -114,12 +129,10 @@ const KelolaUlasan = ({ isSidebarCollapsed }) => {
         </div>
       )}
 
-      {/* Judul kelola ulasan */}
       <div className="kelola-ulasan-header">
         <h2>Kelola Ulasan</h2>
       </div>
 
-      {/* 🔽 Tabel review */}
       <div className="table-container">
         <table className="tabel-ulasan">
           <thead>
@@ -130,6 +143,7 @@ const KelolaUlasan = ({ isSidebarCollapsed }) => {
               <th>Rating</th>
               <th>Komentar</th>
               <th>Tanggal</th>
+              <th>Aksi</th>
             </tr>
           </thead>
           <tbody>
@@ -141,13 +155,20 @@ const KelolaUlasan = ({ isSidebarCollapsed }) => {
                 <td>{"⭐".repeat(rev.rating)}</td>
                 <td className="comment-cell">{rev.comment}</td>
                 <td>{new Date(rev.createdAt).toLocaleDateString()}</td>
+                <td>
+                  <button 
+                    className="btn-delete" 
+                    onClick={() => handleDeleteReview(rev._id)}
+                  >
+                    Hapus
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
-      {/* 🔽 Pagination */}
       <div className="pagination">
         <button
           disabled={currentPage === 1}
