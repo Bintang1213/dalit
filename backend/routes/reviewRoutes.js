@@ -1,3 +1,4 @@
+// routes/reviewRoute.js
 import express from "express";
 import {
   addReview,
@@ -5,6 +6,7 @@ import {
   toggleMenuRecommendation,
   getTopRatedMenus,
   getReviewByOrder,
+  deleteReview, // <-- Import fungsi baru
 } from "../controllers/reviewController.js";
 
 const router = express.Router();
@@ -23,5 +25,8 @@ router.put("/menu/:foodId/recommendation", toggleMenuRecommendation);
 
 // Ambil menu top rated
 router.get("/top", getTopRatedMenus);
+
+// 🆕 Rute untuk menghapus ulasan
+router.delete("/:id", deleteReview);
 
 export default router;

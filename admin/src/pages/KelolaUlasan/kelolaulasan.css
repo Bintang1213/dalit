@@ -1,3 +1,5 @@
+/* src/components/KelolaUlasan/kelolaulasan.css */
+
 .container-ulasan {
   flex: 1;
   margin-left: 260px;
@@ -8,7 +10,7 @@
 }
 
 .container-ulasan.sidebar-collapsed {
-  margin-left: 80px; /* kalau sidebar ditutup, konten tetap rapih */
+  margin-left: 80px;
 }
 
 .kelola-ulasan-header h2 {
@@ -42,7 +44,6 @@
   vertical-align: top;
 }
 
-/* biar komentar panjang tetep rapih */
 .tabel-ulasan td.comment-cell {
   max-width: 300px;
   white-space: normal;
@@ -56,7 +57,6 @@
   font-weight: 600;
 }
 
-/* Summary Cards */
 .summary-section h3 {
   font-size: 24px;
   margin-bottom: 15px;
@@ -100,24 +100,27 @@
   font-weight: 400;
 }
 
-/* Favorite Card */
 .favorite-section h3 {
   font-size: 24px;
   margin-bottom: 15px;
 }
 
-.favorite-card {
-  background: white;
-  padding: 25px;
-  border-radius: 14px;
-  max-width: 400px;
-  box-shadow: 0 6px 16px rgba(0,0,0,0.12);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+.favorite-cards {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  margin-top: 20px;
 }
 
-.favorite-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+.favorite-card {
+  flex: 0 0 auto;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  background-color: #fff;
+  text-align: center;
 }
 
 .btn-recommend {
@@ -146,51 +149,6 @@
   font-weight: 500;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .container-ulasan {
-    margin-left: 0 !important;
-    padding: 15px;
-  }
-
-  .summary-cards {
-    flex-direction: column;
-  }
-
-  .tabel-ulasan th,
-  .tabel-ulasan td {
-    font-size: 14px;
-    padding: 10px;
-  }
-
-  .tabel-ulasan td.comment-cell {
-    max-width: 200px;
-  }
-}
-
-/* src/components/KelolaUlasan/kelolaulasan.css */
-
-/* ...kode CSS lain yang sudah ada */
-
-.favorite-cards {
-  display: flex;
-  gap: 20px; /* Memberi jarak antar kartu */
-  flex-wrap: wrap; /* Memastikan kartu pindah ke baris baru di layar kecil */
-  justify-content: flex-start; /* Menata kartu dari kiri */
-  margin-top: 20px;
-}
-
-.favorite-card {
-  /* Atur tampilan setiap kartu di sini */
-  flex: 0 0 auto; /* Mencegah kartu memanjang */
-  padding: 15px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  background-color: #fff;
-  text-align: center;
-}
-/* Pagination */
 .pagination {
   display: flex;
   justify-content: center;
@@ -219,4 +177,34 @@
   font-size: 15px;
   font-weight: 1000;
   color: #333;
+}
+
+/* --- Penambahan CSS untuk Fitur Hapus --- */
+
+.btn-delete {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  background-color: #dc3545; /* Merah untuk aksi hapus */
+  color: white;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-delete:hover {
+  background-color: #c82333;
+  transform: translateY(-1px);
+}
+
+.btn-delete:active {
+  background-color: #bd2130;
+  transform: translateY(0);
+}
+
+.tabel-ulasan th:last-child,
+.tabel-ulasan td:last-child {
+  width: 80px; /* Atur lebar kolom Aksi */
+  text-align: center;
 }

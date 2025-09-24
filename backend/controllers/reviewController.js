@@ -4,7 +4,7 @@ import Food from "../models/foodModel.js";
 import Order from "../models/order.js";
 
 // ==============================
-// Tambah review (user) - sekali per order, tapi berlaku ke semua menu dalam order
+// Tambah review (user)
 // ==============================
 export const addReview = async (req, res) => {
   try {
@@ -16,7 +16,6 @@ export const addReview = async (req, res) => {
         .json({ message: "userId, orderId, dan rating wajib diisi" });
     }
 
-    // cek sudah ada review dari user ini untuk order ini
     const existingReview = await Review.findOne({ userId, orderId });
     if (existingReview) {
       return res
@@ -24,7 +23,6 @@ export const addReview = async (req, res) => {
         .json({ message: "Pesanan ini sudah diberi rating oleh user ini." });
     }
 
-    // ambil pesanan
     const order = await Order.findById(orderId);
     if (!order) return res.status(404).json({ message: "Pesanan tidak ditemukan" });
 
@@ -32,24 +30,66 @@ export const addReview = async (req, res) => {
       return res.status(400).json({ message: "Pesanan tidak memiliki item" });
     }
 
-    // buat review untuk setiap item di order
     const reviewDocs = order.items.map((item) => ({
       userId,
       orderId,
-      foodId: item._id || item.foodId, // sesuaikan field yang dipakai di model Order
+      foodId: item._id || item.foodId,
       rating,
       comment,
     }));
 
     const reviews = await Review.insertMany(reviewDocs);
 
-    // tandai order sudah direview
     order.reviewed = true;
     await order.save();
 
     res.status(201).json({ success: true, reviews });
   } catch (err) {
     console.error("Error add review:", err);
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// ==============================
+// Hapus review (admin)
+// ==============================
+export const deleteReview = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // 1. Cari dan hapus ulasan yang bersangkutan
+    const reviewToDelete = await Review.findByIdAndDelete(id);
+
+    if (!reviewToDelete) {
+      return res.status(404).json({ message: "Ulasan tidak ditemukan" });
+    }
+
+    const foodId = reviewToDelete.foodId;
+
+    // 2. Hitung ulang rating rata-rata untuk menu yang terkait
+    const result = await Review.aggregate([
+      { $match: { foodId: foodId } },
+      {
+        $group: {
+          _id: "$foodId",
+          avgRating: { $avg: "$rating" },
+        },
+      },
+    ]);
+
+    // Tentukan rating rata-rata baru (atau 0 jika tidak ada ulasan tersisa)
+    const newAvgRating = result.length > 0 ? result[0].avgRating : 0;
+
+    // 3. Perbarui rating di model Food
+    await Food.findByIdAndUpdate(
+      foodId,
+      { avgRating: newAvgRating },
+      { new: true }
+    );
+
+    res.status(200).json({ success: true, message: "Ulasan berhasil dihapus" });
+  } catch (err) {
+    console.error("Error deleting review:", err);
     res.status(500).json({ message: err.message });
   }
 };

@@ -72,6 +72,23 @@ const KelolaUlasan = ({ isSidebarCollapsed }) => {
     }
   };
 
+  const handleDeleteReview = async (reviewId) => {
+    if (window.confirm("Apakah Anda yakin ingin menghapus ulasan ini?")) {
+      try {
+        const res = await axios.delete(`${API_BASE}/${reviewId}`);
+        if (res.status === 200) {
+          setReviews(reviews.filter((rev) => rev._id !== reviewId));
+          toast.success("Ulasan berhasil dihapus!");
+        } else {
+          toast.error("Gagal menghapus ulasan. Coba lagi.");
+        }
+      } catch (error) {
+        console.error("Error deleting review:", error);
+        toast.error("Gagal menghapus ulasan. Coba lagi nanti.");
+      }
+    }
+  };
+
   // --- buka popup history rating ---
   const handleViewHistory = async (rev) => {
     try {
@@ -93,6 +110,7 @@ const KelolaUlasan = ({ isSidebarCollapsed }) => {
   const currentReviews = reviews.slice(startIndex, startIndex + reviewsPerPage);
 
   return (
+    <div className={`container-ulasan ${isSidebarCollapsed ? "sidebar-collapsed" : ""}`}
     <div
       className={`container-ulasan ${
         isSidebarCollapsed ? "sidebar-collapsed" : ""
@@ -146,12 +164,10 @@ const KelolaUlasan = ({ isSidebarCollapsed }) => {
         </div>
       )}
 
-      {/* Judul kelola ulasan */}
       <div className="kelola-ulasan-header">
         <h2>Kelola Ulasan</h2>
       </div>
 
-      {/* 🔽 Tabel review */}
       <div className="table-container">
         <table className="tabel-ulasan">
           <thead>
@@ -175,6 +191,11 @@ const KelolaUlasan = ({ isSidebarCollapsed }) => {
                 <td className="comment-cell">{rev.comment}</td>
                 <td>{new Date(rev.createdAt).toLocaleDateString()}</td>
                 <td>
+                  <button 
+                    className="btn-delete" 
+                    onClick={() => handleDeleteReview(rev._id)}
+                  >
+                    Hapus
                   <button
                     className="btn-history"
                     onClick={() => handleViewHistory(rev)}
@@ -188,7 +209,6 @@ const KelolaUlasan = ({ isSidebarCollapsed }) => {
         </table>
       </div>
 
-      {/* 🔽 Pagination */}
       <div className="pagination">
         <button
           disabled={currentPage === 1}
