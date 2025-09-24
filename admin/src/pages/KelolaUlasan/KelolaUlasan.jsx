@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./kelolaulasan.css";
 import { toast } from "react-toastify";
+import { FaStar } from "react-icons/fa";
 
 const API_BASE = "http://localhost:4000/api/reviews";
 const FOOD_API = "http://localhost:4000/api/food";
@@ -11,6 +12,10 @@ const KelolaUlasan = ({ isSidebarCollapsed }) => {
   const [reviews, setReviews] = useState([]);
   const [topMenus, setTopMenus] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedReview, setSelectedReview] = useState(null); // ✅ untuk simpan order yg dipilih
+  const [history, setHistory] = useState([]); // ✅ data history rating
+  const [showPopup, setShowPopup] = useState(false);
+
   const reviewsPerPage = 10;
 
   useEffect(() => {
@@ -84,12 +89,34 @@ const KelolaUlasan = ({ isSidebarCollapsed }) => {
     }
   };
 
+  // --- buka popup history rating ---
+  const handleViewHistory = async (rev) => {
+    try {
+      setSelectedReview(rev);
+      setShowPopup(true);
+      const res = await axios.get(
+        `${API_BASE}/order/${rev.orderId}?userId=${rev.userId?._id}`
+      );
+      setHistory(res.data.reviews || []);
+    } catch (err) {
+      console.error("Gagal ambil history:", err);
+      toast.error("Gagal ambil history rating.");
+    }
+  };
+
+  // --- Pagination logic ---
   const totalPages = Math.ceil(reviews.length / reviewsPerPage);
   const startIndex = (currentPage - 1) * reviewsPerPage;
   const currentReviews = reviews.slice(startIndex, startIndex + reviewsPerPage);
 
   return (
-    <div className={`container-ulasan ${isSidebarCollapsed ? "sidebar-collapsed" : ""}`}>
+    <div className={`container-ulasan ${isSidebarCollapsed ? "sidebar-collapsed" : ""}`}
+    <div
+      className={`container-ulasan ${
+        isSidebarCollapsed ? "sidebar-collapsed" : ""
+      }`}
+    >
+      {/* 🔄 Rangkuman Rating */}
       <div className="summary-section">
         <h3>Rangkuman Rating per Menu</h3>
         <div className="summary-cards">
@@ -97,13 +124,15 @@ const KelolaUlasan = ({ isSidebarCollapsed }) => {
             <div key={menu._id} className="summary-card">
               <div className="menu-name">{menu.name}</div>
               <div className="menu-rating">
-                ⭐ {menu.avgRating?.toFixed(1)} <span>({menu.totalReviews} ulasan)</span>
+                ⭐ {menu.avgRating?.toFixed(1)}{" "}
+                <span>({menu.totalReviews} ulasan)</span>
               </div>
             </div>
           ))}
         </div>
       </div>
 
+      {/* 🔄 Menu Terfavorit */}
       {topMenus.length > 0 && (
         <div className="favorite-section">
           <h3>Menu Terfavorit</h3>
@@ -115,13 +144,19 @@ const KelolaUlasan = ({ isSidebarCollapsed }) => {
                   ⭐ {menu.avgRating?.toFixed(1)} ({menu.totalReviews} ulasan)
                 </div>
                 <button
-                  className={`btn-recommend ${menu.isRecommended ? "active" : ""}`}
+                  className={`btn-recommend ${
+                    menu.isRecommended ? "active" : ""
+                  }`}
                   onClick={() => toggleRecommendation(menu)}
                 >
-                  {menu.isRecommended ? "Nonaktifkan Rekomendasi" : "Aktifkan Rekomendasi"}
+                  {menu.isRecommended
+                    ? "Nonaktifkan Rekomendasi"
+                    : "Aktifkan Rekomendasi"}
                 </button>
                 {menu.isRecommended && (
-                  <p className="recommended-text">✅ Menu ini sedang direkomendasikan</p>
+                  <p className="recommended-text">
+                    ✅ Menu ini sedang direkomendasikan
+                  </p>
                 )}
               </div>
             ))}
@@ -161,6 +196,11 @@ const KelolaUlasan = ({ isSidebarCollapsed }) => {
                     onClick={() => handleDeleteReview(rev._id)}
                   >
                     Hapus
+                  <button
+                    className="btn-history"
+                    onClick={() => handleViewHistory(rev)}
+                  >
+                    Lihat Rating
                   </button>
                 </td>
               </tr>
@@ -186,6 +226,50 @@ const KelolaUlasan = ({ isSidebarCollapsed }) => {
           {">"}
         </button>
       </div>
+
+      {/* 🔽 Popup history rating */}
+      {showPopup && (
+        <div className="popup-overlay">
+          <div className="popup-content">
+            <h3>History Rating</h3>
+            <p>
+              User: <b>{selectedReview?.userId?.name}</b>
+            </p>
+            <p>
+              Order ID: <b>{selectedReview?.orderId}</b>
+            </p>
+
+            <div className="history-list">
+              {history.length > 0 ? (
+                history.map((h) => (
+                  <div key={h._id} className="history-item">
+                    <div className="history-menu">{h.foodId?.name}</div>
+                    <div className="history-stars">
+                      {[...Array(5)].map((_, i) => (
+                        <FaStar
+                          key={i}
+                          size={20}
+                          color={i < h.rating ? "#ffc107" : "#e4e5e9"}
+                        />
+                      ))}
+                    </div>
+                    <div className="history-comment">"{h.comment}"</div>
+                    <div className="history-date">
+                      {new Date(h.createdAt).toLocaleString()}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p>Tidak ada history rating.</p>
+              )}
+            </div>
+
+            <button className="btn-close" onClick={() => setShowPopup(false)}>
+              Tutup
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
