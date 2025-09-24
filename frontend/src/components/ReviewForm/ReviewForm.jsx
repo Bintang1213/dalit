@@ -5,7 +5,7 @@ import "./ReviewForm.css";
 import { StoreContext } from "../../context/StoreContext"; // sesuaikan path context-mu
 
 const ReviewForm = ({ order, onReviewSubmitted, isReadOnly }) => {
-  const { user } = useContext(StoreContext);
+  const { user } = useContext(StoreContext); // ambil user login
   const userId = user?._id;
 
   const [rating, setRating] = useState(0);
@@ -14,27 +14,29 @@ const ReviewForm = ({ order, onReviewSubmitted, isReadOnly }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchReview = async () => {
-      if (!order?._id || !userId) return;
+  const fetchReview = async () => {
+    if (!order?._id || !userId) return;
 
-      try {
-        const res = await axios.get(
-          `http://localhost:4000/api/reviews/order/${order._id}?userId=${userId}`
-        );
+    try {
+      const res = await axios.get(
+        `http://localhost:4000/api/reviews/order/${order._id}?userId=${userId}`
+      );
 
-        if (res.data?.reviewed) {
-          setRating(res.data.review.rating);
-          setComment(res.data.review.comment || "");
-        }
-      } catch (err) {
-        console.error("Gagal ambil review:", err.response?.data || err.message);
-      } finally {
-        setLoading(false);
+      if (res.data?.reviewed && res.data.reviews.length > 0) {
+        const firstReview = res.data.reviews[0]; // ✅ ambil review pertama
+        setRating(firstReview.rating);
+        setComment(firstReview.comment || "");
       }
-    };
+    } catch (err) {
+      console.error("Gagal ambil review:", err.response?.data || err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchReview();
-  }, [order, userId]);
+  fetchReview();
+}, [order, userId]);
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -59,7 +61,7 @@ const ReviewForm = ({ order, onReviewSubmitted, isReadOnly }) => {
   // --- Mode lihat rating ---
   if (isReadOnly) {
     return (
-      <div className="review-readonly-card">
+      <div className="review-form-container">
         <h3 className="review-form-title">Rating Kamu</h3>
         <div className="review-stars">
           {[...Array(5)].map((_, i) => {
@@ -67,13 +69,13 @@ const ReviewForm = ({ order, onReviewSubmitted, isReadOnly }) => {
             return (
               <FaStar
                 key={starValue}
-                size={26}
-                color={starValue <= rating ? "#facc15" : "#e5e7eb"}
+                size={28}
+                color={starValue <= rating ? "#ffc107" : "#e4e5e9"}
               />
             );
           })}
         </div>
-        <div className="review-comment">{comment || "Tanpa komentar"}</div>
+        <textarea className="review-textarea" value={comment} readOnly />
       </div>
     );
   }
@@ -90,7 +92,7 @@ const ReviewForm = ({ order, onReviewSubmitted, isReadOnly }) => {
             <FaStar
               key={starValue}
               size={28}
-              color={starValue <= (hover || rating) ? "#facc15" : "#e5e7eb"}
+              color={starValue <= (hover || rating) ? "#ffc107" : "#e4e5e9"}
               onMouseEnter={() => setHover(starValue)}
               onMouseLeave={() => setHover(0)}
               onClick={() => setRating(starValue)}
