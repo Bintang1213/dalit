@@ -13,13 +13,12 @@ const KelolaPesanan = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  // 🔍 state pencarian
+  const [searchQuery, setSearchQuery] = useState("");
+
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
-  const totalPages = Math.ceil(pesanan.length / itemsPerPage);
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentPesanan = pesanan.slice(indexOfFirstItem, indexOfLastItem);
 
   const getOrders = async () => {
     setLoading(true);
@@ -99,6 +98,17 @@ const KelolaPesanan = () => {
     getOrders();
   }, []);
 
+  // 🔍 Filter berdasarkan nama pemesan
+  const filteredPesanan = pesanan.filter((order) =>
+    order.name?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // Pagination setelah difilter
+  const totalPages = Math.ceil(filteredPesanan.length / itemsPerPage);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentPesanan = filteredPesanan.slice(indexOfFirstItem, indexOfLastItem);
+
   if (loading) {
     return (
       <div className="loading-container">
@@ -109,7 +119,22 @@ const KelolaPesanan = () => {
 
   return (
     <div className="container-pesanan">
-      <h1 className="judul">Kelola Pesanan</h1>
+      {/* 🔥 Header: Judul + Search */}
+      <div className="header-pesanan">
+        <h1 className="judul">Kelola Pesanan</h1>
+        <div className="search-container">
+          <span className="search-icon">🔍</span>
+          <input
+            type="text"
+            placeholder="Cari berdasarkan nama pemesan..."
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setCurrentPage(1); // reset ke page 1 setiap pencarian
+            }}
+          />
+        </div>
+      </div>
 
       {statusMessage && <div className="success-message">✓ {statusMessage}</div>}
       {error && <div className="error-message">❗ {error}</div>}
@@ -119,6 +144,7 @@ const KelolaPesanan = () => {
           <thead>
             <tr>
               <th>No</th>
+              <th>Nama Pemesan</th>
               <th>Tanggal</th>
               <th>Pesanan</th>
               <th>Harga</th>
@@ -135,20 +161,29 @@ const KelolaPesanan = () => {
               currentPesanan.map((order, index) => (
                 <tr key={order._id}>
                   <td>{indexOfFirstItem + index + 1}</td>
+                  <td>{order.name}</td>
                   <td>{new Date(order.createdAt).toLocaleString()}</td>
-                  <td>{order.items.map((item) => (
-                    <div key={item._id}>{item.name}</div>
-                  ))}</td>
-                  <td>{order.items.map((item) => (
-                    <div key={item._id}>Rp {item.price.toLocaleString()}</div>
-                  ))}</td>
-                  <td>{order.items.map((item) => (
-                    <div key={item._id}>{item.quantity}</div>
-                  ))}</td>
+                  <td>
+                    {order.items.map((item) => (
+                      <div key={item._id}>{item.name}</div>
+                    ))}
+                  </td>
+                  <td>
+                    {order.items.map((item) => (
+                      <div key={item._id}>Rp {item.price.toLocaleString()}</div>
+                    ))}
+                  </td>
+                  <td>
+                    {order.items.map((item) => (
+                      <div key={item._id}>{item.quantity}</div>
+                    ))}
+                  </td>
                   <td>Rp {order.totalAmount.toLocaleString()}</td>
                   <td>{order.method}</td>
                   <td>{order.payment}</td>
-                  <td className={`status-${order.status.toLowerCase()}`}>{order.status}</td>
+                  <td className={`status-${order.status.toLowerCase()}`}>
+                    {order.status}
+                  </td>
                   <td className="aksi">
                     <button
                       onClick={() => openModal(order._id, "Menunggu")}
@@ -173,14 +208,16 @@ const KelolaPesanan = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="10">Tidak ada pesanan</td>
+                <td colSpan="11" className="no-orders">
+                  Tidak ada pesanan
+                </td>
               </tr>
             )}
           </tbody>
         </table>
       </div>
 
-      {/* Pagination seperti KelolaMenu */}
+      {/* Pagination */}
       <div className="pagination-controls">
         <span
           className="pagination-arrow"
@@ -211,7 +248,10 @@ const KelolaPesanan = () => {
               ?
             </h2>
             <div className="modal-buttons">
-              <button className="confirm-btn" onClick={() => updateStatus(selectedStatus)}>
+              <button
+                className="confirm-btn"
+                onClick={() => updateStatus(selectedStatus)}
+              >
                 Ya
               </button>
               <button className="cancel-btn" onClick={closeModal}>
