@@ -1,3 +1,4 @@
+// KelolaVoucher.jsx
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./kelolavoucher.css";
@@ -6,6 +7,7 @@ const KelolaVoucher = () => {
   const [vouchers, setVouchers] = useState([]);
 
   // State form tambah
+  const [title, setTitle] = useState("");
   const [discountType, setDiscountType] = useState("percent");
   const [discountValue, setDiscountValue] = useState("");
   const [minPurchase, setMinPurchase] = useState("");
@@ -14,11 +16,12 @@ const KelolaVoucher = () => {
   const [autoApply, setAutoApply] = useState(false);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [remaining, setRemaining] = useState(""); // -1 or empty = unlimited
 
   const token = localStorage.getItem("token");
 
-  // reset form tambah
   const resetForm = () => {
+    setTitle("");
     setDiscountType("percent");
     setDiscountValue("");
     setMinPurchase("");
@@ -27,12 +30,12 @@ const KelolaVoucher = () => {
     setAutoApply(false);
     setStartDate("");
     setEndDate("");
+    setRemaining("");
   };
 
-  // Ambil data voucher
   const fetchVoucherUsage = async () => {
     try {
-      const res = await axios.get("http://localhost:4000/api/vouchers", {
+      const res = await axios.get("http://localhost:4000/api/vouchers/admin", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setVouchers(res.data);
@@ -43,6 +46,7 @@ const KelolaVoucher = () => {
 
   useEffect(() => {
     fetchVoucherUsage();
+    // eslint-disable-next-line
   }, []);
 
   const handleAddVoucher = async () => {
@@ -54,6 +58,7 @@ const KelolaVoucher = () => {
       await axios.post(
         "http://localhost:4000/api/vouchers",
         {
+          title,
           discountType,
           discountValue: Number(discountValue),
           minPurchase: Number(minPurchase) || 0,
@@ -62,6 +67,7 @@ const KelolaVoucher = () => {
           autoApply,
           startDate,
           endDate,
+          remaining: remaining === "" ? -1 : Number(remaining),
         },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -90,6 +96,7 @@ const KelolaVoucher = () => {
 
   // Fungsi format tanggal DD/MM/YYYY
   const formatTanggal = (dateStr) => {
+    if (!dateStr) return "-";
     const date = new Date(dateStr);
     const day = String(date.getDate()).padStart(2, "0");
     const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -104,6 +111,13 @@ const KelolaVoucher = () => {
 
         {/* Form tambah voucher */}
         <div className="voucher-form">
+          <input
+            type="text"
+            placeholder="Judul (opsional)"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
+
           <select
             value={discountType}
             onChange={(e) => setDiscountType(e.target.value)}
@@ -140,6 +154,13 @@ const KelolaVoucher = () => {
             onChange={(e) => setMaxUsagePerDay(e.target.value)}
           />
 
+          <input
+            type="number"
+            placeholder="Remaining global (-1 = unlimited)"
+            value={remaining}
+            onChange={(e) => setRemaining(e.target.value)}
+          />
+
           <label className="checkbox">
             <input
               type="checkbox"
@@ -169,14 +190,17 @@ const KelolaVoucher = () => {
         <table className="voucher-table">
           <thead>
             <tr>
+              <th>Judul</th>
               <th>Jenis Diskon</th>
               <th>Nilai Diskon</th>
               <th>Minimal Belanja</th>
               <th>Maks. User</th>
               <th>Maks. Per Hari</th>
+              <th>Remaining</th>
               <th>Auto Apply</th>
               <th>Tanggal Mulai</th>
               <th>Tanggal Berakhir</th>
+              <th>Sisa Hari Ini</th>
               <th>Aksi</th>
             </tr>
           </thead>
@@ -184,6 +208,7 @@ const KelolaVoucher = () => {
             {vouchers.length > 0 ? (
               vouchers.map((v) => (
                 <tr key={v._id}>
+                  <td>{v.title || "-"}</td>
                   <td>
                     {v.discountType === "percent"
                       ? "Persentase (%)"
@@ -197,13 +222,13 @@ const KelolaVoucher = () => {
                   <td>Rp {v.minPurchase}</td>
                   <td>{v.maxUsagePerUser ?? "-"}</td>
                   <td>
-                    {v.maxUsagePerDay === 0
-                      ? "Unlimited"
-                      : v.maxUsagePerDay ?? "-"}
+                    {v.maxUsagePerDay === 0 ? "Unlimited" : v.maxUsagePerDay ?? "-"}
                   </td>
+                  <td>{v.remaining >= 0 ? v.remaining : "Unlimited"}</td>
                   <td>{v.autoApply ? "Ya" : "Tidak"}</td>
                   <td>{formatTanggal(v.startDate)}</td>
                   <td>{formatTanggal(v.endDate)}</td>
+                  <td>{v.sisaHariIni ?? "-"}</td>
                   <td>
                     <button
                       onClick={() => handleDeleteVoucher(v._id)}
@@ -216,7 +241,7 @@ const KelolaVoucher = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="9" style={{ textAlign: "center" }}>
+                <td colSpan="12" style={{ textAlign: "center" }}>
                   Belum ada voucher
                 </td>
               </tr>

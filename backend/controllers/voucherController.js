@@ -5,11 +5,13 @@ export const createVoucher = async (req, res) => {
   try {
     const voucher = new Voucher(req.body);
     await voucher.save();
-    res.status(201).json(voucher);
+    res.status(201).json({ success: true, voucher });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    console.error("Error createVoucher:", err);
+    res.status(500).json({ success: false, message: err.message });
   }
 };
+
 
 // Admin: lihat semua voucher
 export const getVouchers = async (req, res) => {
