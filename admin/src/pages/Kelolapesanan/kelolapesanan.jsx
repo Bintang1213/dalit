@@ -119,32 +119,30 @@ const KelolaPesanan = () => {
 
   return (
     <div className="container-pesanan">
-      {/* 🔥 Header: Judul + Search */}
-      <div className="header-pesanan">
-        <h1 className="judul">Kelola Pesanan</h1>
-        <div className="search-container">
-          <span className="search-icon">🔍</span>
-          <input
-            type="text"
-            placeholder="Cari berdasarkan nama pemesan..."
-            value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value);
-              setCurrentPage(1); // reset ke page 1 setiap pencarian
-            }}
-          />
-        </div>
-      </div>
+      <h1 className="judul">Kelola Pesanan</h1>
 
       {statusMessage && <div className="success-message">✓ {statusMessage}</div>}
       {error && <div className="error-message">❗ {error}</div>}
+
+      {/* 🔍 Input pencarian */}
+      <div className="search-container">
+        <input
+          type="text"
+          placeholder="Cari berdasarkan nama pemesan..."
+          value={searchQuery}
+          onChange={(e) => {
+            setSearchQuery(e.target.value);
+            setCurrentPage(1); // reset ke page 1 setiap pencarian
+          }}
+        />
+      </div>
 
       <div className="table-container">
         <table className="tabel-pesanan">
           <thead>
             <tr>
               <th>No</th>
-              <th>Nama Pemesan</th>
+              <th>Nama Pemesan</th> {/* ✅ Tambah kolom nama */}
               <th>Tanggal</th>
               <th>Pesanan</th>
               <th>Harga</th>
@@ -161,7 +159,7 @@ const KelolaPesanan = () => {
               currentPesanan.map((order, index) => (
                 <tr key={order._id}>
                   <td>{indexOfFirstItem + index + 1}</td>
-                  <td>{order.name}</td>
+                  <td>{order.name}</td> {/* ✅ Tampilkan nama */}
                   <td>{new Date(order.createdAt).toLocaleString()}</td>
                   <td>
                     {order.items.map((item) => (
@@ -208,9 +206,7 @@ const KelolaPesanan = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="11" className="no-orders">
-                  Tidak ada pesanan
-                </td>
+                <td colSpan="11">Tidak ada pesanan</td>
               </tr>
             )}
           </tbody>
