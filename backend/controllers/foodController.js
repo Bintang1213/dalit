@@ -150,4 +150,38 @@ const getFoodDetailsById = async (req, res) => {
     }
 };
 
-export { addFood, listFood, removeFood, editFood, updateStatus, updateRecommendationStatus, getFoodDetailsById };
+// Tambahan fungsi pencarian menu
+const searchFood = async (req, res) => {
+  try {
+    const { query } = req.query;
+
+    if (!query || query.trim() === "") {
+      return res.json({ success: true, data: [] });
+    }
+
+    // Cari di name, description, atau price (regex agar fleksibel)
+    const foods = await foodModel.find({
+      $or: [
+        { name: { $regex: query, $options: "i" } },
+        { description: { $regex: query, $options: "i" } },
+        { price: isNaN(Number(query)) ? -1 : Number(query) } // harga harus angka valid
+      ]
+    });
+
+    res.json({ success: true, data: foods });
+  } catch (error) {
+    console.error("Error search:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+export {
+  addFood,
+  listFood,
+  removeFood,
+  editFood,
+  updateStatus,
+  updateRecommendationStatus,
+  getFoodDetailsById,
+  searchFood, // <-- Tambahkan export
+};
