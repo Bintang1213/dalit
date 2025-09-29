@@ -71,7 +71,7 @@ const KelolaVoucher = () => {
         },
         {
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
       fetchVoucherUsage();
       resetForm();
@@ -89,7 +89,10 @@ const KelolaVoucher = () => {
         });
         fetchVoucherUsage();
       } catch (err) {
-        console.error("Hapus voucher error:", err.response?.data || err.message);
+        console.error(
+          "Hapus voucher error:",
+          err.response?.data || err.message,
+        );
       }
     }
   };
@@ -222,7 +225,9 @@ const KelolaVoucher = () => {
                   <td>Rp {v.minPurchase}</td>
                   <td>{v.maxUsagePerUser ?? "-"}</td>
                   <td>
-                    {v.maxUsagePerDay === 0 ? "Unlimited" : v.maxUsagePerDay ?? "-"}
+                    {v.maxUsagePerDay === 0
+                      ? "Unlimited"
+                      : (v.maxUsagePerDay ?? "-")}
                   </td>
                   <td>{v.remaining >= 0 ? v.remaining : "Unlimited"}</td>
                   <td>{v.autoApply ? "Ya" : "Tidak"}</td>

@@ -1,19 +1,19 @@
-import React, { useEffect, useState } from 'react';
-import './Add.css';
-import { assets } from '../../assets/assets';
-import axios from 'axios';
-import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import "./Add.css";
+import { assets } from "../../assets/assets";
+import axios from "axios";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const Add = ({ url, onClose, editData }) => {
   const navigate = useNavigate();
   const [image, setImage] = useState(null);
   const [data, setData] = useState({
-    name: '',
-    description: '',
-    price: '',
-    category: 'Paket Nasi Liwet',
-    status: 'Tersedia', // ✅ default status
+    name: "",
+    description: "",
+    price: "",
+    category: "Paket Nasi Liwet",
+    status: "Tersedia", // ✅ default status
   });
 
   useEffect(() => {
@@ -23,15 +23,15 @@ const Add = ({ url, onClose, editData }) => {
         description: editData.description,
         price: editData.price,
         category: editData.category,
-        status: editData.status || 'Tersedia', // ✅ ambil status lama
+        status: editData.status || "Tersedia", // ✅ ambil status lama
       });
     } else {
       setData({
-        name: '',
-        description: '',
-        price: '',
-        category: 'Paket Nasi Liwet',
-        status: 'Tersedia',
+        name: "",
+        description: "",
+        price: "",
+        category: "Paket Nasi Liwet",
+        status: "Tersedia",
       });
       setImage(null);
     }
@@ -45,20 +45,20 @@ const Add = ({ url, onClose, editData }) => {
   const onSubmithandler = async (event) => {
     event.preventDefault();
     const formData = new FormData();
-    formData.append('name', data.name);
-    formData.append('description', data.description);
-    formData.append('price', Number(data.price));
-    formData.append('category', data.category);
-    formData.append('status', data.status); // ✅ kirim status
+    formData.append("name", data.name);
+    formData.append("description", data.description);
+    formData.append("price", Number(data.price));
+    formData.append("category", data.category);
+    formData.append("status", data.status); // ✅ kirim status
 
     if (image) {
-      formData.append('image', image);
+      formData.append("image", image);
     }
 
     try {
       let response;
       if (editData) {
-        formData.append('id', editData._id);
+        formData.append("id", editData._id);
         response = await axios.post(`${url}/api/food/edit`, formData);
       } else {
         response = await axios.post(`${url}/api/food/add`, formData);
@@ -79,10 +79,12 @@ const Add = ({ url, onClose, editData }) => {
   return (
     <div className="overlay" onClick={onClose}>
       <div className="add" onClick={(e) => e.stopPropagation()}>
-        <button className="close-btn" onClick={onClose}>×</button>
+        <button className="close-btn" onClick={onClose}>
+          ×
+        </button>
         <form onSubmit={onSubmithandler}>
-          <h2 style={{ marginBottom: '20px' }}>
-            {editData ? 'EDIT MENU' : 'TAMBAH MENU'}
+          <h2 style={{ marginBottom: "20px" }}>
+            {editData ? "EDIT MENU" : "TAMBAH MENU"}
           </h2>
 
           {/* Upload Gambar */}
@@ -94,8 +96,8 @@ const Add = ({ url, onClose, editData }) => {
                   image
                     ? URL.createObjectURL(image)
                     : editData
-                    ? `${url}/images/${editData.image}`
-                    : assets.upload_area
+                      ? `${url}/images/${editData.image}`
+                      : assets.upload_area
                 }
                 alt="upload"
               />
@@ -103,9 +105,16 @@ const Add = ({ url, onClose, editData }) => {
             <input
               onChange={(e) => {
                 const file = e.target.files[0];
-                const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
+                const allowedTypes = [
+                  "image/jpeg",
+                  "image/png",
+                  "image/webp",
+                  "image/jpg",
+                ];
                 if (file && !allowedTypes.includes(file.type)) {
-                  toast.error("Hanya file gambar yang diperbolehkan (jpg, jpeg, png, webp)");
+                  toast.error(
+                    "Hanya file gambar yang diperbolehkan (jpg, jpeg, png, webp)",
+                  );
                   e.target.value = null;
                   return;
                 }
@@ -147,7 +156,11 @@ const Add = ({ url, onClose, editData }) => {
           {/* Kategori */}
           <div className="add-category">
             <p>Kategori</p>
-            <select onChange={onChangeHandler} name="category" value={data.category}>
+            <select
+              onChange={onChangeHandler}
+              name="category"
+              value={data.category}
+            >
               <option value="Paket Nasi Liwet">Paket Nasi Liwet</option>
               <option value="Aneka Lauk">Aneka Lauk</option>
               <option value="Aneka Mie">Aneka Mie</option>
@@ -172,14 +185,18 @@ const Add = ({ url, onClose, editData }) => {
           {/* Status Menu */}
           <div className="add-status">
             <p>Status Menu</p>
-            <select onChange={onChangeHandler} name="status" value={data.status}>
+            <select
+              onChange={onChangeHandler}
+              name="status"
+              value={data.status}
+            >
               <option value="Tersedia">Tersedia</option>
               <option value="Habis">Habis</option>
             </select>
           </div>
 
           <button type="submit" className="add-btn">
-            {editData ? 'Simpan Perubahan' : 'Buat'}
+            {editData ? "Simpan Perubahan" : "Buat"}
           </button>
         </form>
       </div>

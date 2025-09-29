@@ -12,7 +12,6 @@ export const createVoucher = async (req, res) => {
   }
 };
 
-
 // Admin: lihat semua voucher
 export const getVouchers = async (req, res) => {
   try {

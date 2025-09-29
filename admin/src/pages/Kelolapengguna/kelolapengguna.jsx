@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import './kelolapengguna.css';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import "./kelolapengguna.css";
 
 const KelolaPengguna = () => {
   const [pengguna, setPengguna] = useState([]);
@@ -29,15 +29,18 @@ const KelolaPengguna = () => {
   };
 
   const handleHapus = async (id) => {
-    const konfirmasi = window.confirm('Yakin ingin menghapus pengguna ini?');
+    const konfirmasi = window.confirm("Yakin ingin menghapus pengguna ini?");
     if (konfirmasi) {
       try {
         const res = await axios.delete(`http://localhost:4000/api/user/${id}`);
         if (res.data.success) {
-          const updated = pengguna.filter(user => user._id !== id);
+          const updated = pengguna.filter((user) => user._id !== id);
           setPengguna(updated);
 
-          const lastPageItemCount = updated.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).length;
+          const lastPageItemCount = updated.slice(
+            (currentPage - 1) * itemsPerPage,
+            currentPage * itemsPerPage,
+          ).length;
           if (lastPageItemCount === 0 && currentPage > 1) {
             setCurrentPage(currentPage - 1);
           }
@@ -72,7 +75,11 @@ const KelolaPengguna = () => {
         </thead>
         <tbody>
           {loading ? (
-            <tr><td colSpan="4" style={{ textAlign: 'center' }}>Memuat data...</td></tr>
+            <tr>
+              <td colSpan="4" style={{ textAlign: "center" }}>
+                Memuat data...
+              </td>
+            </tr>
           ) : currentItems.length > 0 ? (
             currentItems.map((user, index) => (
               <tr key={user._id}>
@@ -80,14 +87,21 @@ const KelolaPengguna = () => {
                 <td>{user.name}</td>
                 <td>{user.email}</td>
                 <td>
-                  <button className="btn-hapus" onClick={() => handleHapus(user._id)}>
+                  <button
+                    className="btn-hapus"
+                    onClick={() => handleHapus(user._id)}
+                  >
                     Hapus
                   </button>
                 </td>
               </tr>
             ))
           ) : (
-            <tr><td colSpan="4" style={{ textAlign: 'center' }}>Tidak ada pengguna</td></tr>
+            <tr>
+              <td colSpan="4" style={{ textAlign: "center" }}>
+                Tidak ada pengguna
+              </td>
+            </tr>
           )}
         </tbody>
       </table>

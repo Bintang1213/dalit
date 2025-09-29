@@ -18,20 +18,28 @@ router.post("/login", async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ success: false, message: "Email dan password harus diisi" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Email dan password harus diisi" });
     }
 
     const admin = await Admin.findOne({ email });
     if (!admin) {
-      return res.status(400).json({ success: false, message: "Email atau password salah" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Email atau password salah" });
     }
 
     const isMatch = await bcrypt.compare(password, admin.password);
     if (!isMatch) {
-      return res.status(400).json({ success: false, message: "Email atau password salah" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Email atau password salah" });
     }
 
-    const token = jwt.sign({ adminId: admin._id }, process.env.JWT_SECRET, { expiresIn: "30d" });
+    const token = jwt.sign({ adminId: admin._id }, process.env.JWT_SECRET, {
+      expiresIn: "30d",
+    });
 
     res.status(200).json({
       success: true,
@@ -40,7 +48,13 @@ router.post("/login", async (req, res) => {
       adminId: admin._id,
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: "Terjadi kesalahan server", error: error.message });
+    res
+      .status(500)
+      .json({
+        success: false,
+        message: "Terjadi kesalahan server",
+        error: error.message,
+      });
   }
 });
 
@@ -49,12 +63,20 @@ router.get("/profile", authMiddleware, async (req, res) => {
   try {
     const admin = await Admin.findById(req.adminId).select("-password");
     if (!admin) {
-      return res.status(404).json({ success: false, message: "Admin tidak ditemukan" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Admin tidak ditemukan" });
     }
 
     res.status(200).json({ success: true, admin });
   } catch (error) {
-    res.status(500).json({ success: false, message: "Terjadi kesalahan server", error: error.message });
+    res
+      .status(500)
+      .json({
+        success: false,
+        message: "Terjadi kesalahan server",
+        error: error.message,
+      });
   }
 });
 

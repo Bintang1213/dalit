@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import './sidebar.css';
-import { NavLink } from 'react-router-dom';
+import React, { useState } from "react";
+import "./sidebar.css";
+import { NavLink } from "react-router-dom";
 import {
   FaTachometerAlt,
   FaUtensils,
@@ -8,11 +8,11 @@ import {
   FaUsers,
   FaMoneyBillWave,
   FaSignOutAlt,
-  FaComments, 
+  FaComments,
   FaStar,
-  FaTags, 
-} from 'react-icons/fa';
-import tengkoLogo from '../../assets/tengko.png';
+  FaTags,
+} from "react-icons/fa";
+import tengkoLogo from "../../assets/tengko.png";
 
 const Sidebar = () => {
   const [isClosed, setIsClosed] = useState(false);
@@ -22,10 +22,10 @@ const Sidebar = () => {
   };
 
   return (
-    <div className={`sidebar ${isClosed ? 'closed' : ''}`}>
+    <div className={`sidebar ${isClosed ? "closed" : ""}`}>
       {/* Tombol Toggle */}
       <button className="toggle-btn" onClick={toggleSidebar}>
-        {isClosed ? '☰' : '⮜'}
+        {isClosed ? "☰" : "⮜"}
       </button>
 
       {/* Logo */}
@@ -35,38 +35,64 @@ const Sidebar = () => {
 
       {/* Menu Options */}
       <div className="sidebar-options">
-        <NavLink to="/dashboard" className="sidebar-option" activeclassname="active">
+        <NavLink
+          to="/dashboard"
+          className="sidebar-option"
+          activeclassname="active"
+        >
           <FaTachometerAlt className="menu-icon" />
           <p>Dashboard</p>
         </NavLink>
 
-        <NavLink to="/kelolamenu" className="sidebar-option" activeclassname="active">
+        <NavLink
+          to="/kelolamenu"
+          className="sidebar-option"
+          activeclassname="active"
+        >
           <FaUtensils className="menu-icon" />
           <p>Kelola Menu</p>
         </NavLink>
 
-        <NavLink to="/kelolapesanan" className="sidebar-option" activeclassname="active">
+        <NavLink
+          to="/kelolapesanan"
+          className="sidebar-option"
+          activeclassname="active"
+        >
           <FaClipboardList className="menu-icon" />
           <p>Kelola Pesanan</p>
         </NavLink>
 
-        <NavLink to="/kelolapengguna" className="sidebar-option" activeclassname="active">
+        <NavLink
+          to="/kelolapengguna"
+          className="sidebar-option"
+          activeclassname="active"
+        >
           <FaUsers className="menu-icon" />
           <p>Kelola Pengguna</p>
         </NavLink>
 
-        <NavLink to="/kelolakeuangan" className="sidebar-option" activeclassname="active">
+        <NavLink
+          to="/kelolakeuangan"
+          className="sidebar-option"
+          activeclassname="active"
+        >
           <FaMoneyBillWave className="menu-icon" />
           <p>Laporan Keuangan</p>
-        </NavLink> 
-          <NavLink 
-          to="/kelolaulasan" 
-          className={({ isActive }) => isActive ? 'sidebar-option active' : 'sidebar-option'}
-          >
+        </NavLink>
+        <NavLink
+          to="/kelolaulasan"
+          className={({ isActive }) =>
+            isActive ? "sidebar-option active" : "sidebar-option"
+          }
+        >
           <FaStar className="menu-icon" />
           <p>Kelola Ulasan</p>
-          </NavLink>
-        <NavLink to="/kelolavoucher" className="sidebar-option" activeclassname="active">
+        </NavLink>
+        <NavLink
+          to="/kelolavoucher"
+          className="sidebar-option"
+          activeclassname="active"
+        >
           <FaTags className="menu-icon" />
           <p>Kelola Voucher</p>
         </NavLink>
@@ -75,7 +101,11 @@ const Sidebar = () => {
           <p>Dukungan Chat</p>
         </NavLink>
 
-        <NavLink to="/logout" className="sidebar-option" activeclassname="active">
+        <NavLink
+          to="/logout"
+          className="sidebar-option"
+          activeclassname="active"
+        >
           <FaSignOutAlt className="menu-icon" />
           <p>Logout</p>
         </NavLink>

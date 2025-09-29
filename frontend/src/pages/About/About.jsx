@@ -1,5 +1,5 @@
-import './About.css';
-import { assets } from '../../assets/assets';
+import "./About.css";
+import { assets } from "../../assets/assets";
 
 const About = () => {
   return (
@@ -15,10 +15,16 @@ const About = () => {
         <div className="story-text">
           <h2>Kisah Kami</h2>
           <p>
-            Kedai Wartiyem didirikan oleh Ibu Dewi Karmila Wulandari pada tahun 2020, setelah sebelumnya melayani pelanggan melalui WhatsApp dan Facebook sejak 2018. Dengan semangat menghadirkan cita rasa rumahan yang autentik, kami terus berkembang mengikuti perubahan zaman.
+            Kedai Wartiyem didirikan oleh Ibu Dewi Karmila Wulandari pada tahun
+            2020, setelah sebelumnya melayani pelanggan melalui WhatsApp dan
+            Facebook sejak 2018. Dengan semangat menghadirkan cita rasa rumahan
+            yang autentik, kami terus berkembang mengikuti perubahan zaman.
           </p>
           <p>
-            Untuk menjawab tantangan operasional dan permintaan pelanggan, kami mengembangkan sistem pemesanan digital yang mendukung layanan makan di tempat, di bungkus, dan di antar. Tujuannya: lebih cepat, akurat, dan efisien.
+            Untuk menjawab tantangan operasional dan permintaan pelanggan, kami
+            mengembangkan sistem pemesanan digital yang mendukung layanan makan
+            di tempat, di bungkus, dan di antar. Tujuannya: lebih cepat, akurat,
+            dan efisien.
           </p>
         </div>
         <div className="story-image">
@@ -32,13 +38,18 @@ const About = () => {
         <div className="visi-misi-grid">
           <div className="visi-box">
             <h3>Visi</h3>
-            <p>Menjadi rumah makan pilihan utama yang menggabungkan rasa autentik dengan pelayanan berbasis teknologi modern.</p>
+            <p>
+              Menjadi rumah makan pilihan utama yang menggabungkan rasa autentik
+              dengan pelayanan berbasis teknologi modern.
+            </p>
           </div>
           <div className="misi-box">
             <h3>Misi</h3>
             <ul>
               <li>Menyediakan makanan berkualitas dengan harga terjangkau</li>
-              <li>Mengutamakan kepuasan pelanggan melalui layanan cepat dan tepat</li>
+              <li>
+                Mengutamakan kepuasan pelanggan melalui layanan cepat dan tepat
+              </li>
               <li>Terus berinovasi dalam pelayanan dan teknologi</li>
             </ul>
           </div>
@@ -59,13 +70,18 @@ const About = () => {
       {/* CTA Section */}
       <section className="cta-section">
         <h2>🍽️ Ingin Coba Masakan Kami?</h2>
-        <p>🚀 Pesan sekarang dan rasakan sensasi kuliner rumahan yang berbeda!</p>
+        <p>
+          🚀 Pesan sekarang dan rasakan sensasi kuliner rumahan yang berbeda!
+        </p>
       </section>
 
       {/* Map Section */}
       <section className="map-section">
         <h2 className="map-title">
-          Lokasi Kami <span className="emoji" role="img" aria-label="pin">📍</span>
+          Lokasi Kami{" "}
+          <span className="emoji" role="img" aria-label="pin">
+            📍
+          </span>
         </h2>
         <iframe
           className="map-iframe"

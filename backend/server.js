@@ -6,27 +6,19 @@ import { fileURLToPath } from "url";
 import http from "http";
 import { Server } from "socket.io";
 import jwt from "jsonwebtoken";
-
-
-// Config & DB
 import { connectDB } from "./config/db.js";
-
-// Router
 import foodRouter from "./routes/foodRoute.js";
 import userRouter from "./routes/userRoute.js";
 import cartRouter from "./routes/cartRoute.js";
 import adminRouter from "./routes/adminRoute.js";
 import orderRouter from "./routes/orderRoute.js";
 import chatRouter from "./routes/chatRoutes.js";
-import reviewRoutes from "./routes/reviewRoutes.js"; // ✅ Router ulasan
-
-// Model
+import reviewRoutes from "./routes/reviewRoutes.js";
 import chatModel from "./models/chatModel.js";
-
 dotenv.config();
-// ✅ Tambahan voucher router
 import voucherRouter from "./routes/voucherRoutes.js";
 import voucherUsageRouter from "./routes/voucherUsageRoute.js";
+import notificationRouter from "./routes/notificationRoutes.js"; 
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -43,7 +35,6 @@ const io = new Server(server, {
   },
 });
 
-// ✅ Middleware Socket untuk JWT
 io.use((socket, next) => {
   const token = socket.handshake.auth.token;
   if (!token) {
@@ -62,7 +53,7 @@ io.use((socket, next) => {
   }
 });
 
-// ✅ Allowed Origins
+// Allowed Origins
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
@@ -86,12 +77,10 @@ const corsOptions = {
   allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
 };
 
-// ✅ Middleware Express
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ✅ Static files
 app.use(
   "/images",
   (req, res, next) => {
@@ -99,43 +88,45 @@ app.use(
     res.header("Access-Control-Allow-Methods", "GET");
     next();
   },
-  express.static(path.join(__dirname, "uploads"))
+  express.static(path.join(__dirname, "uploads")),
 );
 
-// ✅ Connect Database
 connectDB();
 
 app.use("/api/food", foodRouter);
 app.use("/api/user", userRouter);
 app.use("/api/cart", cartRouter);
 app.use("/api/admin", adminRouter);
+app.use("/api/notifications", notificationRouter); 
 
-// ✅ Route voucher usage (log pemakaian voucher)
+// Route voucher usage (log pemakaian voucher)
 app.use("/api/voucher-usage", voucherUsageRouter);
-
-// ✅ Route order
-app.use("/api/order", orderRouter);
-
-// ✅ Route chat
+app.use("/api/order", orderRouter(io));
+// Route chat
 app.use("/api/chat", chatRouter);
-app.use("/api/reviews", reviewRoutes); // 👉 Route ulasan
-
-// ✅ Route voucher
+app.use("/api/reviews", reviewRoutes);
+// Route voucher
 app.use("/api/vouchers", voucherRouter);
 
 app.get("/", (req, res) => {
   res.send("API Working");
 });
 
-// ✅ Socket.IO Logic
+
 io.on("connection", (socket) => {
   const userId = socket.userId;
   const adminId = socket.adminId;
   const userType = socket.userType;
   const identifier = userId || adminId;
 
-  console.log(`${userType} terhubung: ${identifier}`);
-
+  console.log(`[Socket] ${userType} terhubung: ${identifier}`); 
+ 
+  if (identifier) {
+    socket.join(identifier);
+    console.log(
+      `[Socket] ${userType} ${identifier} joined room: ${identifier}`,
+    );
+  } 
   socket.on("join_chat", async (conversationId) => {
     try {
       if (!conversationId || typeof conversationId !== "string") {
@@ -148,7 +139,7 @@ io.on("connection", (socket) => {
         if (!match || match[1] !== userId.toString()) {
           socket.emit(
             "error_message",
-            "Akses ditolak: Anda hanya bisa mengakses chat Anda sendiri"
+            "Akses ditolak: Anda hanya bisa mengakses chat Anda sendiri",
           );
           return;
         }
@@ -166,7 +157,7 @@ io.on("connection", (socket) => {
       socket.join(conversationId);
       socket.currentRoom = conversationId;
       console.log(
-        `${userType} ${identifier} bergabung ke percakapan: ${conversationId}`
+        `[Socket] ${userType} ${identifier} bergabung ke percakapan: ${conversationId}`,
       );
       socket.emit("joined_chat", { conversationId, userType });
     } catch (error) {
@@ -189,7 +180,7 @@ io.on("connection", (socket) => {
       if (message.length > 1000) {
         socket.emit(
           "error_message",
-          "Pesan terlalu panjang (maksimal 1000 karakter)"
+          "Pesan terlalu panjang (maksimal 1000 karakter)",
         );
         return;
       }
@@ -199,7 +190,7 @@ io.on("connection", (socket) => {
         if (!match || match[1] !== userId.toString()) {
           socket.emit(
             "error_message",
-            "Akses ditolak: Anda hanya bisa mengirim pesan ke chat Anda sendiri"
+            "Akses ditolak: Anda hanya bisa mengirim pesan ke chat Anda sendiri",
           );
           return;
         }
@@ -208,7 +199,7 @@ io.on("connection", (socket) => {
       if (socket.currentRoom !== conversationId) {
         socket.emit(
           "error_message",
-          "Anda harus bergabung ke chat terlebih dahulu"
+          "Anda harus bergabung ke chat terlebih dahulu",
         );
         return;
       }
@@ -255,13 +246,13 @@ io.on("connection", (socket) => {
       console.log(
         `Pesan dari ${userType} ${identifier} ke room ${conversationId}: ${message.substring(
           0,
-          50
-        )}...`
+          50,
+        )}...`,
       );
 
       const roomSockets = await io.in(conversationId).fetchSockets();
       console.log(
-        `Jumlah client di room ${conversationId}: ${roomSockets.length}`
+        `Jumlah client di room ${conversationId}: ${roomSockets.length}`,
       );
       io.to(conversationId).emit("receive_message", {
         ...newMessage,
@@ -282,7 +273,6 @@ io.on("connection", (socket) => {
       socket.to(conversationId).emit("user_typing", {
         userId: identifier,
         userType,
-        isTyping: true,
       });
     }
   });
@@ -312,7 +302,7 @@ io.on("connection", (socket) => {
   });
 });
 
-// ✅ Error Handling
+// Error Handling
 app.use((err, req, res, next) => {
   if (err.message === "Not allowed by CORS") {
     res.status(403).json({
@@ -325,7 +315,7 @@ app.use((err, req, res, next) => {
   }
 });
 
-// ✅ Start Server
+// Start Server
 server.listen(port, () => {
   console.log(`Server Started on http://localhost:${port}`);
   console.log(`Allowed origins: ${allowedOrigins.join(", ")}`);

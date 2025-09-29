@@ -26,7 +26,7 @@ export const getVoucherUsage = async (req, res) => {
           ...v.toObject(),
           sisaHariIni,
         };
-      })
+      }),
     );
 
     res.json(result);
@@ -70,7 +70,10 @@ export const applyVoucher = async (req, res) => {
       usedAt: { $gte: startOfDay, $lte: endOfDay },
     });
 
-    if (voucher.maxUsagePerUser > 0 && userUsageToday >= voucher.maxUsagePerUser) {
+    if (
+      voucher.maxUsagePerUser > 0 &&
+      userUsageToday >= voucher.maxUsagePerUser
+    ) {
       return res
         .status(400)
         .json({ message: "Kamu sudah menggunakan voucher ini hari ini" });

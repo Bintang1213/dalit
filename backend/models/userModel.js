@@ -7,10 +7,10 @@ const userSchema = new mongoose.Schema(
     password: { type: String, required: true },
     cartData: { type: Object, default: {} },
   },
-  { 
-    minimize: false, 
-    timestamps: true // ✅ tambahin biar bisa simpan createdAt & updatedAt
-  }
+  {
+    minimize: false,
+    timestamps: true, // ✅ tambahin biar bisa simpan createdAt & updatedAt
+  },
 );
 
 // ✅ konsisten: gunakan "User" sebagai nama model biar sama dengan ref di Review.js

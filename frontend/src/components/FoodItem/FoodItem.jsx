@@ -1,33 +1,44 @@
-import React, { useContext } from 'react';
-import './FoodItem.css';
-import { StoreContext } from '../../context/StoreContext';
-import { LazyLoadImage } from 'react-lazy-load-image-component';
-import { FaPlus, FaMinus, FaStar } from 'react-icons/fa';  // ⭐ ditambah
-import { toast } from 'react-toastify';
+import React, { useContext } from "react";
+import "./FoodItem.css";
+import { StoreContext } from "../../context/StoreContext";
+import { LazyLoadImage } from "react-lazy-load-image-component";
+import { FaPlus, FaMinus, FaStar } from "react-icons/fa"; // ⭐ ditambah
+import { toast } from "react-toastify";
 
 const FoodItem = ({ id, name, price, description, image, status, rating }) => {
-  const { cartItems, addToCart, removeFromCart, url } = useContext(StoreContext);
+  const { cartItems, addToCart, removeFromCart, url } =
+    useContext(StoreContext);
 
   // ===== cek status aktif/nonaktif =====
   const disabledKeywords = [
-    'habis', 'nonaktif', 'kosong', 'sold out', 'unavailable', 'tidak tersedia', 'off', 'disabled'
+    "habis",
+    "nonaktif",
+    "kosong",
+    "sold out",
+    "unavailable",
+    "tidak tersedia",
+    "off",
+    "disabled",
   ];
 
   let isActive = true;
-  if (typeof status === 'boolean') {
+  if (typeof status === "boolean") {
     isActive = status;
-  } else if (typeof status === 'number') {
+  } else if (typeof status === "number") {
     isActive = status === 1;
-  } else if (typeof status === 'string') {
+  } else if (typeof status === "string") {
     const s = status.trim().toLowerCase();
-    isActive = !disabledKeywords.some(k => s.includes(k));
+    isActive = !disabledKeywords.some((k) => s.includes(k));
   }
-  
+
   // Tentukan teks status yang akan ditampilkan
   let statusText = status || "Tidak Diketahui";
   if (!isActive) {
     statusText = "Habis";
-  } else if (typeof status === 'string' && status.trim().toLowerCase() === 'tersedia') {
+  } else if (
+    typeof status === "string" &&
+    status.trim().toLowerCase() === "tersedia"
+  ) {
     statusText = "Tersedia";
   }
 
@@ -56,7 +67,6 @@ const FoodItem = ({ id, name, price, description, image, status, rating }) => {
   return (
     <div className={`food-item ${!isActive ? "food-item-disabled" : ""}`}>
       <div className="food-item-img-container">
-
         {/* ⭐ Badge Rating */}
         {rating !== undefined && (
           <div className="food-rating-badge">
@@ -66,7 +76,7 @@ const FoodItem = ({ id, name, price, description, image, status, rating }) => {
         )}
 
         <LazyLoadImage
-          className='food-item-image'
+          className="food-item-image"
           src={url + "/images/" + image}
           alt={name}
           effect="blur"
@@ -77,17 +87,19 @@ const FoodItem = ({ id, name, price, description, image, status, rating }) => {
             className={`add-icon-wrapper ${!isActive ? "disabled-button" : ""}`}
             onClick={isActive ? handleAdd : undefined}
           >
-            <FaPlus className='add-icon' />
+            <FaPlus className="add-icon" />
           </div>
         ) : (
-          <div className={`food-item-counter ${!isActive ? "disabled-button" : ""}`}>
+          <div
+            className={`food-item-counter ${!isActive ? "disabled-button" : ""}`}
+          >
             <FaMinus
-              className='counter-icon minus'
+              className="counter-icon minus"
               onClick={isActive ? handleRemove : undefined}
             />
             <p>{cartItems[id]}</p>
             <FaPlus
-              className='counter-icon plus'
+              className="counter-icon plus"
               onClick={isActive ? handleAdd : undefined}
             />
           </div>

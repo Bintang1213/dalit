@@ -35,7 +35,7 @@ router.get("/", authMiddleware, async (req, res) => {
         discountValue: v.discountValue,
         minPurchase: v.minPurchase,
         remaining: v.remaining, // stok global
-        sisaHariIni,            // stok untuk user hari ini
+        sisaHariIni, // stok untuk user hari ini
         sudahDipakai,
       };
     });

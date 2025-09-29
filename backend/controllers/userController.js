@@ -3,12 +3,10 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import validator from "validator";
 
-// Membuat token
 const createToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET);
 };
 
-// Login user
 const loginUser = async (req, res) => {
     const { email, password } = req.body;
     try {
@@ -30,8 +28,8 @@ const loginUser = async (req, res) => {
             user: {
                 id: user._id,
                 name: user.name,
-                email: user.email
-            }
+                email: user.email,
+            },
         });
     } catch (error) {
         console.log(error);
@@ -39,7 +37,6 @@ const loginUser = async (req, res) => {
     }
 };
 
-// Registrasi user
 const registerUser = async (req, res) => {
     const { name, password, email } = req.body;
     try {
@@ -53,7 +50,10 @@ const registerUser = async (req, res) => {
         }
 
         if (password.length < 8) {
-            return res.json({ success: false, message: "Gunakan kata sandi yang kuat" });
+            return res.json({
+                success: false,
+                message: "Gunakan kata sandi yang kuat",
+            });
         }
 
         const salt = await bcrypt.genSalt(10);
@@ -62,7 +62,7 @@ const registerUser = async (req, res) => {
         const newUser = new userModel({
             name,
             email,
-            password: hashedPassword
+            password: hashedPassword,
         });
 
         const user = await newUser.save();
@@ -74,20 +74,18 @@ const registerUser = async (req, res) => {
             user: {
                 id: user._id,
                 name: user.name,
-                email: user.email
-            }
+                email: user.email,
+            },
         });
-
     } catch (error) {
         console.log(error);
         res.json({ success: false, message: "Terjadi kesalahan saat registrasi" });
     }
 };
 
-// Ambil semua pengguna
 const getAllUsers = async (req, res) => {
     try {
-        const users = await userModel.find({}, '-password');
+        const users = await userModel.find({}, "-password");
         res.json({ success: true, data: users });
     } catch (error) {
         console.log(error);
@@ -95,7 +93,6 @@ const getAllUsers = async (req, res) => {
     }
 };
 
-// Hapus pengguna berdasarkan ID
 const deleteUser = async (req, res) => {
     const { id } = req.params;
     try {
@@ -110,25 +107,79 @@ const deleteUser = async (req, res) => {
     }
 };
 
-// Ambil data user dari token (profile)
 const getUserProfile = async (req, res) => {
     try {
-        const userId = req.userId; // dari authMiddleware
-        const user = await userModel.findById(userId, '-password');
+        const userId = req.userId;
+        const user = await userModel.findById(userId, "-password");
         if (!user) {
-            return res.status(404).json({ success: false, message: "User tidak ditemukan" });
+            return res
+                .status(404)
+                .json({ success: false, message: "User tidak ditemukan" });
         }
         res.json({ success: true, data: user });
     } catch (error) {
         console.log(error);
-        res.status(500).json({ success: false, message: "Gagal mengambil data user" });
+        res
+            .status(500)
+            .json({ success: false, message: "Gagal mengambil data user" });
     }
 };
 
-export {
-    loginUser,
-    registerUser,
-    getAllUsers,
-    deleteUser,
-    getUserProfile
+const updateUserProfile = async (req, res) => {
+    const { name, email, oldPassword, newPassword } = req.body;
+    const userId = req.userId;
+
+    try {
+        const user = await userModel.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User tidak ditemukan" });
+        }
+
+        if (name && name.trim() !== "") {
+            user.name = name.trim();
+        }
+        if (email && validator.isEmail(email) && email !== user.email) {
+            const emailExists = await userModel.findOne({ email });
+            if (emailExists) {
+                return res.json({ success: false, message: "Email ini sudah terdaftar" });
+            }
+            user.email = email;
+        }
+
+        if (newPassword) {
+            if (!oldPassword) {
+                return res.json({ success: false, message: "Kata sandi lama diperlukan untuk mengganti sandi" });
+            }
+            if (newPassword.length < 8) {
+                return res.json({ success: false, message: "Kata sandi baru harus minimal 8 karakter" });
+            }
+
+            const isMatch = await bcrypt.compare(oldPassword, user.password);
+            if (!isMatch) {
+                return res.json({ success: false, message: "Kata sandi lama salah" });
+            }
+
+            const salt = await bcrypt.genSalt(10);
+            user.password = await bcrypt.hash(newPassword, salt);
+        }
+
+        const updatedUser = await user.save();
+
+        res.json({
+            success: true,
+            message: "Profil berhasil diperbarui",
+            data: {
+                id: updatedUser._id,
+                name: updatedUser.name,
+                email: updatedUser.email,
+            },
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ success: false, message: "Gagal memperbarui profil" });
+    }
 };
+
+export { loginUser, registerUser, getAllUsers, deleteUser, getUserProfile, updateUserProfile };

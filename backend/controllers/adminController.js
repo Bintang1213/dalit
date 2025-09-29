@@ -30,6 +30,8 @@ export const registerAdmin = async (req, res) => {
 
     res.status(201).json({ message: "Admin berhasil didaftarkan" });
   } catch (error) {
-    res.status(500).json({ message: "Terjadi kesalahan server", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Terjadi kesalahan server", error: error.message });
   }
 };

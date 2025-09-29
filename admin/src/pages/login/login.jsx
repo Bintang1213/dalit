@@ -18,17 +18,17 @@ const Login = () => {
 
     try {
       const response = await Axios.post(
-        "http://localhost:4000/api/admin/login", 
+        "http://localhost:4000/api/admin/login",
         {
           email,
-          password
+          password,
         },
         {
           headers: {
             "Content-Type": "application/json",
           },
-          withCredentials: true
-        }
+          withCredentials: true,
+        },
       );
 
       console.log("Login Response:", response.data);
@@ -52,12 +52,14 @@ const Login = () => {
         message: error.message,
         response: error.response?.data,
         status: error.response?.status,
-        headers: error.response?.headers
+        headers: error.response?.headers,
       });
 
       const backendMessage = error.response?.data?.message;
-      setError(backendMessage || "Login gagal. Periksa email dan password Anda.");
-      
+      setError(
+        backendMessage || "Login gagal. Periksa email dan password Anda.",
+      );
+
       localStorage.removeItem("authToken");
       localStorage.removeItem("adminId");
       localStorage.removeItem("adminName");
@@ -76,7 +78,7 @@ const Login = () => {
             {error}
           </div>
         )}
-        
+
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="email">Email</label>
@@ -90,7 +92,7 @@ const Login = () => {
               placeholder="contoh@email.com"
             />
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="password">Password</label>
             <input
@@ -103,9 +105,9 @@ const Login = () => {
               placeholder="Masukkan password"
             />
           </div>
-          
-          <button 
-            type="submit" 
+
+          <button
+            type="submit"
             disabled={loading}
             className={`login-button ${loading ? "loading" : ""}`}
           >

@@ -21,7 +21,6 @@ const StoreContextProvider = (props) => {
     }
   };
 
-  // ✅ PERBAIKAN UTAMA: Fetch user yang lebih robust
   const fetchUser = async (authToken) => {
     if (!authToken) {
       console.log("No token provided for fetchUser");
@@ -34,9 +33,8 @@ const StoreContextProvider = (props) => {
       const response = await axios.get(`${url}/api/user/profile`, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
-      
+
       if (response.data.success && response.data.data) {
-        // ✅ IKUTI STRUKTUR BACKEND: Gunakan response.data.data sesuai getUserProfile
         console.log("User fetched successfully:", response.data.data._id);
         setUser(response.data.data);
         return true;
@@ -47,7 +45,7 @@ const StoreContextProvider = (props) => {
       }
     } catch (error) {
       console.error("Error fetching user data:", error);
-      
+
       // ✅ Handle different error types
       if (error.response?.status === 401 || error.response?.status === 403) {
         console.log("Token expired or invalid, clearing session");
@@ -66,17 +64,20 @@ const StoreContextProvider = (props) => {
     localStorage.removeItem("token");
     setToken("");
     setUser(null);
-    setCartItems({}); // ✅ Also clear cart when logging out
+    setCartItems({});
   };
 
   // ✅ Function untuk set user session
   const setUserSession = (newToken, userData = null) => {
-    console.log("Setting user session:", newToken ? "with token" : "without token");
-    
+    console.log(
+      "Setting user session:",
+      newToken ? "with token" : "without token",
+    );
+
     if (newToken) {
       localStorage.setItem("token", newToken);
       setToken(newToken);
-      
+
       if (userData) {
         setUser(userData);
       } else {
@@ -112,7 +113,10 @@ const StoreContextProvider = (props) => {
       }
 
       // Wait for both to complete
-      const [, userFetchSuccess] = await Promise.all([foodPromise, userPromise]);
+      const [, userFetchSuccess] = await Promise.all([
+        foodPromise,
+        userPromise,
+      ]);
 
       // ✅ If user fetch failed, clear everything
       if (savedToken && !userFetchSuccess) {
@@ -130,10 +134,10 @@ const StoreContextProvider = (props) => {
   // ✅ TAMBAHAN: Effect untuk handle storage changes (multi-tab sync)
   useEffect(() => {
     const handleStorageChange = (e) => {
-      if (e.key === 'token') {
+      if (e.key === "token") {
         const newToken = e.newValue;
         console.log("Token changed in another tab:", !!newToken);
-        
+
         if (!newToken) {
           // Token removed in another tab
           clearUserSession();
@@ -145,8 +149,8 @@ const StoreContextProvider = (props) => {
       }
     };
 
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
   }, [token]);
 
   const addToCart = async (itemId) => {
@@ -161,11 +165,11 @@ const StoreContextProvider = (props) => {
               "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
             },
-          }
+          },
         );
       } catch (error) {
         console.error("Gagal menambahkan ke keranjang di server:", error);
-        
+
         // ✅ Handle auth errors
         if (error.response?.status === 401 || error.response?.status === 403) {
           console.log("Auth error in addToCart, clearing session");
@@ -174,7 +178,7 @@ const StoreContextProvider = (props) => {
       }
     } else {
       console.warn(
-        "Pengguna belum login, item hanya ditambahkan ke keranjang lokal."
+        "Pengguna belum login, item hanya ditambahkan ke keranjang lokal.",
       );
     }
   };
@@ -194,11 +198,11 @@ const StoreContextProvider = (props) => {
               "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
             },
-          }
+          },
         );
       } catch (error) {
         console.error("Gagal menghapus dari keranjang di server:", error);
-        
+
         // ✅ Handle auth errors
         if (error.response?.status === 401 || error.response?.status === 403) {
           console.log("Auth error in removeFromCart, clearing session");
@@ -207,7 +211,7 @@ const StoreContextProvider = (props) => {
       }
     } else {
       console.warn(
-        "Pengguna belum login, item hanya dihapus dari keranjang lokal."
+        "Pengguna belum login, item hanya dihapus dari keranjang lokal.",
       );
     }
   };
@@ -223,6 +227,16 @@ const StoreContextProvider = (props) => {
       }
     }
     return totalAmount;
+  };
+
+  const getTotalCartItems = () => {
+    let totalItems = 0;
+    for (const item in cartItems) {
+      if (cartItems[item] > 0) {
+        totalItems += cartItems[item];
+      }
+    }
+    return totalItems;
   };
 
   const clearCart = () => {
@@ -247,18 +261,18 @@ const StoreContextProvider = (props) => {
     addToCart,
     removeFromCart,
     getTotalCartAmount,
+    getTotalCartItems, 
     clearCart,
     url,
     token,
-    setToken: setUserSession, // ✅ Use setUserSession instead of direct setToken
+    setToken: setUserSession, 
     user,
     setUser,
     loading,
-    // ✅ TAMBAHAN: Helper functions
     logout,
     login,
     clearUserSession,
-    fetchUser: (authToken) => fetchUser(authToken), // Expose for manual refresh
+    fetchUser: (authToken) => fetchUser(authToken), 
   };
 
   return (

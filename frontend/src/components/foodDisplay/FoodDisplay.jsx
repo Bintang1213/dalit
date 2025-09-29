@@ -1,9 +1,9 @@
-import React, { useContext, useEffect, useRef } from 'react';
-import './FoodDisplay.css';
-import { StoreContext } from '../../context/StoreContext';
-import FoodItem from '../FoodItem/FoodItem';
-import gsap from 'gsap';
-import ScrollTrigger from 'gsap/ScrollTrigger';
+import React, { useContext, useEffect, useRef } from "react";
+import "./FoodDisplay.css";
+import { StoreContext } from "../../context/StoreContext";
+import FoodItem from "../FoodItem/FoodItem";
+import gsap from "gsap";
+import ScrollTrigger from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -22,33 +22,34 @@ const FoodDisplay = ({ category }) => {
         duration: 0.8,
         scrollTrigger: {
           trigger: listRef.current,
-          start: 'top 80%',
-          toggleActions: 'play none none none',
+          start: "top 80%",
+          toggleActions: "play none none none",
         },
-      }
+      },
     );
   }, []);
 
   return (
-    <div className='food-display' id='food-display'>
+    <div className="food-display" id="food-display">
       <h2>Menu Rekomendasi</h2>
       <div className="food-display-list" ref={listRef}>
-        {food_list.map((item, index) => (
-          // Logika filter kategori yang sudah ada, tidak diubah
-          (category === "All" || category === item.category) && (
-            <FoodItem
-              key={index}
-              id={item._id}
-              name={item.name}
-              description={item.description}
-              price={item.price}
-              image={item.image}
-              // Baris ini yang saya perbaiki.
-              // Cukup berikan status dari item, biarkan komponen FoodItem yang menanganinya.
-              status={item.status} 
-            />
-          )
-        ))}
+        {food_list.map(
+          (item, index) =>
+            // Logika filter kategori yang sudah ada, tidak diubah
+            (category === "All" || category === item.category) && (
+              <FoodItem
+                key={index}
+                id={item._id}
+                name={item.name}
+                description={item.description}
+                price={item.price}
+                image={item.image}
+                // Baris ini yang saya perbaiki.
+                // Cukup berikan status dari item, biarkan komponen FoodItem yang menanganinya.
+                status={item.status}
+              />
+            ),
+        )}
       </div>
     </div>
   );

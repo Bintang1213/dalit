@@ -1,9 +1,9 @@
-import React from 'react';
-import './Struk.css';
-import { useNavigate, useLocation } from 'react-router-dom';
-import html2canvas from 'html2canvas';
-import { FiDownload } from 'react-icons/fi';
-import moment from 'moment';
+import React from "react";
+import "./Struk.css";
+import { useNavigate, useLocation } from "react-router-dom";
+import html2canvas from "html2canvas";
+import { FiDownload } from "react-icons/fi";
+import moment from "moment";
 
 const Struk = () => {
   const navigate = useNavigate();
@@ -11,18 +11,18 @@ const Struk = () => {
   const order = location.state?.order;
 
   const handleDownload = () => {
-    const strukElement = document.getElementById('struk-download');
+    const strukElement = document.getElementById("struk-download");
 
-    const buttons = strukElement.querySelector('.btn-actions');
-    if (buttons) buttons.style.display = 'none';
+    const buttons = strukElement.querySelector(".btn-actions");
+    if (buttons) buttons.style.display = "none";
 
     html2canvas(strukElement).then((canvas) => {
-      const link = document.createElement('a');
-      link.download = 'struk-kedai-wartiyem.png';
+      const link = document.createElement("a");
+      link.download = "struk-kedai-wartiyem.png";
       link.href = canvas.toDataURL();
       link.click();
 
-      if (buttons) buttons.style.display = 'flex';
+      if (buttons) buttons.style.display = "flex";
     });
   };
 
@@ -31,39 +31,44 @@ const Struk = () => {
       <div className="struk-wrapper">
         <div className="struk-box">
           <p>Data struk tidak ditemukan.</p>
-          <button onClick={() => navigate('/')}>Kembali ke Beranda</button>
+          <button onClick={() => navigate("/")}>Kembali ke Beranda</button>
         </div>
       </div>
     );
   }
 
-// ambil data sesuai dengan PlaceOrder (langsung pakai dari order, kalau gak ada hitung manual)
-const subtotal = order.subtotal ?? order.items.reduce((acc, item) => acc + item.price * item.quantity, 0);
-const serviceFee = (order.serviceFee !== undefined && order.serviceFee !== null) 
-  ? order.serviceFee 
-  : subtotal * 0.1;
-const deliveryFee = order.deliveryFee ?? (order.method === "Diantar" ? 10000 : 0);
-const discount = order.discount ?? 0;
-const total = order.totalAmount ?? (subtotal + serviceFee + deliveryFee - discount);
-const totalQty = order.items.reduce((acc, item) => acc + item.quantity, 0);
-
-
+  // ambil data sesuai dengan PlaceOrder (langsung pakai dari order, kalau gak ada hitung manual)
+  const subtotal =
+    order.subtotal ??
+    order.items.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  const serviceFee =
+    order.serviceFee !== undefined && order.serviceFee !== null
+      ? order.serviceFee
+      : subtotal * 0.1;
+  const deliveryFee =
+    order.deliveryFee ?? (order.method === "Diantar" ? 10000 : 0);
+  const discount = order.discount ?? 0;
+  const total =
+    order.totalAmount ?? subtotal + serviceFee + deliveryFee - discount;
+  const totalQty = order.items.reduce((acc, item) => acc + item.quantity, 0);
 
   return (
     <div className="struk-wrapper">
       <div className="struk-box" id="struk-download">
         <div className="title">KEDAI WARTIYEM</div>
         <div className="alamat">
-          Jl. Ampera No.57, Rt/Rw 002/023 Bulak, Kec. Jatibarang,<br />
-          Kabupaten Indramayu, Jawa Barat 45273<br />
+          Jl. Ampera No.57, Rt/Rw 002/023 Bulak, Kec. Jatibarang,
+          <br />
+          Kabupaten Indramayu, Jawa Barat 45273
+          <br />
           No.Telp: 0813955878510
         </div>
 
         <hr />
 
         <div className="tanggal-jam">
-          <div>{moment(order.createdAt).format('DD-MM-YYYY')}</div>
-          <div>{moment(order.createdAt).format('HH:mm')} WIB</div>
+          <div>{moment(order.createdAt).format("DD-MM-YYYY")}</div>
+          <div>{moment(order.createdAt).format("HH:mm")} WIB</div>
         </div>
         <div className="tanggal-jam">
           <div>Kode Pesanan</div>
@@ -89,7 +94,9 @@ const totalQty = order.items.reduce((acc, item) => acc + item.quantity, 0);
             <div className="item bold-item" key={idx}>
               <span>{item.name}</span>
               <span className="jumlah">x{item.quantity}</span>
-              <span className="harga">Rp. {(item.price * item.quantity).toLocaleString()}</span>
+              <span className="harga">
+                Rp. {(item.price * item.quantity).toLocaleString()}
+              </span>
             </div>
           ))}
         </div>
@@ -97,11 +104,22 @@ const totalQty = order.items.reduce((acc, item) => acc + item.quantity, 0);
         <hr />
 
         <div className="rangkuman">
-          <div className="item"><span>Total QTY : {totalQty}</span></div>
-          <div className="item"><span>Subtotal</span><span>Rp. {subtotal.toLocaleString()}</span></div>
-          <div className="item"><span>Biaya Layanan (10%)</span><span>Rp. {serviceFee.toLocaleString()}</span></div>
+          <div className="item">
+            <span>Total QTY : {totalQty}</span>
+          </div>
+          <div className="item">
+            <span>Subtotal</span>
+            <span>Rp. {subtotal.toLocaleString()}</span>
+          </div>
+          <div className="item">
+            <span>Biaya Layanan (10%)</span>
+            <span>Rp. {serviceFee.toLocaleString()}</span>
+          </div>
           {deliveryFee > 0 && (
-            <div className="item"><span>Ongkos Kirim</span><span>Rp. {deliveryFee.toLocaleString()}</span></div>
+            <div className="item">
+              <span>Ongkos Kirim</span>
+              <span>Rp. {deliveryFee.toLocaleString()}</span>
+            </div>
           )}
           {discount > 0 && (
             <div className="item">
@@ -109,19 +127,29 @@ const totalQty = order.items.reduce((acc, item) => acc + item.quantity, 0);
               <span>- Rp. {discount.toLocaleString()}</span>
             </div>
           )}
-          <div className="item total"><span>TOTAL</span><span>Rp. {total.toLocaleString()}</span></div>
+          <div className="item total">
+            <span>TOTAL</span>
+            <span>Rp. {total.toLocaleString()}</span>
+          </div>
         </div>
 
         <hr />
 
         <div className="pembayaran">
-          <div className="item"><span>Metode Pemesanan</span><span>{order.method}</span></div>
-          <div className="item"><span>{order.payment}</span><span>Rp. {total.toLocaleString()}</span></div>
+          <div className="item">
+            <span>Metode Pemesanan</span>
+            <span>{order.method}</span>
+          </div>
+          <div className="item">
+            <span>{order.payment}</span>
+            <span>Rp. {total.toLocaleString()}</span>
+          </div>
         </div>
 
         {order.note && (
           <div className="catatan">
-            <span className="bold-item">Catatan Pesanan:</span><br />
+            <span className="bold-item">Catatan Pesanan:</span>
+            <br />
             <em>{order.note}</em>
           </div>
         )}
@@ -130,7 +158,7 @@ const totalQty = order.items.reduce((acc, item) => acc + item.quantity, 0);
 
         <div className="btn-actions">
           <button className="btn-red" onClick={handleDownload}>
-            <FiDownload size={16} style={{ marginRight: '6px' }} />
+            <FiDownload size={16} style={{ marginRight: "6px" }} />
             Unduh Struk
           </button>
           <button className="btn-red" onClick={() => navigate("/riwayat")}>

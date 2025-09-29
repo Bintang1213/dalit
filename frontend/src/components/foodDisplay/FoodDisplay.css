@@ -1,15 +1,14 @@
-
-.food-display{
-    margin-top: 10px;
+.food-display {
+  margin-top: 10px;
 }
-.food-display h2{
-    font-weight: 1000px;
-    text-align: left;
-    padding-left: 10px;
-    padding-bottom: 20px;
+.food-display h2 {
+  font-weight: 1000px;
+  text-align: left;
+  padding-left: 10px;
+  padding-bottom: 20px;
 }
 .food-display h2::after {
-  content: '';
+  content: "";
   width: 222px;
   height: 3px;
   background-color: rgb(203, 0, 41);
@@ -17,10 +16,10 @@
   margin-top: 2px; /* sedikit jarak dari teks */
   border-radius: 2px;
 }
-.food-display-list{
-    display: grid;
-    grid-template-columns: repeat(auto-fill,minmax(240px,1fr));
-    margin-top: 30px;
-    gap: 30px;
-    row-gap: 50px;
+.food-display-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  margin-top: 30px;
+  gap: 30px;
+  row-gap: 50px;
 }

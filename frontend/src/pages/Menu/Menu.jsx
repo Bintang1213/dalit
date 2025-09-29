@@ -28,7 +28,7 @@ const Menu = () => {
         (item) =>
           item.name.toLowerCase().includes(searchQuery) ||
           item.description.toLowerCase().includes(searchQuery) ||
-          item.price.toString().includes(searchQuery)
+          item.price.toString().includes(searchQuery),
       );
     }
 
@@ -55,64 +55,62 @@ const Menu = () => {
     <div className="menu-page">
       {/* Kiri: daftar menu */}
       <div className="menu-left">
-        {searchQuery ? (
-          // Jika ada pencarian → tampilkan 1 section khusus
-          (() => {
-            const searchResults = filterAndSortItems(food_list);
-            return searchResults.length > 0 ? (
-              <div className="menu-category-section">
-                <h2 className="menu-category-title">Hasil Pencarian</h2>
-                <div className="menu-category-line"></div>
-                <div className="menu-items">
-                  {searchResults.map((item) => (
-                    <FoodItem
-                      key={item._id}
-                      id={item._id}
-                      name={item.name}
-                      description={item.description}
-                      price={item.price}
-                      image={item.image}
-                      status={item.status}
-                      rating={item.rating}
-                    />
-                  ))}
+        {searchQuery
+          ? // Jika ada pencarian → tampilkan 1 section khusus
+            (() => {
+              const searchResults = filterAndSortItems(food_list);
+              return searchResults.length > 0 ? (
+                <div className="menu-category-section">
+                  <h2 className="menu-category-title">Hasil Pencarian</h2>
+                  <div className="menu-category-line"></div>
+                  <div className="menu-items">
+                    {searchResults.map((item) => (
+                      <FoodItem
+                        key={item._id}
+                        id={item._id}
+                        name={item.name}
+                        description={item.description}
+                        price={item.price}
+                        image={item.image}
+                        status={item.status}
+                        rating={item.rating}
+                      />
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ) : (
-              <p className="empty-message">Tidak ada menu sesuai pencarian</p>
-            );
-          })()
-        ) : (
-          // Kalau tidak ada search → tampilkan per kategori
-          categories.map((category, idx) => {
-            const items = filterAndSortItems(
-              food_list.filter((item) => item.category === category)
-            );
+              ) : (
+                <p className="empty-message">Tidak ada menu sesuai pencarian</p>
+              );
+            })()
+          : // Kalau tidak ada search → tampilkan per kategori
+            categories.map((category, idx) => {
+              const items = filterAndSortItems(
+                food_list.filter((item) => item.category === category),
+              );
 
-            if (items.length === 0) return null; // skip kategori kosong
+              if (items.length === 0) return null; // skip kategori kosong
 
-            return (
-              <div key={idx} className="menu-category-section">
-                <h2 className="menu-category-title">{category}</h2>
-                <div className="menu-category-line"></div>
-                <div className="menu-items">
-                  {items.map((item) => (
-                    <FoodItem
-                      key={item._id}
-                      id={item._id}
-                      name={item.name}
-                      description={item.description}
-                      price={item.price}
-                      image={item.image}
-                      status={item.status}
-                      rating={item.rating}
-                    />
-                  ))}
+              return (
+                <div key={idx} className="menu-category-section">
+                  <h2 className="menu-category-title">{category}</h2>
+                  <div className="menu-category-line"></div>
+                  <div className="menu-items">
+                    {items.map((item) => (
+                      <FoodItem
+                        key={item._id}
+                        id={item._id}
+                        name={item.name}
+                        description={item.description}
+                        price={item.price}
+                        image={item.image}
+                        status={item.status}
+                        rating={item.rating}
+                      />
+                    ))}
+                  </div>
                 </div>
-              </div>
-            );
-          })
-        )}
+              );
+            })}
       </div>
 
       {/* Kanan: filter panel */}

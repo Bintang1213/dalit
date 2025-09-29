@@ -54,10 +54,8 @@ const KelolaUlasan = ({ isSidebarCollapsed }) => {
         toast.success(`Status rekomendasi berhasil diubah.`);
         setTopMenus((prev) =>
           prev.map((m) =>
-            m._id === menu._id
-              ? { ...m, isRecommended: newIsRecommended }
-              : m
-          )
+            m._id === menu._id ? { ...m, isRecommended: newIsRecommended } : m,
+          ),
         );
       } else {
         toast.error("Gagal update rekomendasi.");

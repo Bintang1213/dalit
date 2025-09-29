@@ -125,7 +125,7 @@ const Cart = () => {
         },
         autoClose: false, // tunggu pilihan user
         closeOnClick: false,
-      }
+      },
     );
   };
 
@@ -178,7 +178,9 @@ const Cart = () => {
                   <img
                     src={url + "/images/" + item.image}
                     alt={item.name}
-                    onError={(e) => (e.target.src = url + "/images/default.png")}
+                    onError={(e) =>
+                      (e.target.src = url + "/images/default.png")
+                    }
                   />
                   <p>{item.name}</p>
                   <p>{item.price}</p>

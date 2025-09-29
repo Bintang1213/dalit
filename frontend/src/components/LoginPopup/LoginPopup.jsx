@@ -140,8 +140,8 @@ const LoginPopup = ({ setShowLogin, onLoginSuccess }) => {
           <div className="login-popup-condition">
             <input type="checkbox" required />
             <p>
-              Dengan melanjutkan, saya menyetujui ketentuan penggunaan & kebijakan
-              privasi
+              Dengan melanjutkan, saya menyetujui ketentuan penggunaan &
+              kebijakan privasi
             </p>
           </div>
         )}
@@ -163,7 +163,9 @@ const LoginPopup = ({ setShowLogin, onLoginSuccess }) => {
           {currState === "Login" ? (
             <>
               Belum punya akun?{" "}
-              <span onClick={() => setCurrState("Daftar")}>Daftar Sekarang</span>
+              <span onClick={() => setCurrState("Daftar")}>
+                Daftar Sekarang
+              </span>
             </>
           ) : (
             <>

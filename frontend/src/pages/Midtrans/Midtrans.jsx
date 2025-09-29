@@ -1,13 +1,13 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import './Midtrans.css';
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import "./Midtrans.css";
 
 const Midtrans = () => {
   const navigate = useNavigate();
 
   const handlePaymentComplete = () => {
     // Arahkan ke halaman struk tanpa mengirim data apapun
-    navigate('/struk');
+    navigate("/struk");
   };
 
   return (

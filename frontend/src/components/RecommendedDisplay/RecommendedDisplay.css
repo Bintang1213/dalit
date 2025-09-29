@@ -1,36 +1,36 @@
 /* src/components/RecommendedDisplay/RecommendedDisplay.css */
 
 .recommended-display {
-    width: 90%;
-    margin: auto;
-    margin-top: 50px;
-    margin-bottom: 50px;
+  width: 90%;
+  margin: auto;
+  margin-top: 50px;
+  margin-bottom: 50px;
+}
+
+.recommended-display h2 {
+  font-size: max(2vw, 24px);
+  color: #333;
+  font-weight: 500;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #ff4b4b;
+  padding-bottom: 5px;
+  display: inline-block;
+}
+
+.recommended-section {
+  margin-bottom: 40px;
+}
+
+.recommended-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 20px;
+  row-gap: 50px;
+  margin-top: 20px;
+}
+
+@media (max-width: 768px) {
+  .recommended-display {
+    width: 95%;
   }
-  
-  .recommended-display h2 {
-    font-size: max(2vw, 24px);
-    color: #333;
-    font-weight: 500;
-    margin-bottom: 20px;
-    border-bottom: 2px solid #ff4b4b;
-    padding-bottom: 5px;
-    display: inline-block;
-  }
-  
-  .recommended-section {
-    margin-bottom: 40px;
-  }
-  
-  .recommended-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 20px;
-    row-gap: 50px;
-    margin-top: 20px;
-  }
-  
-  @media (max-width: 768px) {
-    .recommended-display {
-      width: 95%;
-    }
-  }
+}

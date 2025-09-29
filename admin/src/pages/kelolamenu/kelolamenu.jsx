@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import './kelolamenu.css';
-import axios from 'axios';
-import { toast } from 'react-toastify';
-import Add from '../Add/Add'; // Pastikan path-nya sesuai
+import React, { useEffect, useState } from "react";
+import "./kelolamenu.css";
+import axios from "axios";
+import { toast } from "react-toastify";
+import Add from "../Add/Add"; // Pastikan path-nya sesuai
 
 const Kelolamenu = ({ url }) => {
   const [list, setList] = useState([]);
@@ -22,7 +22,8 @@ const Kelolamenu = ({ url }) => {
   const fetchList = async () => {
     try {
       const response = await axios.get(`${url}/api/food/list`);
-      if (response.data.success) { // ✅ Perbaikan typo di sini
+      if (response.data.success) {
+        // ✅ Perbaikan typo di sini
         setList(response.data.data);
       } else {
         toast.error("Error");
@@ -34,8 +35,11 @@ const Kelolamenu = ({ url }) => {
 
   const removeFood = async (foodId) => {
     try {
-      const response = await axios.post(`${url}/api/food/remove`, { id: foodId });
-      if (response.data.success) { // ✅ Perbaikan typo di sini
+      const response = await axios.post(`${url}/api/food/remove`, {
+        id: foodId,
+      });
+      if (response.data.success) {
+        // ✅ Perbaikan typo di sini
         toast.success(response.data.message);
         fetchList();
       } else {
@@ -73,7 +77,8 @@ const Kelolamenu = ({ url }) => {
         id: item._id,
         status: newStatus,
       });
-      if (response.data.success) { // ✅ Perbaikan typo di sini
+      if (response.data.success) {
+        // ✅ Perbaikan typo di sini
         toast.success("Status berhasil diperbarui");
         fetchList();
       } else {
@@ -89,13 +94,13 @@ const Kelolamenu = ({ url }) => {
   }, []);
 
   return (
-    <div className='kelola-menu-content'>
+    <div className="kelola-menu-content">
       <div className="kelola-menu-header">
         <h1>Kelola Menu</h1>
         <button onClick={() => setShowAddPopup(true)}>+ Tambah Menu</button>
       </div>
 
-      <table className='kelola-menu-table'>
+      <table className="kelola-menu-table">
         <thead>
           <tr>
             <th>Gambar</th>
@@ -109,7 +114,9 @@ const Kelolamenu = ({ url }) => {
         <tbody>
           {currentItems.map((item, index) => (
             <tr key={index}>
-              <td><img src={`${url}/images/${item.image}`} alt={item.name} /></td>
+              <td>
+                <img src={`${url}/images/${item.image}`} alt={item.name} />
+              </td>
               <td>{item.name}</td>
               <td>{item.category}</td>
               <td>{item.price}</td>
@@ -121,9 +128,19 @@ const Kelolamenu = ({ url }) => {
                   {item.status || "Tersedia"}
                 </span>
               </td>
-              <td className='aksi-buttons'>
-                <button onClick={() => handleEditClick(item)} className="edit-btn">Edit</button>
-                <button onClick={() => handleDeleteClick(item._id)} className="delete-btn">Hapus</button>
+              <td className="aksi-buttons">
+                <button
+                  onClick={() => handleEditClick(item)}
+                  className="edit-btn"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => handleDeleteClick(item._id)}
+                  className="delete-btn"
+                >
+                  Hapus
+                </button>
               </td>
             </tr>
           ))}
@@ -134,14 +151,16 @@ const Kelolamenu = ({ url }) => {
       <div className="pagination-controls">
         <span
           className="pagination-arrow"
-          onClick={() => setCurrentPage(p => Math.max(p - 1, 1))}
+          onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
         >
           &lt;
         </span>
-        <span>halaman {currentPage} dari {totalPages}</span>
+        <span>
+          halaman {currentPage} dari {totalPages}
+        </span>
         <span
           className="pagination-arrow"
-          onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))}
+          onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
         >
           &gt;
         </span>

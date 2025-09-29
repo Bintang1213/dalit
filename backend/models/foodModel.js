@@ -18,7 +18,7 @@ const foodSchema = new mongoose.Schema(
       default: false, // ✅ menu default tidak direkomendasikan
     },
   },
-  { timestamps: true } // ✅ otomatis ada createdAt & updatedAt
+  { timestamps: true }, // ✅ otomatis ada createdAt & updatedAt
 );
 
 // ✅ nama model konsisten: "Food"

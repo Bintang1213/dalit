@@ -57,7 +57,8 @@ const PlaceOrder = () => {
     if (now < start || now > end) return false;
     if (subtotal < (v.minPurchase || 0)) return false;
     // sisaHariIni bisa "Unlimited" atau angka
-    if (v.sisaHariIni !== "Unlimited" && Number(v.sisaHariIni) <= 0) return false;
+    if (v.sisaHariIni !== "Unlimited" && Number(v.sisaHariIni) <= 0)
+      return false;
     return true;
   };
 
@@ -73,7 +74,7 @@ const PlaceOrder = () => {
       const res = await axios.post(
         "http://localhost:4000/api/vouchers/apply",
         { voucherId: voucher._id }, // cukup kirim voucherId aja
-        { headers: { Authorization: `Bearer ${token}` } } // userId auto dari token
+        { headers: { Authorization: `Bearer ${token}` } }, // userId auto dari token
       );
 
       const data = res.data.voucher;
@@ -93,7 +94,9 @@ const PlaceOrder = () => {
       setVoucherList(fresh.data || []);
     } catch (err) {
       console.error("Gagal apply voucher:", err);
-      toast.error(err.response?.data?.message || "Voucher tidak bisa digunakan");
+      toast.error(
+        err.response?.data?.message || "Voucher tidak bisa digunakan",
+      );
     }
   };
 
@@ -169,7 +172,7 @@ const PlaceOrder = () => {
       const response = await axios.post(
         "http://localhost:4000/api/order",
         orderData,
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}` } },
       );
 
       clearCart();
@@ -298,9 +301,13 @@ const PlaceOrder = () => {
                   const now = new Date();
                   if (new Date(v.startDate) > now) return "Belum aktif";
                   if (new Date(v.endDate) < now) return "Kadaluarsa";
-                  if (v.sisaHariIni !== "Unlimited" && Number(v.sisaHariIni) <= 0)
+                  if (
+                    v.sisaHariIni !== "Unlimited" &&
+                    Number(v.sisaHariIni) <= 0
+                  )
                     return "Kuota habis";
-                  if (subtotal < v.minPurchase) return "Belum memenuhi min order";
+                  if (subtotal < v.minPurchase)
+                    return "Belum memenuhi min order";
                   return null;
                 })();
 
@@ -349,7 +356,9 @@ const PlaceOrder = () => {
               })}
 
               {displayedVouchers.length === 0 && (
-                <p style={{ color: "#666" }}>Tidak ada voucher untuk ditampilkan.</p>
+                <p style={{ color: "#666" }}>
+                  Tidak ada voucher untuk ditampilkan.
+                </p>
               )}
             </div>
           </div>
@@ -369,7 +378,7 @@ const PlaceOrder = () => {
                     Rp. {(item.price * cartItems[item._id]).toLocaleString()}
                   </p>
                 </div>
-              )
+              ),
           )}
 
           <div className="summary-line">

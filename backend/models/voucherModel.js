@@ -14,7 +14,7 @@ const voucherSchema = new mongoose.Schema(
     remaining: { type: Number, default: -1 }, // -1 = unlimited global stock, otherwise decremented on apply
     // tambahan meta jika perlu
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export default mongoose.model("Voucher", voucherSchema);

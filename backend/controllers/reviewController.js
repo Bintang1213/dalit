@@ -24,7 +24,8 @@ export const addReview = async (req, res) => {
     }
 
     const order = await Order.findById(orderId);
-    if (!order) return res.status(404).json({ message: "Pesanan tidak ditemukan" });
+    if (!order)
+      return res.status(404).json({ message: "Pesanan tidak ditemukan" });
 
     if (!order.items || order.items.length === 0) {
       return res.status(400).json({ message: "Pesanan tidak memiliki item" });
@@ -84,7 +85,7 @@ export const deleteReview = async (req, res) => {
     await Food.findByIdAndUpdate(
       foodId,
       { avgRating: newAvgRating },
-      { new: true }
+      { new: true },
     );
 
     res.status(200).json({ success: true, message: "Ulasan berhasil dihapus" });

@@ -5,7 +5,7 @@
   height: 90px;
   background: linear-gradient(90deg, #800000, #a83232); /* Maroon → merah tua */
   font-size: 20px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   padding: 0 20px;
   width: 100%;
   box-sizing: border-box;
@@ -36,7 +36,7 @@ body {
   color: #fff;
   padding: 10px 18px;
   border-radius: 12px;
-  box-shadow: 2px 4px 10px rgba(179,0,0,0.5);
+  box-shadow: 2px 4px 10px rgba(179, 0, 0, 0.5);
   font-weight: 600;
   font-size: 16px;
   display: flex;

@@ -1,6 +1,5 @@
-
 .about-page {
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
   color: #1a1a1a;
   background-color: #f8f8f8;
   padding-bottom: 80px;
@@ -13,7 +12,9 @@
   padding: 20px 10px;
   text-align: center;
   border-radius: 20px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .hero-section:hover {
@@ -61,7 +62,9 @@
   border-radius: 20px;
   border: 5px solid #e63946;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .story-image img:hover {
@@ -79,7 +82,7 @@
 .visi-misi-grid {
   padding-top: 30px;
   display: flex;
-  flex-direction: column;  /* default: kolom untuk mobile */
+  flex-direction: column; /* default: kolom untuk mobile */
   gap: 30px;
   max-width: 1000px;
   margin: 0 auto;
@@ -93,7 +96,9 @@
   border-left: 5px solid #e63946;
   text-align: left;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 /* Hover efek */
@@ -119,11 +124,10 @@
 
   .visi-box,
   .misi-box {
-    flex: 1;          /* sama rata lebar */
-    max-width: none;  /* hilangkan batasan max-width jika ada */
+    flex: 1; /* sama rata lebar */
+    max-width: none; /* hilangkan batasan max-width jika ada */
   }
 }
-
 
 .keunggulan-section {
   padding: 40px 20px;
@@ -151,12 +155,14 @@
   border-radius: 10px;
   border: 2px solid #2a1a1b;
   font-weight: 500;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
   color: #1a1a1a;
-  min-width: 200px;       /* supaya box tetap cukup besar */
-  max-width: 220px;       /* batasi maksimal lebar */
+  min-width: 200px; /* supaya box tetap cukup besar */
+  max-width: 220px; /* batasi maksimal lebar */
   box-sizing: border-box;
-  text-align: center;     /* posisi isi tetap tengah */
+  text-align: center; /* posisi isi tetap tengah */
 }
 
 .keunggulan-item:hover {
@@ -170,9 +176,9 @@
     flex-direction: column;
     align-items: center;
   }
-  
+
   .keunggulan-item {
-    max-width: 300px;   /* biar nggak terlalu melebar */
+    max-width: 300px; /* biar nggak terlalu melebar */
     width: 90%;
   }
 }
@@ -196,7 +202,7 @@
 }
 
 .team-heading::after {
-  content: '';
+  content: "";
   display: block;
   width: 280px;
   height: 4px;
@@ -218,7 +224,9 @@
   padding: 25px;
   width: 240px;
   box-shadow: 0 8px 18px rgba(0, 0, 0, 0.07);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
   text-align: center;
   border: 2px solid transparent;
 }
@@ -285,7 +293,9 @@
   padding: 50px 30px;
   border-radius: 20px;
   margin: 60px 20px 0 20px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .cta-section:hover {
@@ -314,14 +324,16 @@
   margin: 60px auto 80px auto;
   border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
   background: white;
   padding: 10px;
-  transition: box-shadow 0.3s ease, transform 0.3s ease;
+  transition:
+    box-shadow 0.3s ease,
+    transform 0.3s ease;
 }
 
 .map-section:hover {
-  box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
   transform: translateY(-5px);
 }
 

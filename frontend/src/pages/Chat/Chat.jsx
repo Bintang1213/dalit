@@ -29,7 +29,7 @@ const Chat = () => {
       const response = await axios.post(
         `${BACKEND_URL}/api/chat/user/initialize`,
         { userName: user.name },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}` } },
       );
 
       if (response.data.success) {
@@ -46,7 +46,7 @@ const Chat = () => {
       console.error("Error initializing chat:", error);
       setError(
         "Gagal menginisialisasi chat: " +
-          (error.response?.data?.message || error.message)
+          (error.response?.data?.message || error.message),
       );
       return false;
     }
@@ -170,7 +170,7 @@ const Chat = () => {
         console.log(
           "Chat history loaded:",
           response.data.data.length,
-          "messages"
+          "messages",
         );
         setMessages(response.data.data);
       } else {
@@ -193,7 +193,9 @@ const Chat = () => {
     }
 
     if (!socket || !isConnected || !isInitialized) {
-      toast.error("Tidak terhubung ke chat. Silakan tunggu atau refresh halaman.");
+      toast.error(
+        "Tidak terhubung ke chat. Silakan tunggu atau refresh halaman.",
+      );
       return;
     }
 

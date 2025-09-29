@@ -65,7 +65,7 @@ const KelolaPesanan = () => {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-        }
+        },
       );
 
       setStatusMessage(`Status berhasil diubah menjadi ${status}`);
@@ -100,14 +100,17 @@ const KelolaPesanan = () => {
 
   // 🔍 Filter berdasarkan nama pemesan
   const filteredPesanan = pesanan.filter((order) =>
-    order.name?.toLowerCase().includes(searchQuery.toLowerCase())
+    order.name?.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   // Pagination setelah difilter
   const totalPages = Math.ceil(filteredPesanan.length / itemsPerPage);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentPesanan = filteredPesanan.slice(indexOfFirstItem, indexOfLastItem);
+  const currentPesanan = filteredPesanan.slice(
+    indexOfFirstItem,
+    indexOfLastItem,
+  );
 
   if (loading) {
     return (
@@ -121,7 +124,9 @@ const KelolaPesanan = () => {
     <div className="container-pesanan">
       <h1 className="judul">Kelola Pesanan</h1>
 
-      {statusMessage && <div className="success-message">✓ {statusMessage}</div>}
+      {statusMessage && (
+        <div className="success-message">✓ {statusMessage}</div>
+      )}
       {error && <div className="error-message">❗ {error}</div>}
 
       {/* 🔍 Input pencarian */}

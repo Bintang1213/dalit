@@ -62,7 +62,7 @@ router.get("/admin", authMiddleware, async (req, res) => {
           ...v.toObject(),
           sisaHariIni,
         };
-      })
+      }),
     );
 
     res.json(result);
@@ -97,7 +97,10 @@ router.get("/available", authMiddleware, async (req, res) => {
     const today = moment().tz("Asia/Jakarta").format("YYYY-MM-DD");
 
     // ambil voucher yang masih aktif hari ini (startDate <= today <= endDate)
-    const startOfToday = moment(today).tz("Asia/Jakarta").startOf("day").toDate();
+    const startOfToday = moment(today)
+      .tz("Asia/Jakarta")
+      .startOf("day")
+      .toDate();
     const endOfToday = moment(today).tz("Asia/Jakarta").endOf("day").toDate();
 
     // Ambil semua voucher yang masih berlaku hari ini
@@ -151,7 +154,7 @@ router.get("/available", authMiddleware, async (req, res) => {
           remainingGlobal,
           sudahDipakaiHariIni,
         };
-      })
+      }),
     );
 
     res.status(200).json(result);
@@ -185,7 +188,10 @@ router.post("/apply", authMiddleware, async (req, res) => {
     }
 
     const todayStr = moment().tz("Asia/Jakarta").format("YYYY-MM-DD");
-    const startOfDay = moment(todayStr).tz("Asia/Jakarta").startOf("day").toDate();
+    const startOfDay = moment(todayStr)
+      .tz("Asia/Jakarta")
+      .startOf("day")
+      .toDate();
     const endOfDay = moment(todayStr).tz("Asia/Jakarta").endOf("day").toDate();
 
     // cek tanggal aktif
@@ -199,7 +205,9 @@ router.post("/apply", authMiddleware, async (req, res) => {
 
     // cek subtotal minimal
     if (typeof subtotal === "number" && subtotal < voucher.minPurchase) {
-      return res.status(400).json({ message: "Belanja belum memenuhi syarat minimum." });
+      return res
+        .status(400)
+        .json({ message: "Belanja belum memenuhi syarat minimum." });
     }
 
     // cek global kuota per hari
@@ -208,7 +216,10 @@ router.post("/apply", authMiddleware, async (req, res) => {
       usedAt: { $gte: startOfDay, $lte: endOfDay },
     });
 
-    if (voucher.maxUsagePerDay > 0 && totalUsageToday >= voucher.maxUsagePerDay) {
+    if (
+      voucher.maxUsagePerDay > 0 &&
+      totalUsageToday >= voucher.maxUsagePerDay
+    ) {
       return res.status(400).json({ message: "Kuota voucher hari ini habis" });
     }
 
@@ -219,8 +230,13 @@ router.post("/apply", authMiddleware, async (req, res) => {
       usedAt: { $gte: startOfDay, $lte: endOfDay },
     });
 
-    if (voucher.maxUsagePerUser > 0 && userUsageToday >= voucher.maxUsagePerUser) {
-      return res.status(400).json({ message: "Kamu sudah menggunakan voucher ini hari ini" });
+    if (
+      voucher.maxUsagePerUser > 0 &&
+      userUsageToday >= voucher.maxUsagePerUser
+    ) {
+      return res
+        .status(400)
+        .json({ message: "Kamu sudah menggunakan voucher ini hari ini" });
     }
 
     // cek remaining global
@@ -277,10 +293,12 @@ router.put("/:id", authMiddleware, async (req, res) => {
       req.params.id,
       {
         ...req.body,
-        startDate: req.body.startDate ? new Date(req.body.startDate) : undefined,
+        startDate: req.body.startDate
+          ? new Date(req.body.startDate)
+          : undefined,
         endDate: req.body.endDate ? new Date(req.body.endDate) : undefined,
       },
-      { new: true }
+      { new: true },
     );
     res.json(voucher);
   } catch (err) {

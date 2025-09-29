@@ -14,29 +14,28 @@ const ReviewForm = ({ order, onReviewSubmitted, isReadOnly }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-  const fetchReview = async () => {
-    if (!order?._id || !userId) return;
+    const fetchReview = async () => {
+      if (!order?._id || !userId) return;
 
-    try {
-      const res = await axios.get(
-        `http://localhost:4000/api/reviews/order/${order._id}?userId=${userId}`
-      );
+      try {
+        const res = await axios.get(
+          `http://localhost:4000/api/reviews/order/${order._id}?userId=${userId}`,
+        );
 
-      if (res.data?.reviewed && res.data.reviews.length > 0) {
-        const firstReview = res.data.reviews[0]; // ✅ ambil review pertama
-        setRating(firstReview.rating);
-        setComment(firstReview.comment || "");
+        if (res.data?.reviewed && res.data.reviews.length > 0) {
+          const firstReview = res.data.reviews[0]; // ✅ ambil review pertama
+          setRating(firstReview.rating);
+          setComment(firstReview.comment || "");
+        }
+      } catch (err) {
+        console.error("Gagal ambil review:", err.response?.data || err.message);
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      console.error("Gagal ambil review:", err.response?.data || err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
-  fetchReview();
-}, [order, userId]);
-
+    fetchReview();
+  }, [order, userId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

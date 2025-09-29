@@ -18,188 +18,243 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ReviewList from "./pages/ReviewList/ReviewList";
 import ReviewForm from "./components/ReviewForm/ReviewForm";
+import EditProfile from "./pages/EditProfile/EditProfile"; 
+
+const WrappedRoute = ({ children, initial, animate, exit, transition }) => (
+    <motion.div
+        initial={initial}
+        animate={animate}
+        exit={exit}
+        transition={transition}
+    >
+        {children}
+    </motion.div>
+);
+
+const defaultTransition = {
+    initial: { opacity: 0, x: 50 },
+    animate: { opacity: 1, x: 0 },
+    exit: { opacity: 0, x: -50 },
+    transition: { duration: 0.5 }
+};
 
 const App = () => {
-  const [showLogin, setShowLogin] = useState(false);
-  const location = useLocation();
+    const [showLogin, setShowLogin] = useState(false);
+    const location = useLocation();
 
-  return (
-    <>
-      {showLogin && <LoginPopup setShowLogin={setShowLogin} />}
-      <div className="app">
-        {location.pathname !== "/cart" &&
-          location.pathname !== "/order" &&
-          location.pathname !== "/struk" && (
-            <Navbar setShowLogin={setShowLogin} />
-          )}
+    return (
+        <>
+            {showLogin && <LoginPopup setShowLogin={setShowLogin} />}
+            <div className="app">
+                {location.pathname !== "/cart" &&
+                    location.pathname !== "/order" &&
+                    location.pathname !== "/struk" && (
+                        <Navbar setShowLogin={setShowLogin} />
+                    )}
 
-        <div>
-          <AnimatePresence mode="wait">
-            <Routes location={location} key={location.pathname}>
-              <Route
-                path="/"
-                element={
-                  <motion.div
-                    initial={{ opacity: 0, x: -50 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 50 }}
-                    transition={{ duration: 0.5 }}
-                  >
-                    <Home />
-                  </motion.div>
-                }
-              />
-              <Route
-                path="/menu"
-                element={
-                  <motion.div
-                    initial={{ opacity: 0, x: -50 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 50 }}
-                    transition={{ duration: 0.5 }}
-                  >
-                    <Menu />
-                  </motion.div>
-                }
-              />
-              <Route
-                path="/cart"
-                element={
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.8 }}
-                    transition={{ duration: 0.5 }}
-                  >
-                    <Cart />
-                  </motion.div>
-                }
-              />
-              <Route
-                path="/order"
-                element={
-                  <motion.div
-                    initial={{ opacity: 0, y: 50 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -50 }}
-                    transition={{ duration: 0.5 }}
-                  >
-                    <PlaceOrder />
-                  </motion.div>
-                }
-              />
-              <Route
-                path="/struk"
-                element={
-                  <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -30 }}
-                    transition={{ duration: 0.4 }}
-                  >
-                    <Struk />
-                  </motion.div>
-                }
-              />
-              <Route
-                path="/riwayat"
-                element={
-                  <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -30 }}
-                    transition={{ duration: 0.4 }}
-                  >
-                    <OrderHistory />
-                  </motion.div>
-                }
-              />
-              <Route
-                path="/tentang-kami"
-                element={
-                  <motion.div
-                    initial={{ opacity: 0, x: 30 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -30 }}
-                    transition={{ duration: 0.5 }}
-                  >
-                    <About />
-                  </motion.div>
-                }
-              />
-              <Route
-                path="/midtrans-simulator"
-                element={
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.8 }}
-                    transition={{ duration: 0.5 }}
-                  >
-                    <Midtrans />
-                  </motion.div>
-                }
-              />
-              <Route
-                path="/chat"
-                element={
-                  <motion.div
-                    initial={{ opacity: 0, y: 50 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -50 }}
-                    transition={{ duration: 0.5 }}
-                  >
-                    <Chat />
-                  </motion.div>
-                }
-              />
-              {/* route baru untuk ReviewList */}
-              <Route
-                path="/reviews"
-                element={
-                  <motion.div
-                    initial={{ opacity: 0, y: 50 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -50 }}
-                    transition={{ duration: 0.5 }}
-                  >
-                    <ReviewList />
-                  </motion.div>
-                }
-              />
-              {/* ✅ route baru untuk ReviewForm */}
-              <Route
-                path="/reviewform"
-                element={
-                  <motion.div
-                    initial={{ opacity: 0, y: 50 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -50 }}
-                    transition={{ duration: 0.5 }}
-                  >
-                    <ReviewForm />
-                  </motion.div>
-                }
-              />
-            </Routes>
-          </AnimatePresence>
-        </div>
-      </div>
-      <Footer />
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        style={{ zIndex: 99999 }}
-      />
-    </>
-  );
+                <div>
+                    <AnimatePresence mode="wait">
+                        <Routes location={location} key={location.pathname}>
+                            
+                            {/* Rute Beranda */}
+                            <Route
+                                path="/"
+                                element={
+                                    <WrappedRoute
+                                        initial={{ opacity: 0, x: -50 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        exit={{ opacity: 0, x: 50 }}
+                                        transition={{ duration: 0.5 }}
+                                    >
+                                        <Home />
+                                    </WrappedRoute>
+                                }
+                            />
+                            
+                            {/* Rute Edit Profile - BARU DITAMBAHKAN */}
+                            <Route
+                                path="/profile/edit"
+                                element={
+                                    <WrappedRoute
+                                        initial={{ opacity: 0, y: 30 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -30 }}
+                                        transition={{ duration: 0.5 }}
+                                    >
+                                        <EditProfile />
+                                    </WrappedRoute>
+                                }
+                            />
+
+                            {/* Rute Menu */}
+                            <Route
+                                path="/menu"
+                                element={
+                                    <WrappedRoute
+                                        initial={{ opacity: 0, x: -50 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        exit={{ opacity: 0, x: 50 }}
+                                        transition={{ duration: 0.5 }}
+                                    >
+                                        <Menu />
+                                    </WrappedRoute>
+                                }
+                            />
+
+                            {/* Rute Cart */}
+                            <Route
+                                path="/cart"
+                                element={
+                                    <WrappedRoute
+                                        initial={{ opacity: 0, scale: 0.8 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        exit={{ opacity: 0, scale: 0.8 }}
+                                        transition={{ duration: 0.5 }}
+                                    >
+                                        <Cart />
+                                    </WrappedRoute>
+                                }
+                            />
+                            
+                            {/* Rute Place Order */}
+                            <Route
+                                path="/order"
+                                element={
+                                    <WrappedRoute
+                                        initial={{ opacity: 0, y: 50 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -50 }}
+                                        transition={{ duration: 0.5 }}
+                                    >
+                                        <PlaceOrder />
+                                    </WrappedRoute>
+                                }
+                            />
+                            
+                            {/* Rute Struk */}
+                            <Route
+                                path="/struk"
+                                element={
+                                    <WrappedRoute
+                                        initial={{ opacity: 0, y: 30 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -30 }}
+                                        transition={{ duration: 0.4 }}
+                                    >
+                                        <Struk />
+                                    </WrappedRoute>
+                                }
+                            />
+                            
+                            {/* Rute Riwayat */}
+                            <Route
+                                path="/riwayat"
+                                element={
+                                    <WrappedRoute
+                                        initial={{ opacity: 0, y: 30 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -30 }}
+                                        transition={{ duration: 0.4 }}
+                                    >
+                                        <OrderHistory />
+                                    </WrappedRoute>
+                                }
+                            />
+                            
+                            {/* Rute Tentang Kami */}
+                            <Route
+                                path="/tentang-kami"
+                                element={
+                                    <WrappedRoute
+                                        initial={{ opacity: 0, x: 30 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        exit={{ opacity: 0, x: -30 }}
+                                        transition={{ duration: 0.5 }}
+                                    >
+                                        <About />
+                                    </WrappedRoute>
+                                }
+                            />
+                            
+                            {/* Rute Midtrans */}
+                            <Route
+                                path="/midtrans-simulator"
+                                element={
+                                    <WrappedRoute
+                                        initial={{ opacity: 0, scale: 0.8 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        exit={{ opacity: 0, scale: 0.8 }}
+                                        transition={{ duration: 0.5 }}
+                                    >
+                                        <Midtrans />
+                                    </WrappedRoute>
+                                }
+                            />
+                            
+                            {/* Rute Chat */}
+                            <Route
+                                path="/chat"
+                                element={
+                                    <WrappedRoute
+                                        initial={{ opacity: 0, y: 50 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -50 }}
+                                        transition={{ duration: 0.5 }}
+                                    >
+                                        <Chat />
+                                    </WrappedRoute>
+                                }
+                            />
+                            
+                            {/* Rute ReviewList */}
+                            <Route
+                                path="/reviews"
+                                element={
+                                    <WrappedRoute
+                                        initial={{ opacity: 0, y: 50 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -50 }}
+                                        transition={{ duration: 0.5 }}
+                                    >
+                                        <ReviewList />
+                                    </WrappedRoute>
+                                }
+                            />
+                            
+                            {/* Rute ReviewForm */}
+                            <Route
+                                path="/reviewform"
+                                element={
+                                    <WrappedRoute
+                                        initial={{ opacity: 0, y: 50 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -50 }}
+                                        transition={{ duration: 0.5 }}
+                                    >
+                                        <ReviewForm />
+                                    </WrappedRoute>
+                                }
+                            />
+                            
+                        </Routes>
+                    </AnimatePresence>
+                </div>
+            </div>
+            <Footer />
+            <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                style={{ zIndex: 99999 }}
+            />
+        </>
+    );
 };
 
 export default App;
