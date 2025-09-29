@@ -1,7 +1,7 @@
 import React, { useContext, useState, useEffect, useRef } from "react";
 import "./Navbar.css";
 import { assets } from "../../assets/assets";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { StoreContext } from "../../context/StoreContext";
 import { toast } from "react-toastify";
 
@@ -16,9 +16,17 @@ const Navbar = ({ setShowLogin }) => {
   const profileDropdownRef = useRef();
   const menuRef = useRef();
 
+  const navigate = useNavigate();
+
   const handleSearch = () => {
     if (searchQuery.trim() !== "") {
-      toast.info(`Mencari: ${searchQuery}`, { position: "top-center", autoClose: 2000 });
+      navigate(`/menu?search=${encodeURIComponent(searchQuery)}`);
+      setSearchQuery("");
+    } else {
+      toast.info("Ketik dulu kata kunci pencarian!", {
+        position: "top-center",
+        autoClose: 2000,
+      });
     }
   };
 

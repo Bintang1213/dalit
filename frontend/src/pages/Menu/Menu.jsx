@@ -2,26 +2,42 @@ import React, { useContext, useState } from "react";
 import { StoreContext } from "../../context/StoreContext";
 import FoodItem from "../../components/FoodItem/FoodItem";
 import { FaFilter, FaStar } from "react-icons/fa";
+import { useLocation } from "react-router-dom";
 import "./Menu.css";
 
 const Menu = () => {
   const { food_list } = useContext(StoreContext);
-
-  const categories = [...new Set(food_list.map((item) => item.category))];
-
   const [sortOrder, setSortOrder] = useState("");
   const [minRating, setMinRating] = useState(0);
 
-  // Fungsi filter & sort
+  // ambil query search dari URL
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const searchQuery = queryParams.get("search")?.toLowerCase() || "";
+
+  // ambil kategori unik
+  const categories = [...new Set(food_list.map((item) => item.category))];
+
+  // filter & sort
   const filterAndSortItems = (items) => {
     let filtered = [...items];
 
-    // filter berdasarkan rating minimal
+    // filter search
+    if (searchQuery) {
+      filtered = filtered.filter(
+        (item) =>
+          item.name.toLowerCase().includes(searchQuery) ||
+          item.description.toLowerCase().includes(searchQuery) ||
+          item.price.toString().includes(searchQuery)
+      );
+    }
+
+    // filter rating minimal
     if (minRating > 0) {
       filtered = filtered.filter((item) => item.rating >= minRating);
     }
 
-    // urutan berdasarkan harga / rating
+    // sort harga / rating
     if (sortOrder === "asc") {
       filtered.sort((a, b) => a.price - b.price);
     } else if (sortOrder === "desc") {
@@ -39,18 +55,16 @@ const Menu = () => {
     <div className="menu-page">
       {/* Kiri: daftar menu */}
       <div className="menu-left">
-        {categories.map((category, idx) => {
-          const items = filterAndSortItems(
-            food_list.filter((item) => item.category === category)
-          );
-
-          return (
-            <div key={idx} className="menu-category-section">
-              <h2 className="menu-category-title">{category}</h2>
-              <div className="menu-category-line"></div>
-              <div className="menu-items">
-                {items.length > 0 ? (
-                  items.map((item) => (
+        {searchQuery ? (
+          // Jika ada pencarian → tampilkan 1 section khusus
+          (() => {
+            const searchResults = filterAndSortItems(food_list);
+            return searchResults.length > 0 ? (
+              <div className="menu-category-section">
+                <h2 className="menu-category-title">Hasil Pencarian</h2>
+                <div className="menu-category-line"></div>
+                <div className="menu-items">
+                  {searchResults.map((item) => (
                     <FoodItem
                       key={item._id}
                       id={item._id}
@@ -61,14 +75,44 @@ const Menu = () => {
                       status={item.status}
                       rating={item.rating}
                     />
-                  ))
-                ) : (
-                  <p className="empty-message">Tidak ada menu sesuai filter</p>
-                )}
+                  ))}
+                </div>
               </div>
-            </div>
-          );
-        })}
+            ) : (
+              <p className="empty-message">Tidak ada menu sesuai pencarian</p>
+            );
+          })()
+        ) : (
+          // Kalau tidak ada search → tampilkan per kategori
+          categories.map((category, idx) => {
+            const items = filterAndSortItems(
+              food_list.filter((item) => item.category === category)
+            );
+
+            if (items.length === 0) return null; // skip kategori kosong
+
+            return (
+              <div key={idx} className="menu-category-section">
+                <h2 className="menu-category-title">{category}</h2>
+                <div className="menu-category-line"></div>
+                <div className="menu-items">
+                  {items.map((item) => (
+                    <FoodItem
+                      key={item._id}
+                      id={item._id}
+                      name={item.name}
+                      description={item.description}
+                      price={item.price}
+                      image={item.image}
+                      status={item.status}
+                      rating={item.rating}
+                    />
+                  ))}
+                </div>
+              </div>
+            );
+          })
+        )}
       </div>
 
       {/* Kanan: filter panel */}

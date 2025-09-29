@@ -8,6 +8,7 @@ import {
   updateStatus,
   updateRecommendationStatus,
   getFoodDetailsById,
+  searchFood,
 } from "../controllers/foodController.js";
 import Food from "../models/foodModel.js";
 import multer from "multer";
@@ -57,6 +58,7 @@ foodRouter.post("/remove", removeFood);
 foodRouter.post("/edit", uploadMiddleware, editFood);
 foodRouter.post("/update-status", updateStatus);
 foodRouter.post("/update-recommendation", updateRecommendationStatus); // Rute baru untuk rekomendasi
+foodRouter.get("/search", searchFood);
 
 // ======================
 // Routes rekomendasi menu
