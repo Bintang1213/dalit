@@ -6,7 +6,6 @@ import { StoreContext } from "../../context/StoreContext";
 import { toast } from "react-toastify";
 import io from "socket.io-client";
 import {
-  getNotificationCount,
   markAllAsRead,
   fetchNotifications,
 } from "../../api/notificationApi";
@@ -20,7 +19,6 @@ const Navbar = ({ setShowLogin }) => {
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showCartDropdown, setShowCartDropdown] = useState(false);
-
   const [unreadCount, setUnreadCount] = useState(0);
   const [showNotificationDropdown, setShowNotificationDropdown] =
     useState(false);
@@ -33,13 +31,13 @@ const Navbar = ({ setShowLogin }) => {
     setToken,
     user,
     cartItems,
+    food_list,
   } = useContext(StoreContext);
 
   const profileDropdownRef = useRef();
   const menuRef = useRef();
   const notificationRef = useRef();
   const cartRef = useRef();
-
   const navigate = useNavigate();
 
   const handleSearch = () => {
@@ -74,7 +72,9 @@ const Navbar = ({ setShowLogin }) => {
       try {
         await markAllAsRead(token);
         setUnreadCount(0);
-        setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+        setNotifications((prev) =>
+          prev.map((n) => ({ ...n, isRead: true }))
+        );
         toast.success("Semua notifikasi ditandai sudah dibaca");
       } catch (error) {
         toast.error("Gagal menandai sudah dibaca");
@@ -88,7 +88,6 @@ const Navbar = ({ setShowLogin }) => {
       try {
         const data = await fetchNotifications(token);
         setNotifications(data);
-
         const count = data.filter((n) => !n.isRead).length;
         setUnreadCount(count);
       } catch (error) {
@@ -105,22 +104,24 @@ const Navbar = ({ setShowLogin }) => {
     });
   };
 
-  // Fungsi untuk mendapatkan item cart yang unik untuk preview
+  // ✅ Gambar notif cart pakai logo warttiyem
   const getCartPreviewItems = () => {
     const items = [];
     Object.keys(cartItems).forEach((itemId) => {
       if (cartItems[itemId] > 0) {
-        // Simulasi data item - Anda perlu menyesuaikan dengan struktur data Anda
-        items.push({
-          id: itemId,
-          name: `Item ${itemId}`,
-          price: 25000,
-          quantity: cartItems[itemId],
-          image: assets.w, // Ganti dengan gambar yang sesuai
-        });
+        const itemInfo = food_list.find((f) => f._id === itemId);
+        if (itemInfo) {
+          items.push({
+            id: itemId,
+            name: itemInfo.name,
+            price: itemInfo.price,
+            quantity: cartItems[itemId],
+            image: assets.w, // selalu logo warttiyem
+          });
+        }
       }
     });
-    return items.slice(0, 3); // Tampilkan maksimal 3 item di preview
+    return items.slice(0, 3);
   };
 
   useEffect(() => {
@@ -139,7 +140,6 @@ const Navbar = ({ setShowLogin }) => {
 
       socket.on("orderStatusUpdate", (data) => {
         toast.info(data.message, { position: "top-right", autoClose: 5000 });
-
         const newNotification = {
           message: data.message,
           createdAt: new Date().toISOString(),
@@ -186,6 +186,7 @@ const Navbar = ({ setShowLogin }) => {
         setShowCartDropdown(false);
       }
     };
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
@@ -281,6 +282,7 @@ const Navbar = ({ setShowLogin }) => {
             >
               <i className="bi bi-cart3"></i>
             </div>
+
             {getTotalCartItems() > 0 && (
               <div className="cart-badge">
                 {getTotalCartItems() > 9 ? "9+" : getTotalCartItems()}
@@ -297,7 +299,7 @@ const Navbar = ({ setShowLogin }) => {
                 <div className="cart-items-preview">
                   {cartPreviewItems.map((item, index) => (
                     <div key={index} className="cart-item-preview">
-                      <img src={item.image} alt={item.name} />
+                      <img src={assets.w} alt="logo warttiyem" />
                       <div className="cart-item-info">
                         <div className="cart-item-name">{item.name}</div>
                         <div className="cart-item-price">
@@ -306,6 +308,7 @@ const Navbar = ({ setShowLogin }) => {
                       </div>
                     </div>
                   ))}
+
                   {getTotalCartItems() > 3 && (
                     <div
                       style={{
@@ -348,7 +351,6 @@ const Navbar = ({ setShowLogin }) => {
                     setShowNotificationDropdown(!showNotificationDropdown)
                   }
                 ></i>
-
                 {unreadCount > 0 && (
                   <div className="dot-notif">
                     {unreadCount > 9 ? "9+" : unreadCount}
@@ -369,6 +371,7 @@ const Navbar = ({ setShowLogin }) => {
                         </p>
                       )}
                     </div>
+
                     <div className="dropdown-body">
                       {notifications.length > 0 ? (
                         <div className="notification-list">
@@ -379,7 +382,9 @@ const Navbar = ({ setShowLogin }) => {
                               className={`notification-item ${
                                 notif.isRead ? "" : "unread"
                               }`}
-                              onClick={() => setShowNotificationDropdown(false)}
+                              onClick={() =>
+                                setShowNotificationDropdown(false)
+                              }
                             >
                               <div className="notif-message">
                                 {notif.message}
@@ -393,7 +398,6 @@ const Navbar = ({ setShowLogin }) => {
                       ) : (
                         <p className="no-notif">Tidak ada notifikasi.</p>
                       )}
-
                       <Link
                         to="/riwayat"
                         className="notif-footer-link"
@@ -409,7 +413,9 @@ const Navbar = ({ setShowLogin }) => {
               <div className="navbar-profile" ref={profileDropdownRef}>
                 <div
                   className="profile-icon-circle"
-                  onClick={() => setShowProfileDropdown(!showProfileDropdown)}
+                  onClick={() =>
+                    setShowProfileDropdown(!showProfileDropdown)
+                  }
                 >
                   {user?.name ? user.name.charAt(0).toUpperCase() : "U"}
                 </div>
@@ -423,7 +429,10 @@ const Navbar = ({ setShowLogin }) => {
                     >
                       <i className="bi bi-gear"></i> Edit Profil
                     </Link>
-                    <li className="dropdown-item logout" onClick={handleLogout}>
+                    <li
+                      className="dropdown-item logout"
+                      onClick={handleLogout}
+                    >
                       <i className="bi bi-box-arrow-right"></i> Keluar
                     </li>
                   </ul>

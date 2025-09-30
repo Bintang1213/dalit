@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import "./OrderHistory.css";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -11,6 +11,7 @@ import {
   FaQuestionCircle,
 } from "react-icons/fa";
 import ReviewForm from "../../components/ReviewForm/ReviewForm";
+import { StoreContext } from "../../context/StoreContext"; // 👉 tambahin ini
 
 const OrderHistory = () => {
   const navigate = useNavigate();
@@ -26,6 +27,9 @@ const OrderHistory = () => {
   // ID pesanan yang sudah di-review
   const [reviewedOrderIds, setReviewedOrderIds] = useState(new Set());
   const [isReadOnly, setIsReadOnly] = useState(false);
+
+  // 👉 ambil setCartItems dari StoreContext
+  const { setCartItems } = useContext(StoreContext);
 
   const formatCurrency = (number) => {
     return new Intl.NumberFormat("id-ID", {
@@ -79,14 +83,14 @@ const OrderHistory = () => {
           "http://localhost:4000/api/order/user",
           {
             headers: { Authorization: `Bearer ${token}` },
-          },
+          }
         );
 
-        // Ambil ID pesanan yang sudah di-review, paksa ke string
+        // Ambil ID pesanan yang sudah di-review
         const reviewedIds = new Set(
           response.data.data
             .filter((order) => order.reviewed)
-            .map((order) => order._id.toString()),
+            .map((order) => order._id.toString())
         );
 
         setOrders(response.data.data);
@@ -105,7 +109,7 @@ const OrderHistory = () => {
       } catch (error) {
         console.error(
           "Gagal ambil rekomendasi:",
-          error?.response?.data || error.message,
+          error?.response?.data || error.message
         );
       }
     };
@@ -127,13 +131,30 @@ const OrderHistory = () => {
   };
 
   const onReviewSubmitted = () => {
-    // Update tombol secara realtime
     setReviewedOrderIds((prev) =>
-      new Set(prev).add(selectedOrder._id.toString()),
+      new Set(prev).add(selectedOrder._id.toString())
     );
     setShowReviewModal(false);
     setSelectedOrder(null);
     setIsReadOnly(false);
+  };
+
+  // 👉 Fungsi Reorder
+  const handleReorder = (order) => {
+    try {
+      const newCart = {};
+
+      order.items.forEach((item) => {
+        // pastikan pakai field yang benar (foodId atau _id)
+        const id = item.foodId || item._id;
+        newCart[id] = item.quantity || item.qty || 1;
+      });
+
+      setCartItems(newCart); // update context
+      navigate("/cart");
+    } catch (err) {
+      console.error("Gagal reorder:", err);
+    }
   };
 
   const indexOfLastOrder = currentPage * itemsPerPage;
@@ -228,6 +249,14 @@ const OrderHistory = () => {
                         Beri Rating
                       </button>
                     ))}
+
+                  {/* 👉 Tombol Reorder */}
+                  <button
+                    className="reorder-btn"
+                    onClick={() => handleReorder(order)}
+                  >
+                    Reorder
+                  </button>
                 </td>
               </tr>
             ))}
@@ -251,7 +280,6 @@ const OrderHistory = () => {
         <div className="modal-overlay">
           <div className="modal-content">
             <ReviewForm
-              // Kirim seluruh objek order
               order={selectedOrder}
               onReviewSubmitted={onReviewSubmitted}
               isReadOnly={isReadOnly}
