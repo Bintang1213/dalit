@@ -220,44 +220,47 @@ const OrderHistory = () => {
                   {getStatusIcon(order.status)} {order.status}
                 </td>
                 <td
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "6px",
-                  }}
-                >
-                  <button
-                    className="view-detail-btn"
-                    onClick={() => navigate("/struk", { state: { order } })}
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "6px",
+                    }}
                   >
-                    Lihat Detail
-                  </button>
+                    <button
+                      className="view-detail-btn"
+                      onClick={() => navigate("/struk", { state: { order } })}
+                    >
+                      Lihat Detail
+                    </button>
 
-                  {order.status.toLowerCase() === "selesai" &&
-                    (reviewedOrderIds.has(order._id.toString()) ? (
-                      <button
-                        className="view-rating-btn"
-                        onClick={() => handleViewRatingClick(order)}
-                      >
-                        Lihat Rating
-                      </button>
-                    ) : (
-                      <button
-                        className="rate-btn"
-                        onClick={() => handleReviewClick(order)}
-                      >
-                        Beri Rating
-                      </button>
-                    ))}
+                    {/* Rating Button */}
+                    {order.status.toLowerCase() === "selesai" &&
+                      (reviewedOrderIds.has(order._id.toString()) ? (
+                        <button
+                          className="view-rating-btn"
+                          onClick={() => handleViewRatingClick(order)}
+                        >
+                          Lihat Rating
+                        </button>
+                      ) : (
+                        <button
+                          className="rate-btn"
+                          onClick={() => handleReviewClick(order)}
+                        >
+                          Beri Rating
+                        </button>
+                      ))}
 
-                  {/* 👉 Tombol Reorder */}
-                  <button
-                    className="reorder-btn"
-                    onClick={() => handleReorder(order)}
-                  >
-                    Reorder
-                  </button>
-                </td>
+                    {/* 👉 Tambahkan kondisi ini */}
+                    {order.status.toLowerCase() === "selesai" && (
+                      <button
+                        className="reorder-btn"
+                        onClick={() => handleReorder(order)}
+                      >
+                        Pesan Lagi
+                      </button>
+                    )}
+                  </td>
               </tr>
             ))}
           </tbody>
