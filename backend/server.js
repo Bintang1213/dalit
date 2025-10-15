@@ -60,6 +60,7 @@ const allowedOrigins = [
   "https://1sj70g49-5173.asse.devtunnels.ms",
   "http://192.168.1.6:4000",
   "http://localhost:8081",
+  "https://unflamboyant-undepreciable-emilia.ngrok-free.dev",
   process.env.FRONTEND_URL,
 ].filter(Boolean);
 
