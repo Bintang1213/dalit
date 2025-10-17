@@ -12,14 +12,7 @@ import {
 } from "chart.js";
 import "./dashboard.css";
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-);
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const Dashboard = () => {
   const [dashboardData, setDashboardData] = useState({
@@ -29,6 +22,7 @@ const Dashboard = () => {
     totalPemasukan: 0,
     penjualanBulan: Array(12).fill(0),
     pemasukanBulan: Array(12).fill(0),
+    menuTerlaris: { name: "-", total: 0 },
   });
   const [loading, setLoading] = useState(true);
 
@@ -37,6 +31,7 @@ const Dashboard = () => {
     { bg: "#87CEEB", iconBg: "#E0FFFF", iconColor: "#1E90FF" },
     { bg: "#FFB6C1", iconBg: "#FFE4E1", iconColor: "#FF69B4" },
     { bg: "#90EE90", iconBg: "#F0FFF0", iconColor: "#32CD32" },
+    { bg: "#D8BFD8", iconBg: "#F8F0FF", iconColor: "#8A2BE2" }, // 💜 card menu terlaris
   ];
 
   useEffect(() => {
@@ -66,6 +61,7 @@ const Dashboard = () => {
         const monthlyRevenue = Array(12).fill(0);
         let currentMonthSales = 0;
         let currentMonthRevenue = 0;
+        const menuCount = {}; // 🔥 Hitung menu terlaris
 
         const currentMonth = new Date().getMonth();
         const currentYear = new Date().getFullYear();
@@ -76,16 +72,29 @@ const Dashboard = () => {
 
           if (orderDate.getFullYear() === currentYear) {
             monthlySales[month] += 1;
+
             order.items?.forEach((item) => {
               const itemRevenue = item.price * item.quantity;
               monthlyRevenue[month] += itemRevenue;
+
               if (month === currentMonth) {
                 currentMonthSales += item.quantity;
                 currentMonthRevenue += itemRevenue;
               }
+
+              // Hitung jumlah terjual tiap menu
+              menuCount[item.name] = (menuCount[item.name] || 0) + item.quantity;
             });
           }
         });
+
+        // 🏆 Cari menu terlaris
+        let topMenu = { name: "-", total: 0 };
+        for (const [name, total] of Object.entries(menuCount)) {
+          if (total > topMenu.total) {
+            topMenu = { name, total };
+          }
+        }
 
         setDashboardData({
           jumlahMenu: menuRes.data.data?.length || 0,
@@ -94,6 +103,7 @@ const Dashboard = () => {
           totalPemasukan: currentMonthRevenue,
           penjualanBulan: monthlySales,
           pemasukanBulan: monthlyRevenue,
+          menuTerlaris: topMenu,
         });
       } catch (err) {
         console.error("Gagal memuat data dashboard:", err);
@@ -107,18 +117,8 @@ const Dashboard = () => {
 
   const chartData = {
     labels: [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "Mei",
-      "Jun",
-      "Jul",
-      "Agu",
-      "Sep",
-      "Okt",
-      "Nov",
-      "Des",
+      "Jan", "Feb", "Mar", "Apr", "Mei", "Jun",
+      "Jul", "Agu", "Sep", "Okt", "Nov", "Des",
     ],
     datasets: [
       {
@@ -190,6 +190,13 @@ const Dashboard = () => {
                   value: `Rp ${dashboardData.totalPemasukan.toLocaleString("id-ID")}`,
                   link: "/kelolakeuangan",
                 },
+                {
+                  icon: "🔥",
+                  title: "Menu Terlaris",
+                  value: `${dashboardData.menuTerlaris.name}`,
+                  subtext: `Terjual ${dashboardData.menuTerlaris.total} kali`,
+                  link: null, // 🚫 Tidak ada link
+                },
               ].map((card, index) => (
                 <div
                   key={index}
@@ -208,9 +215,17 @@ const Dashboard = () => {
                   <div className="stat-details">
                     <h3>{card.title}</h3>
                     <div className="stat-value">{card.value}</div>
-                    <a href={card.link} className="stat-link">
-                      Lihat detail →
-                    </a>
+                    {card.subtext && (
+                      <p style={{ fontSize: "0.9rem", color: "#555" }}>
+                        {card.subtext}
+                      </p>
+                    )}
+                    {/* tampilkan link hanya kalau ada */}
+                    {card.link && (
+                      <a href={card.link} className="stat-link">
+                        Lihat detail →
+                      </a>
+                    )}
                   </div>
                 </div>
               ))}
