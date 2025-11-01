@@ -1,3 +1,4 @@
+/* ---------- existing styles (kepertahankan) ---------- */
 .place-order {
   display: flex;
   justify-content: space-between;
@@ -36,6 +37,7 @@
   height: 100px;
 }
 
+/* summary, radio, order button - keep original */
 .summary-line {
   display: flex;
   justify-content: space-between;
@@ -64,13 +66,6 @@
   margin-bottom: 10px;
 }
 
-.payment-options input[type="radio"] {
-  accent-color: red;
-  margin-right: 8px;
-  flex-direction: column;
-  gap: 15px;
-}
-
 .order-button {
   background-color: crimson;
   color: white;
@@ -89,6 +84,7 @@
   background-color: #c2185b;
 }
 
+/* back button */
 .back-button {
   display: flex;
   align-items: center;
@@ -96,31 +92,18 @@
   font-weight: bold;
   font-size: 1.5rem;
 }
-
 .back-button .back-arrow {
   font-size: 1.8rem;
   cursor: pointer;
   color: #d40505;
   transition: color 0.3s ease;
 }
-
-.back-button .back-arrow:hover {
-  color: #ff4c4c;
-}
-
+.back-button .back-arrow:hover { color: #ff4c4c; }
 .back-button h2 {
   margin: 0;
   font-size: 1.5rem;
   font-weight: bold;
   color: black;
-}
-
-.place-order-page {
-  padding: 30px;
-}
-
-.back-button:hover {
-  color: #e63946;
 }
 
 /* Radio button style agar sama dengan Cart */
@@ -129,11 +112,7 @@
   gap: 40px;
   flex-wrap: wrap;
 }
-
-.radio-options input[type="radio"] {
-  display: none;
-}
-
+.radio-options input[type="radio"] { display: none; }
 .radio-options label {
   display: flex;
   align-items: center;
@@ -142,7 +121,6 @@
   position: relative;
   cursor: pointer;
 }
-
 .radio-options label::before {
   content: "";
   width: 18px;
@@ -152,119 +130,182 @@
   display: inline-block;
   box-sizing: border-box;
 }
-
 .radio-options input[type="radio"]:checked + label::before {
   background-color: #d91b42;
 }
 
-.place-order-right input[type="number"] {
-  margin-top: 10px;
-  margin-bottom: 15px;
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #c5c5c5;
-  border-radius: 6px;
-  outline-color: crimson;
-  font-size: 16px;
-}
+/* ---------------------------------------------------------
+   VOUCHER STYLES (baru, sesuai permintaan Cece)
+   --------------------------------------------------------- */
 .voucher-section {
   margin-top: 20px;
 }
 
+/* Header text (hitam) -> "Voucher" */
 .voucher-title {
-  font-weight: bold;
-  margin-bottom: 10px;
+  font-weight: 700;
+  margin-bottom: 8px;
   font-size: 16px;
+  color: #000;
 }
 
-.voucher-list {
+/* Box "Pilih Voucher" yang selalu terlihat */
+.voucher-toggle-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 100%;
+  background: #fff;
+  border: 1.5px solid #9a0505;
+  border-radius: 10px;
+  padding: 12px 14px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+}
+.voucher-toggle-box:hover {
+  background: #fff8f8;
+}
+.voucher-toggle-text {
+  font-weight: 600;
+  color: #222;
+}
+.voucher-toggle-caret {
+  color: #9a0505;
+  font-weight: 700;
+}
+
+/* Dropdown area (terlihat saat box diklik) */
+.voucher-dropdown {
+  margin-top: 10px;
+  width: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+  /* ringan animasi slide/fade */
+  animation: slideDown 220ms ease;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+  background: transparent;
+}
+/* inner supaya punya scroll independen */
+.voucher-dropdown-inner {
+  max-height: 260px; /* default show up to 4 */
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 10px;
+  padding: 8px 0;
+  background: transparent;
 }
 
+/* ketika expanded (lihat lainnya) -> lebih tinggi, tapi tetap scroll */
+.voucher-dropdown.expanded .voucher-dropdown-inner {
+  max-height: 460px;
+}
+
+/* voucher card style (rapat, jarak dekat) */
 .voucher-card {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: #fff;
   border: 1.5px solid #9a0505;
-  border-radius: 12px;
-  padding: 14px 18px;
-  background: #ffffffbd;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-  transition: all 0.25s ease;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+  transition: transform 120ms ease, box-shadow 120ms ease;
 }
 
+/* sedikit hover effect */
 .voucher-card:hover {
-  border-color: #9a0505;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.06);
 }
 
+.voucher-info { flex: 1; }
+.voucher-head {
+  margin: 0;
+  font-weight: 700;
+  font-size: 16px;
+  color: #111;
+}
+.voucher-min {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: #666;
+}
+
+/* tombol pakai kecil, bulat & bold sesuai permintaan */
+.voucher-btn {
+  min-width: 78px;
+  height: 36px;
+  border: none;
+  border-radius: 18px;
+  background: #9a0505;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0 14px;
+  transition: background 120ms ease, transform 120ms ease;
+}
+.voucher-btn:hover { background: #b31b1b; }
+.voucher-btn:disabled { background: #ccc; cursor: not-allowed; }
+
+/* style ketika voucher sudah dipakai (hijau) */
 .voucher-card.applied {
   border-color: #16a34a;
   background: #f0fdf4;
 }
+.voucher-btn.applied-btn {
+  background: #16a34a;
+  cursor: default;
+}
 
+/* disabled card */
 .voucher-card.disabled {
   opacity: 0.6;
-  background: #f9f9f9;
-  border-color: #ccc;
+  filter: grayscale(0.02);
 }
 
-.voucher-info h4 {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-  color: #222;
+/* footer tombol lihat lainnya */
+.voucher-dropdown-footer {
+  display: flex;
+  justify-content: center;
+  padding: 8px 0 12px;
+}
+.voucher-see-more {
+  background: none;
+  border: none;
+  color: #9a0505;
+  font-weight: 700;
+  cursor: pointer;
 }
 
-.voucher-info p {
-  margin: 4px 0 0;
-  font-size: 14px;
-  color: #555;
+/* applied voucher box (tampil di luar dropdown, di bawah toggle box) */
+.applied-voucher-box {
+  margin-top: 12px;
+}
+.voucher-applied-label {
+  color: #16a34a;
+  font-weight: 700;
+  margin-right: 8px;
+}
+.voucher-remove-btn {
+  background: none;
+  border: 1px solid #d0d0d0;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
 }
 
-.voucher-min {
-  font-size: 13px;
+/* no voucher text inline */
+.no-voucher-inline {
+  padding: 10px 14px;
   color: #777;
 }
 
-.voucher-btn {
-  padding: 7px 16px;
-  border-radius: 8px;
-  border: none;
-  background: #9a0505;
-  color: white;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.voucher-btn:hover {
-  background: #9a0505;
-}
-
-.voucher-card.applied .voucher-btn {
-  background: #16a34a;
-}
-
-.voucher-btn:disabled {
-  background: #aaa;
-  cursor: not-allowed;
-}
-/* 🔹 Status Voucher */
-.voucher-status {
-  font-size: 13px;
-  margin-top: 4px;
-  font-weight: 500;
-}
-
-.voucher-status.used {
-  color: #555; /* abu-abu kalau sudah dipakai */
-  font-style: italic;
-}
-
-.voucher-status.habis {
-  color: #d91b42; /* merah kalau habis */
-  font-weight: bold;
+/* animasi slide */
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
 }

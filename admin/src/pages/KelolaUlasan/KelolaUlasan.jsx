@@ -18,7 +18,14 @@ const KelolaUlasan = ({ isSidebarCollapsed }) => {
     const fetchReviews = async () => {
       try {
         const res = await axios.get(API_BASE);
-        setReviews(Array.isArray(res.data) ? res.data : []);
+        const data = Array.isArray(res.data) ? res.data : [];
+
+        // 🕒 Urutkan dari yang terbaru ke yang terlama
+        const sorted = data.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+
+        setReviews(sorted);
       } catch (error) {
         console.error("Error fetch reviews:", error);
         setReviews([]);
@@ -54,8 +61,8 @@ const KelolaUlasan = ({ isSidebarCollapsed }) => {
         toast.success(`Status rekomendasi berhasil diubah.`);
         setTopMenus((prev) =>
           prev.map((m) =>
-            m._id === menu._id ? { ...m, isRecommended: newIsRecommended } : m,
-          ),
+            m._id === menu._id ? { ...m, isRecommended: newIsRecommended } : m
+          )
         );
       } else {
         toast.error("Gagal update rekomendasi.");

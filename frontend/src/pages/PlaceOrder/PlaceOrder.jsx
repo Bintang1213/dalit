@@ -24,11 +24,13 @@ const PlaceOrder = () => {
     payment: "",
   });
 
+  // Voucher states (ditambah untuk UI dropdown & show applied)
   const [voucherList, setVoucherList] = useState([]);
   const [voucherApplied, setVoucherApplied] = useState(null);
   const [discountAmount, setDiscountAmount] = useState(0);
-
-  const [selectedVoucherId, setSelectedVoucherId] = useState("all"); // untuk dropdown filter
+  const [selectedVoucherId, setSelectedVoucherId] = useState("all"); // (dipertahankan kalau backend/pilih manual diperlukan)
+  const [showVoucherDropdown, setShowVoucherDropdown] = useState(false); // buka/tutup dropdown
+  const [showAllVouchers, setShowAllVouchers] = useState(false); // lihat lainnya expand
 
   const subtotal = getTotalCartAmount();
   const serviceFee = subtotal * 0.1;
@@ -52,11 +54,12 @@ const PlaceOrder = () => {
   // Fungsi bantu: periksa apakah voucher valid sekarang & memenuhi minPurchase & kuota
   const isVoucherUsable = (v) => {
     const now = new Date();
-    const start = new Date(v.startDate);
-    const end = new Date(v.endDate);
-    if (now < start || now > end) return false;
+    // jika server mengirimkan tanggal dalam format yang valid
+    const start = v.startDate ? new Date(v.startDate) : null;
+    const end = v.endDate ? new Date(v.endDate) : null;
+    if (start && now < start) return false;
+    if (end && now > end) return false;
     if (subtotal < (v.minPurchase || 0)) return false;
-    // sisaHariIni bisa "Unlimited" atau angka
     if (v.sisaHariIni !== "Unlimited" && Number(v.sisaHariIni) <= 0)
       return false;
     return true;
@@ -86,12 +89,24 @@ const PlaceOrder = () => {
         discount = data.discountValue;
       }
 
+      // set applied voucher & discount
       setVoucherApplied(voucher);
       setDiscountAmount(discount);
+
+      // tutup dropdown sesuai request Cece
+      setShowVoucherDropdown(false);
+      setShowAllVouchers(false);
+
       toast.success("Voucher berhasil digunakan!");
-      // refresh voucher list to get updated sisaHariIni
-      const fresh = await axios.get("http://localhost:4000/api/vouchers");
-      setVoucherList(fresh.data || []);
+
+      // refresh voucher list to get updated sisaHariIni (tetap seperti semula)
+      try {
+        const fresh = await axios.get("http://localhost:4000/api/vouchers");
+        setVoucherList(fresh.data || []);
+      } catch (err2) {
+        // gak fatal kalau gagal refresh
+        console.warn("Gagal refresh voucher list:", err2);
+      }
     } catch (err) {
       console.error("Gagal apply voucher:", err);
       toast.error(
@@ -106,7 +121,7 @@ const PlaceOrder = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Kirim pesanan
+  // Kirim pesanan (logika asli Cece tetap utuh)
   const handleOrder = async (e) => {
     e.preventDefault();
 
@@ -197,11 +212,17 @@ const PlaceOrder = () => {
     return false;
   };
 
-  // filter vouchers to show: if dropdown pilih 'all' -> show all; else show selected
-  const displayedVouchers = voucherList.filter((v) => {
-    if (selectedVoucherId === "all") return true;
-    return v._id === selectedVoucherId;
-  });
+  // Cepat: usable & displayed vouchers sesuai permintaan Cece
+  const usableVouchers = voucherList.filter((v) => isVoucherUsable(v));
+  const displayedVouchers = showAllVouchers
+    ? usableVouchers
+    : usableVouchers.slice(0, 4);
+
+  // Hapus voucher yang sudah dipakai (aksi hapus dari UI)
+  const removeAppliedVoucher = () => {
+    setVoucherApplied(null);
+    setDiscountAmount(0);
+  };
 
   return (
     <div className="place-order-page">
@@ -265,105 +286,110 @@ const PlaceOrder = () => {
             onChange={handleInputChange}
           />
 
-          {/* Voucher Section */}
+          {/* ---------------- Voucher Section (DIUBAH) ---------------- */}
           <div className="voucher-section">
-            <p className="voucher-title">Voucher Tersedia</p>
+            {/* Header text jadi "Voucher" */}
+            <p className="voucher-title">Voucher</p>
 
-            {/* Dropdown untuk melihat voucher (filter) */}
-            <select
-              className="voucher-dropdown"
-              value={selectedVoucherId}
-              onChange={(e) => setSelectedVoucherId(e.target.value)}
-              style={{ marginBottom: 12, padding: 8, borderRadius: 6 }}
+            {/* Box yang selalu terlihat: "Pilih Voucher" */}
+            <div
+              className="voucher-toggle-box"
+              onClick={() => setShowVoucherDropdown((s) => !s)}
             >
-              <option value="all">— Semua Voucher —</option>
-              {voucherList.map((v) => {
-                const label =
-                  v.discountType === "percent"
-                    ? `Diskon ${v.discountValue}% (Min Rp ${v.minPurchase})`
-                    : `Diskon Rp ${v.discountValue.toLocaleString()} (Min Rp ${v.minPurchase})`;
-                return (
-                  <option key={v._id} value={v._id}>
-                    {label}
-                  </option>
-                );
-              })}
-            </select>
+              <span className="voucher-toggle-text">Pilih Voucher</span>
+              <span className="voucher-toggle-caret">
+                {showVoucherDropdown ? "▲" : "▼"}
+              </span>
+            </div>
 
-            <div className="voucher-list">
-              {displayedVouchers.map((v) => {
-                const notEnough = subtotal < v.minPurchase;
-                const disabled = notEnough || !isVoucherUsable(v);
-                const isApplied = voucherApplied?._id === v._id;
+            {/* Jika dropdown aktif -> tampilkan kartu voucher (max 4 dulu) */}
+            {showVoucherDropdown && (
+              <div
+                className={`voucher-dropdown ${showAllVouchers ? "expanded" : ""}`}
+              >
+                <div className="voucher-dropdown-inner">
+                  {displayedVouchers.length === 0 ? (
+                    <p className="no-voucher-inline">
+                      Tidak ada voucher yang dapat digunakan untuk pesanan ini.
+                    </p>
+                  ) : (
+                    displayedVouchers.map((v) => {
+                      const isApplied = voucherApplied?._id === v._id;
+                      const disabled = !isVoucherUsable(v);
 
-                // Show a small status if tidak aktif atau sisaHariIni habis
-                const statusText = (() => {
-                  const now = new Date();
-                  if (new Date(v.startDate) > now) return "Belum aktif";
-                  if (new Date(v.endDate) < now) return "Kadaluarsa";
-                  if (
-                    v.sisaHariIni !== "Unlimited" &&
-                    Number(v.sisaHariIni) <= 0
-                  )
-                    return "Kuota habis";
-                  if (subtotal < v.minPurchase)
-                    return "Belum memenuhi min order";
-                  return null;
-                })();
-
-                return (
-                  <div
-                    key={v._id}
-                    className={`voucher-card ${disabled ? "disabled" : ""} ${
-                      isApplied ? "applied" : ""
-                    }`}
-                  >
-                    <div className="voucher-info">
-                      <h4>
-                        {v.discountType === "percent"
-                          ? `Diskon ${v.discountValue}%`
-                          : `Diskon Rp ${v.discountValue.toLocaleString()}`}
-                      </h4>
-                      <p className="voucher-min">
-                        Min. order Rp {v.minPurchase.toLocaleString()}
-                      </p>
-                      {statusText && (
-                        <p
-                          className={`voucher-status ${
-                            statusText === "Kuota habis" ? "habis" : "used"
-                          }`}
+                      return (
+                        <div
+                          key={v._id}
+                          className={`voucher-card ${isApplied ? "applied" : ""} ${disabled ? "disabled" : ""}`}
                         >
-                          {statusText}
-                        </p>
-                      )}
-                      {v.sisaHariIni !== undefined && (
-                        <p className="voucher-status">
-                          Kuota hari ini: {v.sisaHariIni}
-                        </p>
-                      )}
-                    </div>
+                          <div className="voucher-info">
+                            <h4 className="voucher-head">
+                              {v.discountType === "percent"
+                                ? `Diskon ${v.discountValue}%`
+                                : `Diskon Rp ${v.discountValue.toLocaleString()}`}
+                            </h4>
+                            <p className="voucher-min">
+                              Min. order Rp {v.minPurchase?.toLocaleString()}
+                            </p>
+                          </div>
 
+                          <button
+                            type="button"
+                            className={`voucher-btn ${isApplied ? "applied-btn" : ""}`}
+                            onClick={() => {
+                              if (!disabled) applyVoucher(v);
+                            }}
+                            disabled={disabled}
+                          >
+                            {isApplied ? "Dipakai" : "Pakai"}
+                          </button>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+
+                {/* tombol "Lihat Lainnya" (tetap di dropdown) */}
+                {usableVouchers.length > 4 && (
+                  <div className="voucher-dropdown-footer">
                     <button
                       type="button"
-                      className="voucher-btn"
-                      onClick={() => !disabled && applyVoucher(v)}
-                      disabled={disabled}
+                      className="voucher-see-more"
+                      onClick={() => setShowAllVouchers((s) => !s)}
                     >
-                      {isApplied ? "Dipakai" : "Pakai"}
+                      {showAllVouchers ? "Tutup" : "Lihat Lainnya ⌄"}
                     </button>
                   </div>
-                );
-              })}
+                )}
+              </div>
+            )}
 
-              {displayedVouchers.length === 0 && (
-                <p style={{ color: "#666" }}>
-                  Tidak ada voucher untuk ditampilkan.
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
+            {/* Jika ada voucherApplied -> tampilkan di luar dropdown seperti permintaan */}
+            {voucherApplied && (
+              <div className="applied-voucher-box">
+                <div className="voucher-card applied">
+                  <div className="voucher-info">
+                    <h4 className="voucher-head">
+                      {voucherApplied.discountType === "percent"
+                        ? `Diskon ${voucherApplied.discountValue}%`
+                        : `Diskon Rp ${voucherApplied.discountValue.toLocaleString()}`}
+                    </h4>
+                    <p className="voucher-min">
+                      Min. order Rp {voucherApplied.minPurchase?.toLocaleString()}
+                    </p>
+                  </div>
 
+                  <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                    <span className="voucher-applied-label">Dipakai ✅</span>
+                  </div>
+                  </div>
+                  </div>
+                  )}
+                  </div>
+                  {/* ---------------- end voucher section ---------------- */}
+                  </div>
+
+        {/* KANAN (tidak diubah) */}
         <div className="place-order-right">
           <h2 className="title">Ringkasan Pemesanan</h2>
           <hr className="summary-line" />
