@@ -7,6 +7,7 @@ import "./kelolakeuangan.css";
 const KelolaKeuangan = () => {
   const [orderData, setOrderData] = useState([]);
   const [totalPemasukan, setTotalPemasukan] = useState(0);
+  const [menuTerlaris, setMenuTerlaris] = useState(null); // ✅ tambah state menu terlaris
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -69,9 +70,35 @@ const KelolaKeuangan = () => {
     setTotalPemasukan(total);
   };
 
+  // ✅ hitung menu terlaris otomatis
+  const calculateMenuTerlaris = (filteredOrders) => {
+    const menuCount = {};
+    filteredOrders.forEach((order) => {
+      if (Array.isArray(order.items)) {
+        order.items.forEach((item) => {
+          const name = item.name;
+          const qty = parseInt(item.quantity) || 0;
+          menuCount[name] = (menuCount[name] || 0) + qty;
+        });
+      }
+    });
+
+    let maxMenu = null;
+    let maxQty = 0;
+    for (const [name, qty] of Object.entries(menuCount)) {
+      if (qty > maxQty) {
+        maxQty = qty;
+        maxMenu = name;
+      }
+    }
+
+    setMenuTerlaris(maxMenu ? { name: maxMenu, quantity: maxQty } : null);
+  };
+
   useEffect(() => {
     const filtered = filterTransaksi();
     calculateTotalPemasukan(filtered);
+    calculateMenuTerlaris(filtered); // ✅ panggil perhitungan menu terlaris
   }, [startDate, endDate, orderData]);
 
   const filteredOrders = filterTransaksi();
@@ -80,7 +107,6 @@ const KelolaKeuangan = () => {
   let orderNumber = 1;
   filteredOrders.forEach((order) => {
     if (Array.isArray(order.items)) {
-      const itemsOnPage = order.items.length;
       const paymentMethod = order.paymentMethod || "Tunai";
       order.items.forEach((item) => {
         const price = parseInt(item.price) || 0;
@@ -166,8 +192,15 @@ const KelolaKeuangan = () => {
 
     const afterTableY = doc.lastAutoTable.finalY || 35;
 
+    // ✅ Tambahkan menu terlaris di PDF
+    if (menuTerlaris) {
+      doc.setFontSize(12);
+      doc.setTextColor(0, 0, 0);
+      doc.text(`Menu Terlaris: ${menuTerlaris.name} (Terjual ${menuTerlaris.quantity} kali)`, 14, afterTableY + 10);
+    }
+
     autoTable(doc, {
-      startY: afterTableY + 5,
+      startY: afterTableY + 20,
       margin: { left: 14, right: 14 },
       theme: "grid",
       head: [["", "", "", "", "", "Total Pemasukan", `Rp ${total.toLocaleString()}`]],
@@ -271,6 +304,13 @@ const KelolaKeuangan = () => {
                     Rp {totalPemasukan.toLocaleString()}
                   </td>
                 </tr>
+                {menuTerlaris && (
+                  <tr className="menu-terlaris-row">
+                    <td colSpan="7" style={{ textAlign: "center", fontWeight: "bold", background: "#ffeaea" }}>
+                      🍽️ Menu Terlaris: {menuTerlaris.name} (Terjual {menuTerlaris.quantity} kali)
+                    </td>
+                  </tr>
+                )}
               </>
             ) : (
               <tr>

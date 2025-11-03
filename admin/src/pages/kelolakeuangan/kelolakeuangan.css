@@ -1,6 +1,6 @@
 .container-keuangan {
-  width: calc(100% - 260px); /* 260px untuk sidebar + margin kecil */
-  margin-left: 270px; /* geser ke kanan supaya tidak tertutup sidebar */
+  width: calc(100% - 260px);
+  margin-left: 270px;
   padding: 30px;
   background-color: #f7f7f7;
   font-family: "Poppins", sans-serif;
@@ -22,7 +22,8 @@
   font-weight: bold;
 }
 
-.filter-kategori select {
+.filter-kategori select,
+.filter-kategori input[type="date"] {
   padding: 8px 12px;
   font-size: 14px;
   border-radius: 8px;
@@ -67,10 +68,54 @@
   width: 50px;
 }
 
+/* Baris total */
 .total-row {
   background-color: #fff9f4;
 }
 
+/* Baris menu terlaris */
+.menu-terlaris-row {
+  background-color: #ffeaea;
+  font-weight: 600;
+  text-align: center;
+  font-size: 16px;
+  color: #b30000;
+  letter-spacing: 0.3px;
+}
+
+.menu-terlaris-row td {
+  padding: 18px;
+  border-top: 2px solid #ffcccc;
+}
+
+/* Tombol unduh */
+.download-button-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 25px;
+  padding-right: 20px;
+}
+
+.download-button {
+  background-color: #d63031;
+  color: white;
+  padding: 12px 28px;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(214, 48, 49, 0.2);
+  transition: all 0.3s ease-in-out;
+}
+
+.download-button:hover {
+  background-color: #c0392b;
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(192, 57, 43, 0.3);
+}
+
+/* Pagination */
 .pagination-controls {
   display: flex;
   justify-content: center;
@@ -94,39 +139,12 @@
   color: darkred;
 }
 
-.download-button-container {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 20px;
-  padding-right: 20px;
-}
-
-.download-button {
-  background-color: #d63031;
-  color: white;
-  padding: 10px 24px;
-  border: none;
-  border-radius: 10px;
-  font-size: 15px;
-  font-weight: 500;
-  font-family: "Poppins", sans-serif;
-  cursor: pointer;
-  box-shadow: 0 4px 8px rgba(214, 48, 49, 0.2);
-  transition: all 0.3s ease-in-out;
-}
-
-.download-button:hover {
-  background-color: #c0392b;
-  transform: scale(1.05);
-  box-shadow: 0 6px 12px rgba(192, 57, 43, 0.3);
-}
-
 /* Responsive */
 @media (max-width: 768px) {
   .container-keuangan {
     width: 100%;
-    margin-left: 0; /* hilangkan margin kiri di mobile supaya full lebar */
-    padding: 10px;
+    margin-left: 0;
+    padding: 15px;
   }
 
   .kelola-keuangan-header {
@@ -145,67 +163,12 @@
     padding: 12px;
   }
 
-  .btn-actions {
-    display: flex;
+  .download-button-container {
     justify-content: center;
-    gap: 12px;
-    margin: 16px 0;
   }
 
-  .btn-red {
-    display: flex;
-    align-items: center;
-    padding: 8px 16px;
-    background-color: red;
-    color: white;
-    font-weight: bold;
-    font-size: 13px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: 0.2s;
+  .menu-terlaris-row {
+    font-size: 15px;
+    padding: 10px;
   }
-
-  .btn-red:hover {
-    background-color: darkred;
-  }
-
-  #laporan-download {
-    background-color: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
-
-  .export-button {
-    padding: 8px 16px;
-    background-color: #dc3545;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background-color 0.2s;
-  }
-
-  .export-button:hover {
-    background-color: #bb2d3b;
-  }
-}
-
-/* Border radius sudut tabel */
-.tabel-keuangan th:first-child {
-  border-top-left-radius: 10px;
-}
-
-.tabel-keuangan th:last-child {
-  border-top-right-radius: 10px;
-}
-
-.tabel-keuangan tr:last-child td:first-child {
-  border-bottom-left-radius: 10px;
-}
-
-.tabel-keuangan tr:last-child td:last-child {
-  border-bottom-right-radius: 10px;
 }
