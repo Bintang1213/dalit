@@ -1,127 +1,158 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect, useMemo } from "react";
 import { StoreContext } from "../../context/StoreContext";
 import FoodItem from "../../components/FoodItem/FoodItem";
 import { FaFilter, FaStar } from "react-icons/fa";
 import { useLocation } from "react-router-dom";
+import axios from "axios";
 import "./Menu.css";
 
 const Menu = () => {
-  const { food_list } = useContext(StoreContext);
+  const { food_list, url } = useContext(StoreContext);
   const [sortOrder, setSortOrder] = useState("");
   const [minRating, setMinRating] = useState(0);
+  const [ratingData, setRatingData] = useState([]); // ⭐ data rating dari backend
 
-  // ambil query search dari URL
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const searchQuery = queryParams.get("search")?.toLowerCase() || "";
 
-  // ambil kategori unik
   const categories = [...new Set(food_list.map((item) => item.category))];
 
-  // filter & sort
-  const filterAndSortItems = (items) => {
-    let filtered = [...items];
+  // ==========================
+  // 🔥 Ambil data rating dari backend
+  // ==========================
+  useEffect(() => {
+    const fetchRatings = async () => {
+      try {
+        const res = await axios.get("http://localhost:4000/api/reviews/top");
+        setRatingData(res.data);
+        console.log("Data rating:", res.data);
+      } catch (error) {
+        console.error("Gagal ambil data rating:", error);
+      }
+    };
+    fetchRatings();
+  }, [url]);
 
-    // filter search
+  // Helper: ambil rating dari hasil agregasi jika ada
+  const getRatingForFood = (foodId) => {
+    const found = ratingData.find((r) => r._id === foodId);
+    return found ? found.avgRating : 0;
+  };
+
+  // ==========================
+  // 🎯 Filter dan sorting
+  // ==========================
+  const filteredFood = useMemo(() => {
+    let items = [...food_list];
+
+// Gabungkan data rating ke setiap item
+items = items.map((item) => {
+  const found = ratingData.find((r) => r._id === item._id);
+  return {
+    ...item,
+    avgRating: found?.avgRating || 0,
+    totalReviews: found?.totalReviews || 0,
+    ratingCounts: found?.ratingCounts || {},
+  };
+});
+
+
+    // 🔍 Filter pencarian
     if (searchQuery) {
-      filtered = filtered.filter(
+      items = items.filter(
         (item) =>
-          item.name.toLowerCase().includes(searchQuery) ||
-          item.description.toLowerCase().includes(searchQuery) ||
-          item.price.toString().includes(searchQuery),
+          (item.name || "").toLowerCase().includes(searchQuery) ||
+          (item.description || "").toLowerCase().includes(searchQuery)
       );
     }
 
-    // filter rating minimal
+    // ⭐ Filter rating minimal
     if (minRating > 0) {
-      filtered = filtered.filter((item) => item.rating >= minRating);
-    }
+  items = items.filter((item) => Number(item.avgRating || 0) >= minRating);
+}
 
-    // sort harga / rating
+
+    // 💰 Urutkan harga
     if (sortOrder === "asc") {
-      filtered.sort((a, b) => a.price - b.price);
+      items.sort((a, b) => Number(a.price || 0) - Number(b.price || 0));
     } else if (sortOrder === "desc") {
-      filtered.sort((a, b) => b.price - a.price);
-    } else if (sortOrder === "ratingAsc") {
-      filtered.sort((a, b) => a.rating - b.rating);
-    } else if (sortOrder === "ratingDesc") {
-      filtered.sort((a, b) => b.rating - a.rating);
+      items.sort((a, b) => Number(b.price || 0) - Number(a.price || 0));
     }
 
-    return filtered;
-  };
+    return items;
+  }, [food_list, sortOrder, minRating, searchQuery, ratingData]);
 
   return (
     <div className="menu-page">
-      {/* Kiri: daftar menu */}
+      {/* ==================== KIRI: DAFTAR MENU ==================== */}
       <div className="menu-left">
-        {searchQuery
-          ? // Jika ada pencarian → tampilkan 1 section khusus
-            (() => {
-              const searchResults = filterAndSortItems(food_list);
-              return searchResults.length > 0 ? (
-                <div className="menu-category-section">
-                  <h2 className="menu-category-title">Hasil Pencarian</h2>
-                  <div className="menu-category-line"></div>
-                  <div className="menu-items">
-                    {searchResults.map((item) => (
-                      <FoodItem
-                        key={item._id}
-                        id={item._id}
-                        name={item.name}
-                        description={item.description}
-                        price={item.price}
-                        image={item.image}
-                        status={item.status}
-                        rating={item.rating}
-                      />
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                <p className="empty-message">Tidak ada menu sesuai pencarian</p>
-              );
-            })()
-          : // Kalau tidak ada search → tampilkan per kategori
-            categories.map((category, idx) => {
-              const items = filterAndSortItems(
-                food_list.filter((item) => item.category === category),
-              );
+        {searchQuery ? (
+          filteredFood.length > 0 ? (
+            <div className="menu-category-section">
+              <h2 className="menu-category-title">Hasil Pencarian</h2>
+              <div className="menu-category-line"></div>
+              <div className="menu-items">
+                {filteredFood.map((item) => (
+                  <FoodItem key={item._id} {...item} />
+                ))}
+              </div>
+            </div>
+          ) : (
+            <p className="empty-message">Tidak ada menu sesuai pencarian</p>
+          )
+        ) : sortOrder || minRating > 0 ? (
+          // === jika user memilih filter harga atau rating
+          <div className="menu-category-section">
+            <h2 className="menu-category-title">
+              {minRating > 0
+                ? `Rating ${minRating} ke atas`
+                : sortOrder === "desc"
+                ? "Harga Tertinggi - Terendah"
+                : sortOrder === "asc"
+                ? "Harga Terendah - Tertinggi"
+                : ""}
+            </h2>
+            <div className="menu-category-line"></div>
+            <div className="menu-items">
+              {filteredFood.map((item) => (
+                <FoodItem key={item._id} {...item} />
+              ))}
+            </div>
+          </div>
+        ) : (
+          // === default: tampilkan berdasarkan kategori
+          categories.map((category, idx) => {
+            const items = filteredFood.filter(
+              (item) => item.category === category
+            );
+            if (items.length === 0) return null;
 
-              if (items.length === 0) return null; // skip kategori kosong
-
-              return (
-                <div key={idx} className="menu-category-section">
-                  <h2 className="menu-category-title">{category}</h2>
-                  <div className="menu-category-line"></div>
-                  <div className="menu-items">
-                    {items.map((item) => (
-                      <FoodItem
-                        key={item._id}
-                        id={item._id}
-                        name={item.name}
-                        description={item.description}
-                        price={item.price}
-                        image={item.image}
-                        status={item.status}
-                        rating={item.rating}
-                      />
-                    ))}
-                  </div>
+            return (
+              <div key={idx} className="menu-category-section">
+                <h2 className="menu-category-title">{category}</h2>
+                <div className="menu-category-line"></div>
+                <div className="menu-items">
+                  {items.map((item) => (
+                    <FoodItem key={item._id} {...item} />
+                  ))}
                 </div>
-              );
-            })}
+              </div>
+            );
+          })
+        )}
       </div>
 
-      {/* Kanan: filter panel */}
+      {/* ==================== KANAN: FILTER ==================== */}
       <div className="menu-right">
         <h3 className="filter-title">
           <FaFilter className="filter-icon" /> Filter
         </h3>
 
-        {/* Sort pakai radio */}
+        {/* ===== URUTKAN ===== */}
         <div className="filter-section">
           <label>Urutkan</label>
+
           <div className="checkbox-option">
             <input
               type="radio"
@@ -133,6 +164,7 @@ const Menu = () => {
             />
             <label htmlFor="default">Default</label>
           </div>
+
           <div className="checkbox-option">
             <input
               type="radio"
@@ -144,6 +176,7 @@ const Menu = () => {
             />
             <label htmlFor="hargaDesc">Harga Tertinggi - Terendah</label>
           </div>
+
           <div className="checkbox-option">
             <input
               type="radio"
@@ -157,7 +190,7 @@ const Menu = () => {
           </div>
         </div>
 
-        {/* Filter Rating minimal */}
+        {/* ===== RATING ===== */}
         <div className="filter-section">
           <label>Rating Minimal</label>
           {[5, 4, 3, 2].map((stars) => (
