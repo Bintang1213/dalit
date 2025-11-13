@@ -12,14 +12,26 @@ const StoreContextProvider = (props) => {
 
   const url = "http://localhost:4000";
 
-  const fetchFoodList = async () => {
-    try {
-      const response = await axios.get(`${url}/api/food/list`);
-      setFoodList(response.data.data);
-    } catch (error) {
-      console.error("Gagal mengambil daftar makanan:", error);
-    }
-  };
+  // di StoreContext.jsx — ganti implementasi fetchFoodList dengan ini
+const fetchFoodList = async () => {
+  try {
+    const response = await axios.get(`${url}/api/food/list`);
+    // Normalisasi data: pastikan price = Number, rating minimal 0, category default
+    const normalized = (response.data.data || []).map((item) => ({
+      ...item,
+      price:
+        item.price === undefined || item.price === null
+          ? 0
+          : Number(item.price), // pastikan numeric
+      rating: item.rating === undefined || item.rating === null ? 0 : Number(item.rating),
+      category: item.category || "Uncategorized",
+    }));
+    setFoodList(normalized);
+  } catch (error) {
+    console.error("Gagal mengambil daftar makanan:", error);
+  }
+};
+
 
   const fetchUser = async (authToken) => {
     if (!authToken) {
