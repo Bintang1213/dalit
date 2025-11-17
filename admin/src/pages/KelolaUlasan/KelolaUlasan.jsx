@@ -1,4 +1,4 @@
-// src/components/KelolaUlasan/KelolaUlasan.jsx
+// KelolaUlasan.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./kelolaulasan.css";
@@ -20,14 +20,12 @@ const KelolaUlasan = ({ isSidebarCollapsed }) => {
         const res = await axios.get(API_BASE);
         const data = Array.isArray(res.data) ? res.data : [];
 
-        // 🕒 Urutkan dari yang terbaru ke yang terlama
         const sorted = data.sort(
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
         );
 
         setReviews(sorted);
       } catch (error) {
-        console.error("Error fetch reviews:", error);
         setReviews([]);
       }
     };
@@ -35,10 +33,15 @@ const KelolaUlasan = ({ isSidebarCollapsed }) => {
     const fetchTopMenus = async () => {
       try {
         const res = await axios.get(`${API_BASE}/top`);
-        const menus = Array.isArray(res.data) ? res.data : [];
+        let menus = Array.isArray(res.data) ? res.data : [];
+
+        // ✅ FILTER: Jangan tampilkan menu dengan nama hilang / sudah dihapus
+        menus = menus.filter(
+          (m) => m.name && m.name !== "Unknown" && m.totalReviews > 0
+        );
+
         setTopMenus(menus);
       } catch (error) {
-        console.error("Error fetch top menus:", error);
         setTopMenus([]);
       }
     };
@@ -49,27 +52,25 @@ const KelolaUlasan = ({ isSidebarCollapsed }) => {
 
   const toggleRecommendation = async (menu) => {
     try {
-      const currentIsRecommended = menu.isRecommended;
-      const newIsRecommended = !currentIsRecommended;
+      const newStatus = !menu.isRecommended;
 
       const res = await axios.post(`${FOOD_API}/update-recommendation`, {
         id: menu._id,
-        isRecommended: newIsRecommended,
+        isRecommended: newStatus,
       });
 
       if (res.data.success) {
-        toast.success(`Status rekomendasi berhasil diubah.`);
+        toast.success("Status rekomendasi berhasil diubah.");
         setTopMenus((prev) =>
           prev.map((m) =>
-            m._id === menu._id ? { ...m, isRecommended: newIsRecommended } : m
+            m._id === menu._id ? { ...m, isRecommended: newStatus } : m
           )
         );
       } else {
         toast.error("Gagal update rekomendasi.");
       }
-    } catch (error) {
-      console.error("Gagal update rekomendasi:", error);
-      toast.error("Gagal update rekomendasi. Coba lagi nanti.");
+    } catch {
+      toast.error("Gagal update rekomendasi.");
     }
   };
 
@@ -81,11 +82,10 @@ const KelolaUlasan = ({ isSidebarCollapsed }) => {
           setReviews(reviews.filter((rev) => rev._id !== reviewId));
           toast.success("Ulasan berhasil dihapus!");
         } else {
-          toast.error("Gagal menghapus ulasan. Coba lagi.");
+          toast.error("Gagal menghapus ulasan.");
         }
-      } catch (error) {
-        console.error("Error deleting review:", error);
-        toast.error("Gagal menghapus ulasan. Coba lagi nanti.");
+      } catch {
+        toast.error("Gagal menghapus ulasan.");
       }
     }
   };
@@ -100,9 +100,9 @@ const KelolaUlasan = ({ isSidebarCollapsed }) => {
         isSidebarCollapsed ? "sidebar-collapsed" : ""
       }`}
     >
-      {/* 🔄 Rangkuman Rating */}
       <div className="summary-section">
         <h3>Rangkuman Rating per Menu</h3>
+
         <div className="summary-cards">
           {topMenus.map((menu) => (
             <div key={menu._id} className="summary-card">
@@ -116,17 +116,19 @@ const KelolaUlasan = ({ isSidebarCollapsed }) => {
         </div>
       </div>
 
-      {/* 🔄 Menu Terfavorit */}
       {topMenus.length > 0 && (
         <div className="favorite-section">
           <h3>Menu Terfavorit</h3>
+
           <div className="favorite-cards">
             {topMenus.map((menu) => (
               <div key={menu._id} className="favorite-card">
                 <div className="menu-name">{menu.name}</div>
+
                 <div className="menu-rating">
                   ⭐ {menu.avgRating?.toFixed(1)} ({menu.totalReviews} ulasan)
                 </div>
+
                 <button
                   className={`btn-recommend ${
                     menu.isRecommended ? "active" : ""
@@ -137,6 +139,7 @@ const KelolaUlasan = ({ isSidebarCollapsed }) => {
                     ? "Nonaktifkan Rekomendasi"
                     : "Aktifkan Rekomendasi"}
                 </button>
+
                 {menu.isRecommended && (
                   <p className="recommended-text">
                     ✅ Menu ini sedang direkomendasikan
@@ -165,15 +168,22 @@ const KelolaUlasan = ({ isSidebarCollapsed }) => {
               <th>Aksi</th>
             </tr>
           </thead>
+
           <tbody>
             {currentReviews.map((rev, index) => (
               <tr key={rev._id}>
                 <td>{startIndex + index + 1}</td>
                 <td>{rev.userId?.name || "Anonim"}</td>
-                <td>{rev.foodId?.name || "-"}</td>
+
+                {/* Jika menu sudah dihapus → tampilkan '-' */}
+                <td>{rev.foodId?.name ?? "-"}</td>
+
                 <td>{"⭐".repeat(rev.rating)}</td>
+
                 <td className="comment-cell">{rev.comment}</td>
+
                 <td>{new Date(rev.createdAt).toLocaleDateString()}</td>
+
                 <td>
                   <button
                     className="btn-delete"
@@ -195,9 +205,11 @@ const KelolaUlasan = ({ isSidebarCollapsed }) => {
         >
           {"<"}
         </button>
+
         <span>
           halaman {currentPage} dari {totalPages}
         </span>
+
         <button
           disabled={currentPage === totalPages}
           onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
