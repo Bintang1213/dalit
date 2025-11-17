@@ -7,14 +7,20 @@ import "./kelolakeuangan.css";
 const KelolaKeuangan = () => {
   const [orderData, setOrderData] = useState([]);
   const [totalPemasukan, setTotalPemasukan] = useState(0);
-  const [menuTerlaris, setMenuTerlaris] = useState(null); // ✅ tambah state menu terlaris
+  const [menuTerlaris, setMenuTerlaris] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+
+  const [filterMode, setFilterMode] = useState("all");
+
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+
+  const [selectedMonth, setSelectedMonth] = useState("");
+  const [selectedYear, setSelectedYear] = useState("");
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -40,6 +46,52 @@ const KelolaKeuangan = () => {
     fetchOrders();
   }, []);
 
+  // BUTTON FILTER
+  const applyQuickFilter = (mode) => {
+    setFilterMode(mode);
+
+    const today = new Date();
+
+    if (mode === "day") {
+      const d = today.toISOString().split("T")[0];
+      setStartDate(d);
+      setEndDate(d);
+    }
+
+    if (mode === "all") {
+      setStartDate("");
+      setEndDate("");
+      setSelectedMonth("");
+      setSelectedYear("");
+    }
+  };
+
+  // FILTER BULAN DROPDOWN
+  const applyMonthDropdown = (month) => {
+    if (!month) return;
+
+    const now = new Date();
+    const year = now.getFullYear();
+
+    const first = new Date(year, month - 1, 1).toISOString().split("T")[0];
+    const last = new Date(year, month, 0).toISOString().split("T")[0];
+
+    setStartDate(first);
+    setEndDate(last);
+  };
+
+  // FILTER TAHUN DROPDOWN
+  const applyYearDropdown = (year) => {
+    if (!year) return;
+
+    const first = `${year}-01-01`;
+    const last = `${year}-12-31`;
+
+    setStartDate(first);
+    setEndDate(last);
+  };
+
+  // FILTER UTAMA
   const filterTransaksi = () => {
     return orderData.filter((order) => {
       const orderDate = new Date(order.createdAt);
@@ -70,7 +122,6 @@ const KelolaKeuangan = () => {
     setTotalPemasukan(total);
   };
 
-  // ✅ hitung menu terlaris otomatis
   const calculateMenuTerlaris = (filteredOrders) => {
     const menuCount = {};
     filteredOrders.forEach((order) => {
@@ -98,13 +149,14 @@ const KelolaKeuangan = () => {
   useEffect(() => {
     const filtered = filterTransaksi();
     calculateTotalPemasukan(filtered);
-    calculateMenuTerlaris(filtered); // ✅ panggil perhitungan menu terlaris
+    calculateMenuTerlaris(filtered);
   }, [startDate, endDate, orderData]);
 
   const filteredOrders = filterTransaksi();
 
   const flattenedData = [];
   let orderNumber = 1;
+
   filteredOrders.forEach((order) => {
     if (Array.isArray(order.items)) {
       const paymentMethod = order.paymentMethod || "Tunai";
@@ -139,6 +191,7 @@ const KelolaKeuangan = () => {
     if (currentPage < totalPages) setCurrentPage(currentPage + 1);
   };
 
+  // DOWNLOAD PDF
   const handleUnduhPDF = () => {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
@@ -152,9 +205,9 @@ const KelolaKeuangan = () => {
 
     if (startDate && endDate) {
       doc.setFontSize(12);
-      doc.setTextColor(0, 0, 0);
-      doc.setFont(undefined, "normal");
-      const periodeText = `Periode: ${new Date(startDate).toLocaleDateString("id-ID")} - ${new Date(endDate).toLocaleDateString("id-ID")}`;
+      const periodeText = `Periode: ${new Date(startDate).toLocaleDateString(
+        "id-ID"
+      )} - ${new Date(endDate).toLocaleDateString("id-ID")}`;
       doc.text(periodeText, 14, 22);
     }
 
@@ -175,62 +228,36 @@ const KelolaKeuangan = () => {
 
     autoTable(doc, {
       startY: 28,
-      head: [["No", "Tanggal", "Pesanan", "Metode Pembayaran", "Harga Per Item", "Jumlah", "Total"]],
+      head: [
+        ["No", "Tanggal", "Pesanan", "Metode Pembayaran", "Harga", "Jumlah", "Total"],
+      ],
       body: tableData,
       styles: { fontSize: 10 },
       headStyles: { fillColor: [255, 0, 0], textColor: 255, fontStyle: "bold" },
       alternateRowStyles: { fillColor: [255, 230, 230] },
       margin: { left: 14, right: 14 },
-      columnStyles: {
-        0: { cellWidth: 10 },
-        1: { cellWidth: 20 },
-        3: { cellWidth: 25 },
-        4: { cellWidth: 25, halign: "right" },
-        6: { cellWidth: 25, halign: "right" },
-      },
     });
 
     const afterTableY = doc.lastAutoTable.finalY || 35;
 
-    // ✅ Tambahkan menu terlaris di PDF
     if (menuTerlaris) {
-      doc.setFontSize(12);
-      doc.setTextColor(0, 0, 0);
-      doc.text(`Menu Terlaris: ${menuTerlaris.name} (Terjual ${menuTerlaris.quantity} kali)`, 14, afterTableY + 10);
+      doc.text(
+        `Menu Terlaris: ${menuTerlaris.name} (Terjual ${menuTerlaris.quantity} kali)`,
+        14,
+        afterTableY + 10
+      );
     }
 
     autoTable(doc, {
       startY: afterTableY + 20,
       margin: { left: 14, right: 14 },
-      theme: "grid",
       head: [["", "", "", "", "", "Total Pemasukan", `Rp ${total.toLocaleString()}`]],
       headStyles: {
         fillColor: [255, 200, 200],
         textColor: [150, 0, 0],
         fontStyle: "bold",
-        halign: "center",
-      },
-      body: [],
-      styles: { fontSize: 14, cellPadding: 4 },
-      columnStyles: {
-        5: { halign: "right", fontStyle: "bold" },
-        6: { halign: "right", fontStyle: "bold" },
       },
     });
-
-    const afterTotalY = doc.lastAutoTable.finalY || afterTableY + 10;
-    const today = new Date();
-    const tanggalCetak = `Indramayu, ${today.getDate()} ${today.toLocaleString("id-ID", { month: "long" })} ${today.getFullYear()}`;
-    const tanggalY = afterTotalY + 20;
-    const tanggalX = pageWidth - 70;
-
-    doc.setFontSize(11);
-    doc.setTextColor(0, 0, 0);
-    doc.setFont(undefined, "bold");
-    doc.text(tanggalCetak, tanggalX, tanggalY);
-    doc.text("Mengetahui,", tanggalX, tanggalY + 5);
-    doc.text("Manajer Keuangan", tanggalX, tanggalY + 10);
-    doc.text("(_________________)", tanggalX, tanggalY + 40);
 
     doc.save("laporan-keuangan.pdf");
   };
@@ -242,18 +269,90 @@ const KelolaKeuangan = () => {
     <div className="container-keuangan">
       <div className="kelola-keuangan-header">
         <h2>Laporan Keuangan</h2>
-        <div className="filter-kategori" style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+
+        <div className="filter-kategori">
           <label>
             Dari:
-            <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} style={{ marginLeft: 5 }} />
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => {
+                setStartDate(e.target.value);
+                setFilterMode("all");
+              }}
+            />
           </label>
+
           <label>
             Sampai:
-            <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} style={{ marginLeft: 5 }} />
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => {
+                setEndDate(e.target.value);
+                setFilterMode("all");
+              }}
+            />
           </label>
         </div>
       </div>
 
+      {/* FILTER CEPAT */}
+      <div
+        className="filter-buttons"
+        style={{ marginTop: "10px", display: "flex", gap: "10px" }}
+      >
+        <button className="btn-filter" onClick={() => applyQuickFilter("day")}>
+          Hari Ini
+        </button>
+
+        <button className="btn-filter" onClick={() => applyQuickFilter("all")}>
+          Semua
+        </button>
+
+        {/* Dropdown Bulan */}
+        <select
+          className="dropdown-filter"
+          value={selectedMonth}
+          onChange={(e) => {
+            setSelectedMonth(e.target.value);
+            applyMonthDropdown(parseInt(e.target.value));
+          }}
+        >
+          <option value="">Pilih Bulan</option>
+          <option value="1">Januari</option>
+          <option value="2">Februari</option>
+          <option value="3">Maret</option>
+          <option value="4">April</option>
+          <option value="5">Mei</option>
+          <option value="6">Juni</option>
+          <option value="7">Juli</option>
+          <option value="8">Agustus</option>
+          <option value="9">September</option>
+          <option value="10">Oktober</option>
+          <option value="11">November</option>
+          <option value="12">Desember</option>
+        </select>
+
+        {/* Dropdown Tahun */}
+        <select
+          className="dropdown-filter"
+          value={selectedYear}
+          onChange={(e) => {
+            setSelectedYear(e.target.value);
+            applyYearDropdown(e.target.value);
+          }}
+        >
+          <option value="">Pilih Tahun</option>
+          {[2023, 2024, 2025, 2026, 2027, 2028, 2029].map((year) => (
+            <option key={year} value={year}>
+              {year}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* TABEL */}
       <div className="table-container">
         <table className="tabel-keuangan">
           <thead>
@@ -261,12 +360,13 @@ const KelolaKeuangan = () => {
               <th>No</th>
               <th>Tanggal</th>
               <th>Pesanan</th>
-              <th>Metode Pembayaran</th>
-              <th>Harga Per Item</th>
+              <th>Metode</th>
+              <th>Harga</th>
               <th>Jumlah</th>
               <th>Total</th>
             </tr>
           </thead>
+
           <tbody>
             {currentData.length > 0 ? (
               <>
@@ -296,6 +396,7 @@ const KelolaKeuangan = () => {
                     </tr>
                   );
                 })}
+
                 <tr className="total-row">
                   <td colSpan="6" style={{ textAlign: "right", fontWeight: "bold" }}>
                     Total Pemasukan:
@@ -304,29 +405,41 @@ const KelolaKeuangan = () => {
                     Rp {totalPemasukan.toLocaleString()}
                   </td>
                 </tr>
+
                 {menuTerlaris && (
                   <tr className="menu-terlaris-row">
-                    <td colSpan="7" style={{ textAlign: "center", fontWeight: "bold", background: "#ffeaea" }}>
-                      🍽️ Menu Terlaris: {menuTerlaris.name} (Terjual {menuTerlaris.quantity} kali)
+                    <td colSpan="7" style={{ textAlign: "center" }}>
+                      🍽️ Menu Terlaris: {menuTerlaris.name} (Terjual{" "}
+                      {menuTerlaris.quantity}x)
                     </td>
                   </tr>
                 )}
               </>
             ) : (
               <tr>
-                <td colSpan="7" style={{ textAlign: "center" }}>Tidak ada data</td>
+                <td colSpan="7" style={{ textAlign: "center" }}>
+                  Tidak ada data
+                </td>
               </tr>
             )}
           </tbody>
         </table>
       </div>
 
+      {/* PAGE CONTROL */}
       <div className="pagination-controls">
-        <span className="pagination-arrow" onClick={handlePrevPage}>&lt;</span>
-        <span className="page-number">Halaman {currentPage} dari {totalPages}</span>
-        <span className="pagination-arrow" onClick={handleNextPage}>&gt;</span>
+        <span className="pagination-arrow" onClick={handlePrevPage}>
+          &lt;
+        </span>
+        <span className="page-number">
+          Halaman {currentPage} dari {totalPages}
+        </span>
+        <span className="pagination-arrow" onClick={handleNextPage}>
+          &gt;
+        </span>
       </div>
 
+      {/* DOWNLOAD */}
       <div className="download-button-container">
         <button onClick={handleUnduhPDF} className="download-button">
           Unduh Laporan Keuangan
