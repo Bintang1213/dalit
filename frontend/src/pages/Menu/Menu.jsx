@@ -6,6 +6,7 @@ import { useLocation } from "react-router-dom";
 import axios from "axios";
 import "./Menu.css";
 
+
 const Menu = () => {
   const { food_list, url } = useContext(StoreContext);
   const [sortOrder, setSortOrder] = useState("");
@@ -24,8 +25,8 @@ const Menu = () => {
   useEffect(() => {
     const fetchRatings = async () => {
       try {
-        const res = await axios.get("http://localhost:4000/api/reviews/top");
-        setRatingData(res.data);
+        const response = await axios.get("http://localhost:4000/api/reviews/top");
+        setRatingData(response.data);
         console.log("Data rating:", res.data);
       } catch (error) {
         console.error("Gagal ambil data rating:", error);
