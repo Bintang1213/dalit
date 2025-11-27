@@ -24,6 +24,7 @@ const Dashboard = () => {
     pemasukanBulan: Array(12).fill(0),
     menuTerlaris: { name: "-", total: 0 },
   });
+
   const [loading, setLoading] = useState(true);
 
   const cardColors = [
@@ -31,7 +32,7 @@ const Dashboard = () => {
     { bg: "#87CEEB", iconBg: "#E0FFFF", iconColor: "#1E90FF" },
     { bg: "#FFB6C1", iconBg: "#FFE4E1", iconColor: "#FF69B4" },
     { bg: "#90EE90", iconBg: "#F0FFF0", iconColor: "#32CD32" },
-    { bg: "#D8BFD8", iconBg: "#F8F0FF", iconColor: "#8A2BE2" }, // 💜 card menu terlaris
+    { bg: "#D8BFD8", iconBg: "#F8F0FF", iconColor: "#8A2BE2" },
   ];
 
   useEffect(() => {
@@ -42,26 +43,29 @@ const Dashboard = () => {
         return;
       }
 
+      // 🔥 REFACTORED AXIOS INSTANCE ✔️
+      const api = Axios.create({
+        baseURL: "http://localhost:4000/api",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
       try {
         setLoading(true);
+
+        // 🔥 Semua request pakai instance
         const [menuRes, userRes, orderRes] = await Promise.all([
-          Axios.get("http://localhost:4000/api/food", {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          Axios.get("http://localhost:4000/api/user", {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          Axios.get("http://localhost:4000/api/order", {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
+          api.get("/food"),
+          api.get("/user"),
+          api.get("/order"),
         ]);
 
         const orders = orderRes.data.data || [];
+
         const monthlySales = Array(12).fill(0);
         const monthlyRevenue = Array(12).fill(0);
         let currentMonthSales = 0;
         let currentMonthRevenue = 0;
-        const menuCount = {}; // 🔥 Hitung menu terlaris
+        const menuCount = {};
 
         const currentMonth = new Date().getMonth();
         const currentYear = new Date().getFullYear();
@@ -74,26 +78,23 @@ const Dashboard = () => {
             monthlySales[month] += 1;
 
             order.items?.forEach((item) => {
-              const itemRevenue = item.price * item.quantity;
-              monthlyRevenue[month] += itemRevenue;
+              const revenue = item.price * item.quantity;
+              monthlyRevenue[month] += revenue;
 
               if (month === currentMonth) {
                 currentMonthSales += item.quantity;
-                currentMonthRevenue += itemRevenue;
+                currentMonthRevenue += revenue;
               }
 
-              // Hitung jumlah terjual tiap menu
-              menuCount[item.name] = (menuCount[item.name] || 0) + item.quantity;
+              menuCount[item.name] =
+                (menuCount[item.name] || 0) + item.quantity;
             });
           }
         });
 
-        // 🏆 Cari menu terlaris
         let topMenu = { name: "-", total: 0 };
         for (const [name, total] of Object.entries(menuCount)) {
-          if (total > topMenu.total) {
-            topMenu = { name, total };
-          }
+          if (total > topMenu.total) topMenu = { name, total };
         }
 
         setDashboardData({
@@ -105,8 +106,8 @@ const Dashboard = () => {
           pemasukanBulan: monthlyRevenue,
           menuTerlaris: topMenu,
         });
-      } catch (err) {
-        console.error("Gagal memuat data dashboard:", err);
+      } catch (error) {
+        console.error("Gagal memuat data dashboard:", error);
       } finally {
         setLoading(false);
       }
@@ -193,9 +194,9 @@ const Dashboard = () => {
                 {
                   icon: "🔥",
                   title: "Menu Terlaris",
-                  value: `${dashboardData.menuTerlaris.name}`,
+                  value: dashboardData.menuTerlaris.name,
                   subtext: `Terjual ${dashboardData.menuTerlaris.total} kali`,
-                  link: null, // 🚫 Tidak ada link
+                  link: null,
                 },
               ].map((card, index) => (
                 <div
@@ -220,7 +221,6 @@ const Dashboard = () => {
                         {card.subtext}
                       </p>
                     )}
-                    {/* tampilkan link hanya kalau ada */}
                     {card.link && (
                       <a href={card.link} className="stat-link">
                         Lihat detail →
