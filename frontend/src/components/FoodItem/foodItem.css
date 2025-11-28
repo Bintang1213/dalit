@@ -239,3 +239,6 @@
   color: crimson;
   font-size: 14px;
 }
+.disabled-rating {
+  filter: grayscale(100%) brightness(0.8);
+}

@@ -19,6 +19,11 @@ const FoodItem = ({
   const { cartItems, addToCart, removeFromCart, url } =
     useContext(StoreContext);
 
+  // Format harga internasional — ribuan pakai koma
+  const formatInternational = (value) => {
+    return value.toLocaleString("en-US");
+  };
+
   // Tentukan apakah menu aktif
   const disabledKeywords = [
     "habis",
@@ -31,15 +36,17 @@ const FoodItem = ({
     "disabled",
   ];
 
-  let isActive = true;
-  if (typeof status === "boolean") {
-    isActive = status;
-  } else if (typeof status === "number") {
-    isActive = status === 1;
-  } else if (typeof status === "string") {
-    const s = status.trim().toLowerCase();
-    isActive = !disabledKeywords.some((k) => s.includes(k));
-  }
+  const isStatusActive = (value) => {
+    if (typeof value === "boolean") return value;
+    if (typeof value === "number") return value === 1;
+    if (typeof value === "string") {
+      const s = value.trim().toLowerCase();
+      return !disabledKeywords.some((k) => s.includes(k));
+    }
+    return true;
+  };
+
+  const isActive = isStatusActive(status);
 
   let statusText = status || "Tidak Diketahui";
   if (!isActive) {
@@ -51,7 +58,7 @@ const FoodItem = ({
     statusText = "Tersedia";
   }
 
-  // 🔥 Cari rating dominan (bintang yang paling banyak)
+  // ⭐ Cari rating dominan
   const getDominantRating = () => {
     if (!ratingCounts || Object.keys(ratingCounts).length === 0) return null;
     let maxCount = 0;
@@ -67,7 +74,7 @@ const FoodItem = ({
 
   const dominantRating = getDominantRating();
 
-  // Handle tambah & kurang keranjang
+  // Tambah ke keranjang
   const handleAdd = () => {
     if (!isActive) {
       toast.warn(`${name} sedang tidak tersedia`, {
@@ -77,6 +84,7 @@ const FoodItem = ({
       });
       return;
     }
+
     addToCart(_id);
     toast.success(`${name} berhasil ditambahkan ke keranjang!`, {
       toastId: `add-${_id}`,
@@ -93,19 +101,23 @@ const FoodItem = ({
   return (
     <div className={`food-item ${!isActive ? "food-item-disabled" : ""}`}>
       <div className="food-item-img-container">
-        {/* ⭐ Badge Rating */}
-       <div className="food-rating-badge">
-  {avgRating > 0 ? (
-    <>
-      <FaStar className="star-icon" />
-      <span>{avgRating.toFixed(1)}</span>
-      <span className="review-count">({totalReviews})</span>
-    </>
-  ) : (
-    <span className="no-rating">Belum pernah di-rating</span>
-  )}
-</div>
 
+        {/* ⭐ Badge Rating */}
+        <div className={`food-rating-badge ${!isActive ? "disabled-rating" : ""}`}>
+          <FaStar className="star-icon" />
+
+          {avgRating > 0 ? (
+            <>
+              <span>{avgRating.toFixed(1)}</span>
+              <span className="review-count">({totalReviews})</span>
+            </>
+          ) : (
+            <>
+              <span>0.0</span>
+              <span className="review-count">(0)</span>
+            </>
+          )}
+        </div>
 
         <LazyLoadImage
           className="food-item-image"
@@ -114,34 +126,38 @@ const FoodItem = ({
           effect="blur"
         />
 
-        {!cartItems[_id] ? (
-          <div
-            className={`add-icon-wrapper ${!isActive ? "disabled-button" : ""}`}
-            onClick={isActive ? handleAdd : undefined}
-          >
-            <FaPlus className="add-icon" />
-          </div>
-        ) : (
-          <div
-            className={`food-item-counter ${!isActive ? "disabled-button" : ""}`}
-          >
-            <FaMinus
-              className="counter-icon minus"
-              onClick={isActive ? handleRemove : undefined}
-            />
-            <p>{cartItems[_id]}</p>
-            <FaPlus
-              className="counter-icon plus"
-              onClick={isActive ? handleAdd : undefined}
-            />
-          </div>
+        {/* 🔥 Tombol hanya muncul jika menu aktif */}
+        {isActive && (
+          !cartItems[_id] ? (
+            <div className="add-icon-wrapper" onClick={handleAdd}>
+              <FaPlus className="add-icon" />
+            </div>
+          ) : (
+            <div className="food-item-counter">
+              <FaMinus
+                className="counter-icon minus"
+                onClick={handleRemove}
+              />
+              <p>{cartItems[_id]}</p>
+              <FaPlus
+                className="counter-icon plus"
+                onClick={handleAdd}
+              />
+            </div>
+          )
         )}
+
       </div>
 
       <div className="food-item-info">
         <p className="food-item-name">{name}</p>
         <p className="food-item-desc">{description}</p>
-        <p className="food-item-price">Rp. {price}</p>
+
+        {/* Harga dengan format internasional */}
+        <p className="food-item-price">
+          Rp {formatInternational(price)}
+        </p>
+
         <p className="food-item-status">
           Status:{" "}
           <span className={isActive ? "status-aktif" : "status-nonaktif"}>
