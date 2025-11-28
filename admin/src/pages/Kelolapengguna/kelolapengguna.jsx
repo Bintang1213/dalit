@@ -12,10 +12,12 @@ const KelolaPengguna = () => {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const currentItems = pengguna.slice(startIndex, startIndex + itemsPerPage);
 
+  // 🔹 Refactoring: Data-level → Extract BASE_URL
+  const BASE_URL = "http://localhost:4000/api/user";
+
   const getPengguna = async () => {
     try {
-      // 🔹 Ubah endpoint dari /all ke /
-      const res = await axios.get("http://localhost:4000/api/user/");
+      const res = await axios.get(`${BASE_URL}/`);
       if (res.data.success) {
         setPengguna(res.data.data);
       } else {
@@ -32,15 +34,16 @@ const KelolaPengguna = () => {
     const konfirmasi = window.confirm("Yakin ingin menghapus pengguna ini?");
     if (konfirmasi) {
       try {
-        const res = await axios.delete(`http://localhost:4000/api/user/${id}`);
+        const res = await axios.delete(`${BASE_URL}/${id}`);
         if (res.data.success) {
           const updated = pengguna.filter((user) => user._id !== id);
           setPengguna(updated);
 
           const lastPageItemCount = updated.slice(
             (currentPage - 1) * itemsPerPage,
-            currentPage * itemsPerPage,
+            currentPage * itemsPerPage
           ).length;
+
           if (lastPageItemCount === 0 && currentPage > 1) {
             setCurrentPage(currentPage - 1);
           }

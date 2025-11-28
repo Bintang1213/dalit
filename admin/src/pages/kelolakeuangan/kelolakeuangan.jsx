@@ -56,14 +56,13 @@ const KelolaKeuangan = () => {
       const d = today.toISOString().split("T")[0];
       setStartDate(d);
       setEndDate(d);
-    }
-
-    if (mode === "all") {
+    } else if (mode === "all") {
       setStartDate("");
       setEndDate("");
       setSelectedMonth("");
       setSelectedYear("");
     }
+    
   };
 
   // FILTER BULAN DROPDOWN
