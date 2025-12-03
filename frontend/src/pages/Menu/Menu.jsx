@@ -6,12 +6,11 @@ import { useLocation } from "react-router-dom";
 import axios from "axios";
 import "./Menu.css";
 
-
 const Menu = () => {
   const { food_list, url } = useContext(StoreContext);
   const [sortOrder, setSortOrder] = useState("");
   const [minRating, setMinRating] = useState(0);
-  const [ratingData, setRatingData] = useState([]); // ⭐ data rating dari backend
+  const [ratingData, setRatingData] = useState([]);
 
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
@@ -25,9 +24,11 @@ const Menu = () => {
   useEffect(() => {
     const fetchRatings = async () => {
       try {
-        const response = await axios.get("http://localhost:4000/api/reviews/top");
+        const response = await axios.get(
+          "http://localhost:4000/api/reviews/top"
+        );
         setRatingData(response.data);
-        console.log("Data rating:", res.data);
+        console.log("Data rating:", response.data); // ✔ FIXED
       } catch (error) {
         console.error("Gagal ambil data rating:", error);
       }
@@ -47,17 +48,16 @@ const Menu = () => {
   const filteredFood = useMemo(() => {
     let items = [...food_list];
 
-// Gabungkan data rating ke setiap item
-items = items.map((item) => {
-  const found = ratingData.find((r) => r._id === item._id);
-  return {
-    ...item,
-    avgRating: found?.avgRating || 0,
-    totalReviews: found?.totalReviews || 0,
-    ratingCounts: found?.ratingCounts || {},
-  };
-});
-
+    // Gabungkan data rating ke setiap item
+    items = items.map((item) => {
+      const found = ratingData.find((r) => r._id === item._id);
+      return {
+        ...item,
+        avgRating: found?.avgRating || 0,
+        totalReviews: found?.totalReviews || 0,
+        ratingCounts: found?.ratingCounts || {},
+      };
+    });
 
     // 🔍 Filter pencarian
     if (searchQuery) {
@@ -70,9 +70,10 @@ items = items.map((item) => {
 
     // ⭐ Filter rating minimal
     if (minRating > 0) {
-  items = items.filter((item) => Number(item.avgRating || 0) >= minRating);
-}
-
+      items = items.filter(
+        (item) => Number(item.avgRating || 0) >= minRating
+      );
+    }
 
     // 💰 Urutkan harga
     if (sortOrder === "asc") {
@@ -103,7 +104,6 @@ items = items.map((item) => {
             <p className="empty-message">Tidak ada menu sesuai pencarian</p>
           )
         ) : sortOrder || minRating > 0 ? (
-          // === jika user memilih filter harga atau rating
           <div className="menu-category-section">
             <h2 className="menu-category-title">
               {minRating > 0
@@ -122,7 +122,6 @@ items = items.map((item) => {
             </div>
           </div>
         ) : (
-          // === default: tampilkan berdasarkan kategori
           categories.map((category, idx) => {
             const items = filteredFood.filter(
               (item) => item.category === category
@@ -197,7 +196,9 @@ items = items.map((item) => {
           {[5, 4, 3, 2].map((stars) => (
             <div
               key={stars}
-              className={`rating-filter ${minRating === stars ? "active" : ""}`}
+              className={`rating-filter ${
+                minRating === stars ? "active" : ""
+              }`}
               onClick={() => setMinRating(stars)}
             >
               {Array.from({ length: 5 }, (_, i) => (

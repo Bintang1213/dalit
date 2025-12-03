@@ -15,16 +15,15 @@ const FoodItem = ({
   avgRating,
   totalReviews,
   ratingCounts,
+  rating, // fallback jika data dari API pakai 'rating'
 }) => {
   const { cartItems, addToCart, removeFromCart, url } =
     useContext(StoreContext);
 
-  // Format harga internasional — ribuan pakai koma
   const formatInternational = (value) => {
-    return value.toLocaleString("en-US");
+    return Number(value || 0).toLocaleString("en-US");
   };
 
-  // Tentukan apakah menu aktif
   const disabledKeywords = [
     "habis",
     "nonaktif",
@@ -49,16 +48,14 @@ const FoodItem = ({
   const isActive = isStatusActive(status);
 
   let statusText = status || "Tidak Diketahui";
-  if (!isActive) {
-    statusText = "Habis";
-  } else if (
-    typeof status === "string" &&
-    status.trim().toLowerCase() === "tersedia"
-  ) {
+  if (!isActive) statusText = "Habis";
+  else if (typeof status === "string" && status.trim().toLowerCase() === "tersedia")
     statusText = "Tersedia";
-  }
 
-  // ⭐ Cari rating dominan
+  // rating fallback: gunakan avgRating jika ada, else gunakan rating
+  const effectiveAvg = (typeof avgRating === "number" ? avgRating : (typeof rating === "number" ? rating : 0));
+  const effectiveTotalReviews = typeof totalReviews === "number" ? totalReviews : 0;
+
   const getDominantRating = () => {
     if (!ratingCounts || Object.keys(ratingCounts).length === 0) return null;
     let maxCount = 0;
@@ -74,49 +71,38 @@ const FoodItem = ({
 
   const dominantRating = getDominantRating();
 
-  // Tambah ke keranjang
+  const itemKey = String(_id);
+  const currentCount = cartItems[itemKey] || 0;
+
   const handleAdd = () => {
     if (!isActive) {
       toast.warn(`${name} sedang tidak tersedia`, {
-        toastId: `warn-${_id}`,
+        toastId: `warn-${itemKey}`,
         position: "top-right",
         autoClose: 1500,
       });
       return;
     }
-
-    addToCart(_id);
+    addToCart(itemKey);
     toast.success(`${name} berhasil ditambahkan ke keranjang!`, {
-      toastId: `add-${_id}`,
+      toastId: `add-${itemKey}`,
       position: "top-right",
-      autoClose: 2000,
+      autoClose: 1500,
     });
   };
 
   const handleRemove = () => {
     if (!isActive) return;
-    removeFromCart(_id);
+    removeFromCart(itemKey);
   };
 
   return (
     <div className={`food-item ${!isActive ? "food-item-disabled" : ""}`}>
       <div className="food-item-img-container">
-
-        {/* ⭐ Badge Rating */}
         <div className={`food-rating-badge ${!isActive ? "disabled-rating" : ""}`}>
           <FaStar className="star-icon" />
-
-          {avgRating > 0 ? (
-            <>
-              <span>{avgRating.toFixed(1)}</span>
-              <span className="review-count">({totalReviews})</span>
-            </>
-          ) : (
-            <>
-              <span>0.0</span>
-              <span className="review-count">(0)</span>
-            </>
-          )}
+          <span>{effectiveAvg.toFixed(1)}</span>
+          <span className="review-count">({effectiveTotalReviews})</span>
         </div>
 
         <LazyLoadImage
@@ -126,9 +112,8 @@ const FoodItem = ({
           effect="blur"
         />
 
-        {/* 🔥 Tombol hanya muncul jika menu aktif */}
         {isActive && (
-          !cartItems[_id] ? (
+          !currentCount ? (
             <div className="add-icon-wrapper" onClick={handleAdd}>
               <FaPlus className="add-icon" />
             </div>
@@ -138,7 +123,7 @@ const FoodItem = ({
                 className="counter-icon minus"
                 onClick={handleRemove}
               />
-              <p>{cartItems[_id]}</p>
+              <p>{currentCount}</p>
               <FaPlus
                 className="counter-icon plus"
                 onClick={handleAdd}
@@ -146,14 +131,12 @@ const FoodItem = ({
             </div>
           )
         )}
-
       </div>
 
       <div className="food-item-info">
         <p className="food-item-name">{name}</p>
         <p className="food-item-desc">{description}</p>
 
-        {/* Harga dengan format internasional */}
         <p className="food-item-price">
           Rp {formatInternational(price)}
         </p>

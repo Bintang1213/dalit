@@ -406,64 +406,69 @@ export default (io) => {
   });
 
   // =============================
-  // PATCH update order status (Admin)
-  // =============================
-  router.patch("/:id", authMiddleware, async (req, res) => {
-    try {
-      if (!req.adminId) {
-        return errorResponse(
-          res,
-          403,
-          "Hanya admin yang bisa mengubah status pesanan",
-        );
-      }
-
-      const { status: newStatus } = req.body;
-      const orderId = req.params.id;
-
-      const order = await Order.findByIdAndUpdate(
-        orderId,
-        { status: newStatus, updatedAt: moment().tz("Asia/Jakarta").toDate() },
-        { new: true },
-      ).lean();
-
-      if (!order) return errorResponse(res, 404, "Pesanan tidak ditemukan");
-
-      const targetUserId = order.userId.toString();
-
-      const orderShortId = order._id.toString().slice(-6);
-      const notificationMessage = `Status pesanan Anda #${orderShortId} telah diperbarui menjadi "${newStatus}"`;
-
-      await Notification.create({
-        userId: targetUserId,
-        message: notificationMessage,
-        orderId: order._id,
-      });
-
-      io.to(targetUserId).emit("orderStatusUpdate", {
-        orderId: order._id,
-        newStatus: newStatus,
-        message: notificationMessage,
-      });
-
-      res
-        .status(200)
-        .json({
-          success: true,
-          message: "Status pesanan diperbarui",
-          data: order,
-        });
-    } catch (error) {
-      console.error("[ERROR] Update order:", error);
-      res
-        .status(500)
-        .json({
-          success: false,
-          message: "Terjadi kesalahan server",
-          error: error.message,
-        });
+// PATCH update order status (Admin)
+// =============================
+router.patch("/:id", authMiddleware, async (req, res) => {
+  try {
+    if (!req.adminId) {
+      return errorResponse(
+        res,
+        403,
+        "Hanya admin yang bisa mengubah status pesanan",
+      );
     }
-  });
+
+    const { status: newStatus } = req.body;
+    const orderId = req.params.id;
+
+    const order = await Order.findByIdAndUpdate(
+      orderId,
+      { status: newStatus, updatedAt: moment().tz("Asia/Jakarta").toDate() },
+      { new: true },
+    ).lean();
+
+    if (!order) return errorResponse(res, 404, "Pesanan tidak ditemukan");
+
+    const targetUserId = order.userId.toString();
+
+    // 🔥 Ambil nama pesanan (nama semua item)
+    let namaPesanan = "Pesanan";
+
+    if (order.items && order.items.length > 0) {
+      namaPesanan = order.items.map(i => i.name || i.title).join(", ");
+    }
+
+    // 🔥 Notifikasi dengan nama makanan (bukan ID)
+    const notificationMessage = `Status pesanan Anda "${namaPesanan}" telah diperbarui menjadi "${newStatus}"`;
+
+    await Notification.create({
+      userId: targetUserId,
+      message: notificationMessage,
+      orderId: order._id,
+    });
+
+    io.to(targetUserId).emit("orderStatusUpdate", {
+      orderId: order._id,
+      newStatus: newStatus,
+      message: notificationMessage,
+      namaPesanan: namaPesanan,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Status pesanan diperbarui",
+      data: order,
+    });
+  } catch (error) {
+    console.error("[ERROR] Update order:", error);
+    res.status(500).json({
+      success: false,
+      message: "Terjadi kesalahan server",
+      error: error.message,
+    });
+  }
+});
+
 
   // =============================
   // DELETE order (Admin)

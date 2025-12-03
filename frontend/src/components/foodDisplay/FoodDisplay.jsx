@@ -1,17 +1,19 @@
-import React, { useContext, useEffect, useRef } from "react";
+import React, { useContext, useEffect, useRef, useMemo } from "react";
 import "./FoodDisplay.css";
 import { StoreContext } from "../../context/StoreContext";
 import FoodItem from "../FoodItem/FoodItem";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
-
 gsap.registerPlugin(ScrollTrigger);
 
 const FoodDisplay = ({ category }) => {
-  const { food_list } = useContext(StoreContext);
+  const { food_list, ratings } = useContext(StoreContext);
   const listRef = useRef(null);
 
+  // Animasi
   useEffect(() => {
+    if (!listRef.current) return;
+
     gsap.fromTo(
       listRef.current,
       { opacity: 0, y: 50 },
@@ -22,61 +24,79 @@ const FoodDisplay = ({ category }) => {
         scrollTrigger: {
           trigger: listRef.current,
           start: "top 80%",
-          toggleActions: "play none none none",
         },
       }
     );
   }, []);
 
-  // 🔹 Cek apakah status menu aktif
+  // ===============================
+  // ⭐ MERGE RATING SECARA AMAN
+  // ===============================
+  const foodWithRating = useMemo(() => {
+    return (food_list || []).map((item) => {
+      const r = ratings?.[item._id];
+
+      return {
+        ...item,
+        avgRating: Number(r?.averageRating ?? item.avgRating ?? 0),
+        totalReviews: Number(r?.reviewCount ?? item.totalReviews ?? 0),
+        ratingCounts: r?.ratingCounts ?? item.ratingCounts ?? {},
+      };
+    });
+  }, [food_list, ratings]);
+
+  // ===============================
+  // ⭐ CEK STATUS MENU (habis/nonaktif)
+  // ===============================
   const isStatusAktif = (status) => {
-    if (typeof status === "boolean") return status;
-    if (typeof status === "number") return status === 1;
-    if (typeof status === "string") {
-      const s = status.toLowerCase().trim();
-      return ![
-        "habis", "nonaktif", "kosong", "sold out", "unavailable",
-        "tidak tersedia", "off", "disabled"
-      ].includes(s);
-    }
-    return true;
+    if (!status) return true;
+    const s = status.toString().toLowerCase().trim();
+
+    return !["habis", "sold out", "nonaktif", "tidak tersedia"].includes(s);
   };
 
-  // 🔹 Cek apakah menu termasuk rekomendasi
+  // ===============================
+  // ⭐ LOGIKA REKOMENDASI
+  // ===============================
   const isRekomendasi = (item) => {
-    const rekom = item.isRecommended; // Ganti dari item.rekomendasi
-    if (rekom === true || rekom === "true" || rekom === 1 || rekom === "1") {
+    if (
+      item.isRecommended === true ||
+      item.isRecommended === "true" ||
+      item.isRecommended === 1 ||
+      item.isRecommended === "1"
+    ) {
       return true;
     }
-    // fallback kalau belum ada field isRecommended
-    return typeof item.rating === "number" && item.rating >= 4.5 && isStatusAktif(item.status);
+    return item.avgRating >= 4.5;
   };
 
-  const filteredList = food_list.filter((item) => {
-    const aktif = isStatusAktif(item.status);
+  // ===============================
+  // ⭐ FILTER FINAL SESUAI RULE BARU
+  // ===============================
+  const filteredList = useMemo(() => {
+    return foodWithRating.filter((item) => {
+      const aktif = isStatusAktif(item.status);
 
-    if (category === "All") {
-      return aktif && isRekomendasi(item);
-    } else {
-      return item.category === category;
-    }
-  });
+      if (category === "All") {
+        return aktif && isRekomendasi(item);
+      }
+      return aktif && item.category === category;
+    });
+  }, [category, foodWithRating]);
 
   return (
     <div className="food-display" id="food-display">
       <h2>{category === "All" ? "Menu Rekomendasi" : `Menu ${category}`}</h2>
+
       <div className="food-display-list" ref={listRef}>
         {filteredList.length > 0 ? (
-          filteredList.map((item, index) => (
+          filteredList.map((item) => (
             <FoodItem
-              key={index}
-              id={item._id}
-              name={item.name}
-              description={item.description}
-              price={item.price}
-              image={item.image}
-              status={item.status}
-              rating={item.rating}
+              key={item._id}
+              {...item}
+              avgRating={item.avgRating}
+              totalReviews={item.totalReviews}
+              ratingCounts={item.ratingCounts}
             />
           ))
         ) : (
