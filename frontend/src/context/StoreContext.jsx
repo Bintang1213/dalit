@@ -1,3 +1,4 @@
+// StoreContext.jsx (FINAL FIXED by Pipit)
 import { createContext, useEffect, useState } from "react";
 import axios from "axios";
 
@@ -10,92 +11,92 @@ const StoreContextProvider = (props) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // ⭐ DITAMBAHKAN — tempat nyimpen rating
+  const [ratings, setRatings] = useState({});
+
   const url = "http://localhost:4000";
 
-  // di StoreContext.jsx — ganti implementasi fetchFoodList dengan ini
-const fetchFoodList = async () => {
-  try {
-    const response = await axios.get(`${url}/api/food/list`);
-    // Normalisasi data: pastikan price = Number, rating minimal 0, category default
-    const normalized = (response.data.data || []).map((item) => ({
-      ...item,
-      price:
-        item.price === undefined || item.price === null
-          ? 0
-          : Number(item.price), // pastikan numeric
-      rating: item.rating === undefined || item.rating === null ? 0 : Number(item.rating),
-      category: item.category || "Uncategorized",
-    }));
-    setFoodList(normalized);
-  } catch (error) {
-    console.error("Gagal mengambil daftar makanan:", error);
-  }
-};
+  const fetchFoodList = async () => {
+    try {
+      const response = await axios.get(`${url}/api/food/list`);
+      const normalized = (response.data.data || []).map((item) => ({
+        _id: item._id || item.id || item._id?.toString(),
+        ...item,
+        price:
+          item.price === undefined || item.price === null
+            ? 0
+            : Number(item.price),
+        rating:
+          item.rating === undefined || item.rating === null
+            ? 0
+            : Number(item.rating),
+        category: item.category || "Uncategorized",
+      }));
+      setFoodList(normalized);
+    } catch (error) {
+      console.error("Gagal mengambil daftar makanan:", error);
+    }
+  };
 
+  // ⭐ DITAMBAHKAN — fetch rating dari API
+  const fetchRatings = async () => {
+    try {
+      const response = await axios.get(`${url}/api/reviews/top`);
+      const data = response.data || [];
+
+      const mapped = {};
+data.forEach((item) => {
+  mapped[item._id] = {
+    averageRating: item.avgRating || 0,
+    reviewCount: item.totalReviews || 0,
+    ratingCounts: item.ratingCounts || {},
+  };
+});
+
+setRatings(mapped);
+    } catch (err) {
+      console.error("Gagal fetch ratings:", err);
+    }
+  };
 
   const fetchUser = async (authToken) => {
     if (!authToken) {
-      console.log("No token provided for fetchUser");
       setUser(null);
       return false;
     }
-
     try {
-      console.log("Fetching user profile with token...");
       const response = await axios.get(`${url}/api/user/profile`, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
 
       if (response.data.success && response.data.data) {
-        console.log("User fetched successfully:", response.data.data._id);
         setUser(response.data.data);
         return true;
       } else {
-        console.error("Failed to fetch user:", response.data.message);
         clearUserSession();
         return false;
       }
     } catch (error) {
-      console.error("Error fetching user data:", error);
-
-      // ✅ Handle different error types
       if (error.response?.status === 401 || error.response?.status === 403) {
-        console.log("Token expired or invalid, clearing session");
         clearUserSession();
-      } else {
-        console.error("Network or server error:", error.message);
-        // Don't clear session for network errors
       }
       return false;
     }
   };
 
-  // ✅ Function untuk clear user session
   const clearUserSession = () => {
-    console.log("Clearing user session...");
     localStorage.removeItem("token");
     setToken("");
     setUser(null);
     setCartItems({});
   };
 
-  // ✅ Function untuk set user session
   const setUserSession = (newToken, userData = null) => {
-    console.log(
-      "Setting user session:",
-      newToken ? "with token" : "without token",
-    );
-
     if (newToken) {
       localStorage.setItem("token", newToken);
       setToken(newToken);
-
-      if (userData) {
-        setUser(userData);
-      } else {
-        // Fetch user data if not provided
-        fetchUser(newToken);
-      }
+      if (userData) setUser(userData);
+      else fetchUser(newToken);
     } else {
       clearUserSession();
     }
@@ -103,128 +104,99 @@ const fetchFoodList = async () => {
 
   useEffect(() => {
     async function loadInitialData() {
-      console.log("Loading initial data...");
       setLoading(true);
-
-      // ✅ PERBAIKAN: Clear state terlebih dahulu
       setUser(null);
       setToken("");
       setCartItems({});
 
       const savedToken = localStorage.getItem("token");
-      console.log("Saved token exists:", !!savedToken);
 
-      // Load food list
-      const foodPromise = fetchFoodList();
+      // ⭐ DITAMBAHKAN — fetch food + ratings sekaligus
+      const foodPromise = Promise.all([fetchFoodList(), fetchRatings()]);
 
-      // Load user if token exists
       let userPromise = Promise.resolve(false);
       if (savedToken) {
-        setToken(savedToken); // Set token immediately
+        setToken(savedToken);
         userPromise = fetchUser(savedToken);
       }
 
-      // Wait for both to complete
       const [, userFetchSuccess] = await Promise.all([
         foodPromise,
         userPromise,
       ]);
 
-      // ✅ If user fetch failed, clear everything
       if (savedToken && !userFetchSuccess) {
-        console.log("User fetch failed, clearing session");
         clearUserSession();
       }
 
       setLoading(false);
-      console.log("Initial data loaded");
     }
 
     loadInitialData();
-  }, []); // ✅ Empty dependency array - only run on mount
+  }, []);
 
-  // ✅ TAMBAHAN: Effect untuk handle storage changes (multi-tab sync)
   useEffect(() => {
     const handleStorageChange = (e) => {
       if (e.key === "token") {
         const newToken = e.newValue;
-        console.log("Token changed in another tab:", !!newToken);
-
         if (!newToken) {
-          // Token removed in another tab
           clearUserSession();
         } else if (newToken !== token) {
-          // Token changed in another tab
           setToken(newToken);
           fetchUser(newToken);
         }
       }
     };
-
     window.addEventListener("storage", handleStorageChange);
     return () => window.removeEventListener("storage", handleStorageChange);
   }, [token]);
 
   const addToCart = async (itemId) => {
-    setCartItems((prev) => ({ ...prev, [itemId]: (prev[itemId] || 0) + 1 }));
+    const key = String(itemId);
+    setCartItems((prev) => ({ ...prev, [key]: (prev[key] || 0) + 1 }));
     if (token) {
       try {
         await axios.post(
           `${url}/api/cart/add`,
-          { itemId },
+          { itemId: key },
           {
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
             },
-          },
+          }
         );
       } catch (error) {
-        console.error("Gagal menambahkan ke keranjang di server:", error);
-
-        // ✅ Handle auth errors
         if (error.response?.status === 401 || error.response?.status === 403) {
-          console.log("Auth error in addToCart, clearing session");
           clearUserSession();
         }
       }
-    } else {
-      console.warn(
-        "Pengguna belum login, item hanya ditambahkan ke keranjang lokal.",
-      );
     }
   };
 
   const removeFromCart = async (itemId) => {
+    const key = String(itemId);
     setCartItems((prev) => ({
       ...prev,
-      [itemId]: Math.max((prev[itemId] || 1) - 1, 0),
+      [key]: Math.max((prev[key] || 1) - 1, 0),
     }));
     if (token) {
       try {
         await axios.post(
           `${url}/api/cart/remove`,
-          { itemId },
+          { itemId: key },
           {
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
             },
-          },
+          }
         );
       } catch (error) {
-        console.error("Gagal menghapus dari keranjang di server:", error);
-
-        // ✅ Handle auth errors
         if (error.response?.status === 401 || error.response?.status === 403) {
-          console.log("Auth error in removeFromCart, clearing session");
           clearUserSession();
         }
       }
-    } else {
-      console.warn(
-        "Pengguna belum login, item hanya dihapus dari keranjang lokal.",
-      );
     }
   };
 
@@ -232,10 +204,10 @@ const fetchFoodList = async () => {
     let totalAmount = 0;
     for (const item in cartItems) {
       if (cartItems[item] > 0) {
-        let itemInfo = food_list.find((product) => product._id === item);
-        if (itemInfo) {
-          totalAmount += itemInfo.price * cartItems[item];
-        }
+        const itemInfo = food_list.find(
+          (product) => String(product._id) === String(item)
+        );
+        if (itemInfo) totalAmount += itemInfo.price * cartItems[item];
       }
     }
     return totalAmount;
@@ -244,9 +216,7 @@ const fetchFoodList = async () => {
   const getTotalCartItems = () => {
     let totalItems = 0;
     for (const item in cartItems) {
-      if (cartItems[item] > 0) {
-        totalItems += cartItems[item];
-      }
+      if (cartItems[item] > 0) totalItems += cartItems[item];
     }
     return totalItems;
   };
@@ -255,36 +225,34 @@ const fetchFoodList = async () => {
     setCartItems({});
   };
 
-  // ✅ TAMBAHAN: Helper functions untuk authentication
   const logout = () => {
-    console.log("Manual logout triggered");
     clearUserSession();
   };
 
   const login = (newToken, userData) => {
-    console.log("Manual login triggered");
     setUserSession(newToken, userData);
   };
 
   const contextValue = {
     food_list,
+    ratings, // ⭐ DITAMBAHKAN! Supaya FoodDisplay bisa akses rating
     cartItems,
     setCartItems,
     addToCart,
     removeFromCart,
     getTotalCartAmount,
-    getTotalCartItems, 
+    getTotalCartItems,
     clearCart,
     url,
     token,
-    setToken: setUserSession, 
+    setToken: setUserSession,
     user,
     setUser,
     loading,
     logout,
     login,
     clearUserSession,
-    fetchUser: (authToken) => fetchUser(authToken), 
+    fetchUser: (authToken) => fetchUser(authToken),
   };
 
   return (
