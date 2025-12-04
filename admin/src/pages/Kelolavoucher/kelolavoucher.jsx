@@ -16,9 +16,12 @@ const KelolaVoucher = () => {
   const [autoApply, setAutoApply] = useState(false);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [remaining, setRemaining] = useState(""); // -1 or empty = unlimited
+  const [remaining, setRemaining] = useState("");
 
-  const token = localStorage.getItem("token");
+  // 🔥 FIX: Token harus authToken, bukan token
+  const token = localStorage.getItem("authToken");
+
+  console.log("Token dari localStorage:", token); // Debugging
 
   const resetForm = () => {
     setTitle("");
@@ -35,9 +38,12 @@ const KelolaVoucher = () => {
 
   const fetchVoucherUsage = async () => {
     try {
+      console.log("Fetch dengan token:", token); // Debugging
+
       const res = await axios.get("http://localhost:4000/api/vouchers/admin", {
         headers: { Authorization: `Bearer ${token}` },
       });
+
       setVouchers(res.data);
     } catch (err) {
       console.error("Gagal ambil voucher:", err.response?.data || err.message);
@@ -71,7 +77,7 @@ const KelolaVoucher = () => {
         },
         {
           headers: { Authorization: `Bearer ${token}` },
-        },
+        }
       );
       fetchVoucherUsage();
       resetForm();
@@ -89,15 +95,12 @@ const KelolaVoucher = () => {
         });
         fetchVoucherUsage();
       } catch (err) {
-        console.error(
-          "Hapus voucher error:",
-          err.response?.data || err.message,
-        );
+        console.error("Hapus voucher error:", err.response?.data || err.message);
       }
     }
   };
 
-  // Fungsi format tanggal DD/MM/YYYY
+  // Format tanggal DD/MM/YYYY
   const formatTanggal = (dateStr) => {
     if (!dateStr) return "-";
     const date = new Date(dateStr);
@@ -112,7 +115,7 @@ const KelolaVoucher = () => {
       <div className="voucher-container">
         <h2>Kelola Voucher</h2>
 
-        {/* Form tambah voucher */}
+        {/* Form tambah */}
         <div className="voucher-form">
           <input
             type="text"
@@ -173,16 +176,8 @@ const KelolaVoucher = () => {
             Auto Apply
           </label>
 
-          <input
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-          />
-          <input
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-          />
+          <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+          <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
 
           <button onClick={handleAddVoucher} className="btn-add">
             Tambah Voucher
@@ -207,16 +202,13 @@ const KelolaVoucher = () => {
               <th>Aksi</th>
             </tr>
           </thead>
+
           <tbody>
             {vouchers.length > 0 ? (
               vouchers.map((v) => (
                 <tr key={v._id}>
                   <td>{v.title || "-"}</td>
-                  <td>
-                    {v.discountType === "percent"
-                      ? "Persentase (%)"
-                      : "Nominal (Rp)"}
-                  </td>
+                  <td>{v.discountType === "percent" ? "Persentase (%)" : "Nominal (Rp)"}</td>
                   <td>
                     {v.discountType === "percent"
                       ? `${v.discountValue}%`
@@ -224,21 +216,14 @@ const KelolaVoucher = () => {
                   </td>
                   <td>Rp {v.minPurchase}</td>
                   <td>{v.maxUsagePerUser ?? "-"}</td>
-                  <td>
-                    {v.maxUsagePerDay === 0
-                      ? "Unlimited"
-                      : (v.maxUsagePerDay ?? "-")}
-                  </td>
+                  <td>{v.maxUsagePerDay === 0 ? "Unlimited" : v.maxUsagePerDay ?? "-"}</td>
                   <td>{v.remaining >= 0 ? v.remaining : "Unlimited"}</td>
                   <td>{v.autoApply ? "Ya" : "Tidak"}</td>
                   <td>{formatTanggal(v.startDate)}</td>
                   <td>{formatTanggal(v.endDate)}</td>
                   <td>{v.sisaHariIni ?? "-"}</td>
                   <td>
-                    <button
-                      onClick={() => handleDeleteVoucher(v._id)}
-                      className="btn-delete"
-                    >
+                    <button onClick={() => handleDeleteVoucher(v._id)} className="btn-delete">
                       Hapus
                     </button>
                   </td>
