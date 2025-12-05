@@ -303,6 +303,27 @@
   padding: 10px 14px;
   color: #777;
 }
+/* NAMA VOUCHER – BOLD */
+.voucher-name {
+  margin: 0;
+  font-weight: 700;
+  font-size: 15px;
+  color: #111;
+}
+
+/* MIN BLJ – ABU TIPIS */
+.voucher-min-gray {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: #6d6d6d; /* abu tipis */
+}
+
+/* EXPIRED DATE – ABU PUDAR + KECIL */
+.voucher-expired {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: #9b9b9b; /* abu pudar */
+}
 
 /* animasi slide */
 @keyframes slideDown {

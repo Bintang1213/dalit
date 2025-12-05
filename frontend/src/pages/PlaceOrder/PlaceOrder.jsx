@@ -301,43 +301,49 @@ const PlaceOrder = () => {
               >
                 <div className="voucher-dropdown-inner">
                   {displayedVouchers.length === 0 ? (
-                    <p className="no-voucher-inline">
-                      Tidak ada voucher yang dapat digunakan untuk pesanan ini.
-                    </p>
-                  ) : (
-                    displayedVouchers.map((v) => {
-                      const isApplied = voucherApplied?._id === v._id;
-                      const disabled = !isVoucherUsable(v);
+                      <p className="no-voucher-inline">
+                        Tidak ada voucher yang dapat digunakan untuk pesanan ini.
+                      </p>
+                    ) : (
+                      displayedVouchers.map((v) => {
+                        const isApplied = voucherApplied?._id === v._id;
+                        const disabled = !isVoucherUsable(v);
 
-                      return (
-                        <div
-                          key={v._id}
-                          className={`voucher-card ${isApplied ? "applied" : ""} ${disabled ? "disabled" : ""}`}
-                        >
-                          <div className="voucher-info">
-                            <h4 className="voucher-head">
-                              {v.discountType === "percent"
-                                ? `Diskon ${v.discountValue}%`
-                                : `Diskon Rp ${v.discountValue.toLocaleString()}`}
-                            </h4>
-                            <p className="voucher-min">
-                              Min. order Rp {v.minPurchase?.toLocaleString()}
-                            </p>
-                          </div>
-
-                          <button
-                            type="button"
-                            className={`voucher-btn ${isApplied ? "applied-btn" : ""}`}
-                            onClick={() => {
-                              if (!disabled) applyVoucher(v);
-                            }}
-                            disabled={disabled}
+                        return (
+                          <div
+                            key={v._id}
+                            className={`voucher-card ${isApplied ? "applied" : ""} ${disabled ? "disabled" : ""}`}
                           >
-                            {isApplied ? "Dipakai" : "Pakai"}
-                          </button>
-                        </div>
-                      );
-                    })
+                            <div className="voucher-info">
+                              
+                              {/* --- NAMA VOUCHER (BOLD) --- */}
+                              <h4 className="voucher-name">{v.title}</h4>
+
+                              {/* --- MINIMUM BELANJA (ABU TIPIS) --- */}
+                              <p className="voucher-min-gray">
+                                Min. Blj Rp {v.minPurchase?.toLocaleString()}
+                              </p>
+
+                              {/* --- EXPIRED DATE (ABU LEBIH PUCAT, KECIL) --- */}
+                              <p className="voucher-expired">
+                                Hingga {moment(v.endDate).format("DD.MM.YYYY")}
+                              </p>
+
+                            </div>
+
+                            <button
+                              type="button"
+                              className={`voucher-btn ${isApplied ? "applied-btn" : ""}`}
+                              onClick={() => {
+                                if (!disabled) applyVoucher(v);
+                              }}
+                              disabled={disabled}
+                            >
+                              {isApplied ? "Dipakai" : "Pakai"}
+                            </button>
+                          </div>
+                        );
+                      })
                   )}
                 </div>
 
@@ -358,23 +364,21 @@ const PlaceOrder = () => {
 
             {/* Jika ada voucherApplied -> tampilkan di luar dropdown seperti permintaan */}
             {voucherApplied && (
-              <div className="applied-voucher-box">
-                <div className="voucher-card applied">
-                  <div className="voucher-info">
-                    <h4 className="voucher-head">
-                      {voucherApplied.discountType === "percent"
-                        ? `Diskon ${voucherApplied.discountValue}%`
-                        : `Diskon Rp ${voucherApplied.discountValue.toLocaleString()}`}
-                    </h4>
-                    <p className="voucher-min">
-                      Min. order Rp {voucherApplied.minPurchase?.toLocaleString()}
-                    </p>
-                  </div>
+                  <div className="applied-voucher-box">
+                    <div className="voucher-card applied">
+                      
+                      <div className="voucher-info">
+                        <h4 className="voucher-name">{voucherApplied.title}</h4>
+                        <p className="voucher-min-gray">
+                          Min. Blj Rp {voucherApplied.minPurchase?.toLocaleString()}
+                        </p>
+                        <p className="voucher-expired">
+                          Hingga {moment(voucherApplied.endDate).format("DD.MM.YYYY")}
+                        </p>
+                      </div>
 
-                  <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                    <span className="voucher-applied-label">Dipakai ✅</span>
-                  </div>
-                  </div>
+                      <span className="voucher-applied-label">Dipakai ✅</span>
+                    </div>
                   </div>
                   )}
                   </div>
