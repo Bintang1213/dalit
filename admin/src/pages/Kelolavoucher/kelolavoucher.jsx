@@ -1,4 +1,3 @@
-// KelolaVoucher.jsx
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./kelolavoucher.css";
@@ -6,7 +5,7 @@ import "./kelolavoucher.css";
 const KelolaVoucher = () => {
   const [vouchers, setVouchers] = useState([]);
 
-  // State form tambah
+  // State form
   const [title, setTitle] = useState("");
   const [discountType, setDiscountType] = useState("percent");
   const [discountValue, setDiscountValue] = useState("");
@@ -16,12 +15,12 @@ const KelolaVoucher = () => {
   const [autoApply, setAutoApply] = useState(false);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [remaining, setRemaining] = useState("");
 
-  // 🔥 FIX: Token harus authToken, bukan token
-  const token = localStorage.getItem("authToken");
+  // ✅ STATE EDIT
+  const [isEdit, setIsEdit] = useState(false);
+  const [editId, setEditId] = useState(null);
 
-  console.log("Token dari localStorage:", token); // Debugging
+  const token = localStorage.getItem("token");
 
   const resetForm = () => {
     setTitle("");
@@ -33,17 +32,15 @@ const KelolaVoucher = () => {
     setAutoApply(false);
     setStartDate("");
     setEndDate("");
-    setRemaining("");
+    setIsEdit(false);
+    setEditId(null);
   };
 
   const fetchVoucherUsage = async () => {
     try {
-      console.log("Fetch dengan token:", token); // Debugging
-
       const res = await axios.get("http://localhost:4000/api/vouchers/admin", {
         headers: { Authorization: `Bearer ${token}` },
       });
-
       setVouchers(res.data);
     } catch (err) {
       console.error("Gagal ambil voucher:", err.response?.data || err.message);
@@ -52,39 +49,66 @@ const KelolaVoucher = () => {
 
   useEffect(() => {
     fetchVoucherUsage();
-    // eslint-disable-next-line
   }, []);
 
-  const handleAddVoucher = async () => {
+  // ✅ TAMBAH & UPDATE DISATUKAN
+  const handleSubmitVoucher = async () => {
     if (!discountValue || !startDate || !endDate) {
       alert("Lengkapi semua field wajib!");
       return;
     }
+
+    const payload = {
+      title,
+      discountType,
+      discountValue: Number(discountValue),
+      minPurchase: Number(minPurchase) || 0,
+      maxUsagePerUser: Number(maxUsagePerUser) || 1,
+      maxUsagePerDay: Number(maxUsagePerDay) || 0,
+      autoApply,
+      startDate,
+      endDate,
+    };
+
     try {
-      await axios.post(
-        "http://localhost:4000/api/vouchers",
-        {
-          title,
-          discountType,
-          discountValue: Number(discountValue),
-          minPurchase: Number(minPurchase) || 0,
-          maxUsagePerUser: Number(maxUsagePerUser) || 1,
-          maxUsagePerDay: Number(maxUsagePerDay) || 0,
-          autoApply,
-          startDate,
-          endDate,
-          remaining: remaining === "" ? -1 : Number(remaining),
-        },
-        {
+      if (isEdit) {
+        // ✅ UPDATE
+        await axios.put(
+          `http://localhost:4000/api/vouchers/${editId}`,
+          payload,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+      } else {
+        // ✅ TAMBAH
+        await axios.post("http://localhost:4000/api/vouchers", payload, {
           headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+        });
+      }
+
       fetchVoucherUsage();
       resetForm();
     } catch (err) {
-      console.error("Tambah voucher error:", err.response?.data || err.message);
-      alert("Gagal menambahkan voucher");
+      console.error("Submit voucher error:", err.response?.data || err.message);
+      alert("Gagal menyimpan voucher");
     }
+  };
+
+  // ✅ KLIK EDIT
+  const handleEditVoucher = (v) => {
+    setIsEdit(true);
+    setEditId(v._id);
+
+    setTitle(v.title || "");
+    setDiscountType(v.discountType);
+    setDiscountValue(v.discountValue);
+    setMinPurchase(v.minPurchase);
+    setMaxUsagePerUser(v.maxUsagePerUser);
+    setMaxUsagePerDay(v.maxUsagePerDay);
+    setAutoApply(v.autoApply);
+    setStartDate(v.startDate?.slice(0, 10));
+    setEndDate(v.endDate?.slice(0, 10));
   };
 
   const handleDeleteVoucher = async (id) => {
@@ -100,7 +124,6 @@ const KelolaVoucher = () => {
     }
   };
 
-  // Format tanggal DD/MM/YYYY
   const formatTanggal = (dateStr) => {
     if (!dateStr) return "-";
     const date = new Date(dateStr);
@@ -115,7 +138,7 @@ const KelolaVoucher = () => {
       <div className="voucher-container">
         <h2>Kelola Voucher</h2>
 
-        {/* Form tambah */}
+        {/* ✅ FORM ADD / EDIT */}
         <div className="voucher-form">
           <input
             type="text"
@@ -160,13 +183,6 @@ const KelolaVoucher = () => {
             onChange={(e) => setMaxUsagePerDay(e.target.value)}
           />
 
-          <input
-            type="number"
-            placeholder="Remaining global (-1 = unlimited)"
-            value={remaining}
-            onChange={(e) => setRemaining(e.target.value)}
-          />
-
           <label className="checkbox">
             <input
               type="checkbox"
@@ -176,15 +192,30 @@ const KelolaVoucher = () => {
             Auto Apply
           </label>
 
-          <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
-          <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+          />
 
-          <button onClick={handleAddVoucher} className="btn-add">
-            Tambah Voucher
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+          />
+
+          <button onClick={handleSubmitVoucher} className="btn-add">
+            {isEdit ? "Update Voucher" : "Tambah Voucher"}
           </button>
+
+          {isEdit && (
+            <button onClick={resetForm} className="btn-cancel">
+              Batal Edit
+            </button>
+          )}
         </div>
 
-        {/* Tabel voucher */}
+        {/* ✅ TABEL */}
         <table className="voucher-table">
           <thead>
             <tr>
@@ -194,7 +225,6 @@ const KelolaVoucher = () => {
               <th>Minimal Belanja</th>
               <th>Maks. User</th>
               <th>Maks. Per Hari</th>
-              <th>Remaining</th>
               <th>Auto Apply</th>
               <th>Tanggal Mulai</th>
               <th>Tanggal Berakhir</th>
@@ -208,7 +238,7 @@ const KelolaVoucher = () => {
               vouchers.map((v) => (
                 <tr key={v._id}>
                   <td>{v.title || "-"}</td>
-                  <td>{v.discountType === "percent" ? "Persentase (%)" : "Nominal (Rp)"}</td>
+                  <td>{v.discountType === "percent" ? "Persentase" : "Nominal"}</td>
                   <td>
                     {v.discountType === "percent"
                       ? `${v.discountValue}%`
@@ -216,14 +246,22 @@ const KelolaVoucher = () => {
                   </td>
                   <td>Rp {v.minPurchase}</td>
                   <td>{v.maxUsagePerUser ?? "-"}</td>
-                  <td>{v.maxUsagePerDay === 0 ? "Unlimited" : v.maxUsagePerDay ?? "-"}</td>
-                  <td>{v.remaining >= 0 ? v.remaining : "Unlimited"}</td>
+                  <td>{v.maxUsagePerDay === 0 ? "Unlimited" : v.maxUsagePerDay}</td>
                   <td>{v.autoApply ? "Ya" : "Tidak"}</td>
                   <td>{formatTanggal(v.startDate)}</td>
                   <td>{formatTanggal(v.endDate)}</td>
                   <td>{v.sisaHariIni ?? "-"}</td>
                   <td>
-                    <button onClick={() => handleDeleteVoucher(v._id)} className="btn-delete">
+                    <button
+                      onClick={() => handleEditVoucher(v)}
+                      className="btn-edit"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDeleteVoucher(v._id)}
+                      className="btn-delete"
+                    >
                       Hapus
                     </button>
                   </td>
@@ -231,7 +269,7 @@ const KelolaVoucher = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="12" style={{ textAlign: "center" }}>
+                <td colSpan="11" style={{ textAlign: "center" }}>
                   Belum ada voucher
                 </td>
               </tr>
