@@ -90,8 +90,12 @@
 /* Container untuk tombol aksi */
 .aksi-buttons {
   display: flex;
-  gap: 8px;
+  justify-content: center;   /* ✅ tombol di tengah */
+  align-items: center;
+  gap: 10px;
+  background: transparent;  /* ✅ hilangkan efek kotak */
 }
+
 
 /* Tombol Edit */
 .edit-btn {
@@ -103,6 +107,7 @@
   font-weight: 600;
   cursor: pointer;
   box-shadow: 0 2px 6px rgba(25, 118, 210, 0.4);
+  min-width: 80px; 
   transition:
     background-color 0.3s ease,
     box-shadow 0.3s ease;
@@ -117,6 +122,7 @@
 .delete-btn {
   background-color: #b30000;
   color: white;
+  min-width: 80px; 
   border: none;
   padding: 7px 14px;
   border-radius: 6px;
@@ -275,4 +281,7 @@
 
 .status-badge:hover {
   opacity: 0.8;
+}
+.kelola-menu-table td:last-child {
+  border-left: none;
 }
