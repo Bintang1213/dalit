@@ -300,51 +300,49 @@ const PlaceOrder = () => {
                 className={`voucher-dropdown ${showAllVouchers ? "expanded" : ""}`}
               >
                 <div className="voucher-dropdown-inner">
-                  {displayedVouchers.length === 0 ? (
-                      <p className="no-voucher-inline">
-                        Tidak ada voucher yang dapat digunakan untuk pesanan ini.
-                      </p>
-                    ) : (
-                      displayedVouchers.map((v) => {
-                        const isApplied = voucherApplied?._id === v._id;
-                        const disabled = !isVoucherUsable(v);
+                  {displayedVouchers.map((v) => {
+                    const isApplied = voucherApplied?._id === v._id;
+                    const disabled = !isVoucherUsable(v);
 
-                        return (
-                          <div
-                            key={v._id}
-                            className={`voucher-card ${isApplied ? "applied" : ""} ${disabled ? "disabled" : ""}`}
-                          >
-                            <div className="voucher-info">
-                              
-                              {/* --- NAMA VOUCHER (BOLD) --- */}
-                              <h4 className="voucher-name">{v.title}</h4>
+                    // ✅ FORMAT NAMA + JENIS VOUCHER
+                    const voucherLabel =
+                    v.discountType === "percent"
+                      ? `DISKON ${v.title} - ${v.discountValue}%`
+                      : `DISKON ${v.title} - Rp ${v.discountValue.toLocaleString()}`;
 
-                              {/* --- MINIMUM BELANJA (ABU TIPIS) --- */}
-                              <p className="voucher-min-gray">
-                                Min. Blj Rp {v.minPurchase?.toLocaleString()}
-                              </p>
+                    return (
+                      <div
+                        key={v._id}
+                        className={`voucher-card ${isApplied ? "applied" : ""} ${disabled ? "disabled" : ""}`}
+                      >
+                        <div className="voucher-info">
+                          
+                          {/* ✅ NAMA VOUCHER + JENIS */}
+                          <h4 className="voucher-name">{voucherLabel}</h4>
 
-                              {/* --- EXPIRED DATE (ABU LEBIH PUCAT, KECIL) --- */}
-                              <p className="voucher-expired">
-                                Hingga {moment(v.endDate).format("DD.MM.YYYY")}
-                              </p>
+                          <p className="voucher-min-gray">
+                            Min. Blj Rp {v.minPurchase?.toLocaleString()}
+                          </p>
 
-                            </div>
+                          <p className="voucher-expired">
+                            Hingga {moment(v.endDate).format("DD.MM.YYYY")}
+                          </p>
 
-                            <button
-                              type="button"
-                              className={`voucher-btn ${isApplied ? "applied-btn" : ""}`}
-                              onClick={() => {
-                                if (!disabled) applyVoucher(v);
-                              }}
-                              disabled={disabled}
-                            >
-                              {isApplied ? "Dipakai" : "Pakai"}
-                            </button>
-                          </div>
-                        );
-                      })
-                  )}
+                        </div>
+
+                        <button
+                          type="button"
+                          className={`voucher-btn ${isApplied ? "applied-btn" : ""}`}
+                          onClick={() => {
+                            if (!disabled) applyVoucher(v);
+                          }}
+                          disabled={disabled}
+                        >
+                          {isApplied ? "Dipakai" : "Pakai"}
+                        </button>
+                      </div>
+                    );
+                  })}
                 </div>
 
                 {/* tombol "Lihat Lainnya" (tetap di dropdown) */}
@@ -368,7 +366,11 @@ const PlaceOrder = () => {
                     <div className="voucher-card applied">
                       
                       <div className="voucher-info">
-                        <h4 className="voucher-name">{voucherApplied.title}</h4>
+                        <h4 className="voucher-name">
+                            {voucherApplied.discountType === "percent"
+                              ? `DISKON ${voucherApplied.title} - ${voucherApplied.discountValue}%`
+                              : `DISKON ${voucherApplied.title} - Rp ${voucherApplied.discountValue.toLocaleString()}`}
+                          </h4>
                         <p className="voucher-min-gray">
                           Min. Blj Rp {voucherApplied.minPurchase?.toLocaleString()}
                         </p>

@@ -46,7 +46,10 @@ const KelolaKeuangan = () => {
     fetchOrders();
   }, []);
 
-  // BUTTON FILTER
+  // =========================
+  // FILTER
+  // =========================
+
   const applyQuickFilter = (mode) => {
     setFilterMode(mode);
 
@@ -62,10 +65,8 @@ const KelolaKeuangan = () => {
       setSelectedMonth("");
       setSelectedYear("");
     }
-    
   };
 
-  // FILTER BULAN DROPDOWN
   const applyMonthDropdown = (month) => {
     if (!month) return;
 
@@ -79,18 +80,13 @@ const KelolaKeuangan = () => {
     setEndDate(last);
   };
 
-  // FILTER TAHUN DROPDOWN
   const applyYearDropdown = (year) => {
     if (!year) return;
 
-    const first = `${year}-01-01`;
-    const last = `${year}-12-31`;
-
-    setStartDate(first);
-    setEndDate(last);
+    setStartDate(`${year}-01-01`);
+    setEndDate(`${year}-12-31`);
   };
 
-  // FILTER UTAMA
   const filterTransaksi = () => {
     return orderData.filter((order) => {
       const orderDate = new Date(order.createdAt);
@@ -113,8 +109,8 @@ const KelolaKeuangan = () => {
       if (Array.isArray(order.items)) {
         order.items.forEach((item) => {
           const price = parseInt(item.price) || 0;
-          const quantity = parseInt(item.quantity) || 0;
-          total += price * quantity;
+          const qty = parseInt(item.quantity) || 0;
+          total += price * qty;
         });
       }
     });
@@ -126,19 +122,19 @@ const KelolaKeuangan = () => {
     filteredOrders.forEach((order) => {
       if (Array.isArray(order.items)) {
         order.items.forEach((item) => {
-          const name = item.name;
           const qty = parseInt(item.quantity) || 0;
-          menuCount[name] = (menuCount[name] || 0) + qty;
+          menuCount[item.name] = (menuCount[item.name] || 0) + qty;
         });
       }
     });
 
     let maxMenu = null;
     let maxQty = 0;
+
     for (const [name, qty] of Object.entries(menuCount)) {
       if (qty > maxQty) {
-        maxQty = qty;
         maxMenu = name;
+        maxQty = qty;
       }
     }
 
@@ -153,109 +149,100 @@ const KelolaKeuangan = () => {
 
   const filteredOrders = filterTransaksi();
 
+  // =========================
+  // FLATTEN DATA
+  // =========================
   const flattenedData = [];
   let orderNumber = 1;
 
   filteredOrders.forEach((order) => {
     if (Array.isArray(order.items)) {
       const paymentMethod = order.paymentMethod || "Tunai";
+
       order.items.forEach((item) => {
-        const price = parseInt(item.price) || 0;
-        const quantity = parseInt(item.quantity) || 0;
         flattenedData.push({
-          orderNumber,
           orderId: order._id,
+          orderNumber,
           orderDate: order.createdAt,
           paymentMethod,
           itemId: item._id,
           itemName: item.name,
-          itemPrice: price,
-          itemQuantity: quantity,
-          itemTotal: price * quantity,
+          itemPrice: parseInt(item.price) || 0,
+          itemQuantity: parseInt(item.quantity) || 0,
+          itemTotal: (parseInt(item.price) || 0) * (parseInt(item.quantity) || 0),
         });
       });
+
       orderNumber++;
     }
   });
 
+  // =========================
+  // PAGINATION
+  // =========================
   const totalPages = Math.ceil(flattenedData.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const currentData = flattenedData.slice(startIndex, startIndex + itemsPerPage);
 
+  // HITUNG JUMLAH ITEM PER ORDER *DALAM PAGE*
+  const rowSpanMap = {};
+  currentData.forEach((item) => {
+    if (!rowSpanMap[item.orderId]) {
+      rowSpanMap[item.orderId] = currentData.filter(
+        (d) => d.orderId === item.orderId
+      ).length;
+    }
+  });
+
   const handlePrevPage = () => {
-    if (currentPage > 1) setCurrentPage(currentPage - 1);
+    if (currentPage > 1) setCurrentPage((p) => p - 1);
   };
 
   const handleNextPage = () => {
-    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+    if (currentPage < totalPages) setCurrentPage((p) => p + 1);
   };
 
+  // =========================
   // DOWNLOAD PDF
+  // =========================
+
   const handleUnduhPDF = () => {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
 
-    const title = "Laporan Keuangan Kedai Wartiyem";
     doc.setFontSize(18);
     doc.setTextColor(220, 0, 0);
     doc.setFont(undefined, "bold");
+
+    const title = "Laporan Keuangan Kedai Wartiyem";
     const textWidth = doc.getTextWidth(title);
     doc.text(title, (pageWidth - textWidth) / 2, 15);
 
     if (startDate && endDate) {
       doc.setFontSize(12);
-      const periodeText = `Periode: ${new Date(startDate).toLocaleDateString(
-        "id-ID"
-      )} - ${new Date(endDate).toLocaleDateString("id-ID")}`;
-      doc.text(periodeText, 14, 22);
-    }
-
-    const tableData = [];
-    let total = 0;
-    flattenedData.forEach((item) => {
-      tableData.push([
-        item.orderNumber,
-        new Date(item.orderDate).toLocaleDateString("id-ID"),
-        item.itemName,
-        item.paymentMethod,
-        `Rp ${item.itemPrice.toLocaleString()}`,
-        item.itemQuantity,
-        `Rp ${item.itemTotal.toLocaleString()}`,
-      ]);
-      total += item.itemTotal;
-    });
-
-    autoTable(doc, {
-      startY: 28,
-      head: [
-        ["No", "Tanggal", "Pesanan", "Metode Pembayaran", "Harga", "Jumlah", "Total"],
-      ],
-      body: tableData,
-      styles: { fontSize: 10 },
-      headStyles: { fillColor: [255, 0, 0], textColor: 255, fontStyle: "bold" },
-      alternateRowStyles: { fillColor: [255, 230, 230] },
-      margin: { left: 14, right: 14 },
-    });
-
-    const afterTableY = doc.lastAutoTable.finalY || 35;
-
-    if (menuTerlaris) {
       doc.text(
-        `Menu Terlaris: ${menuTerlaris.name} (Terjual ${menuTerlaris.quantity} kali)`,
+        `Periode: ${new Date(startDate).toLocaleDateString("id-ID")} - ${new Date(
+          endDate
+        ).toLocaleDateString("id-ID")}`,
         14,
-        afterTableY + 10
+        22
       );
     }
 
+    const tableData = flattenedData.map((item) => [
+      item.orderNumber,
+      new Date(item.orderDate).toLocaleDateString("id-ID"),
+      item.itemName,
+      item.paymentMethod,
+      `Rp ${item.itemPrice.toLocaleString()}`,
+      item.itemQuantity,
+      `Rp ${item.itemTotal.toLocaleString()}`,
+    ]);
+
     autoTable(doc, {
-      startY: afterTableY + 20,
-      margin: { left: 14, right: 14 },
-      head: [["", "", "", "", "", "Total Pemasukan", `Rp ${total.toLocaleString()}`]],
-      headStyles: {
-        fillColor: [255, 200, 200],
-        textColor: [150, 0, 0],
-        fontStyle: "bold",
-      },
+      startY: 28,
+      head: [["No", "Tanggal", "Pesanan", "Metode", "Harga", "Jumlah", "Total"]],
+      body: tableData,
     });
 
     doc.save("laporan-keuangan.pdf");
@@ -296,11 +283,8 @@ const KelolaKeuangan = () => {
         </div>
       </div>
 
-      {/* FILTER CEPAT */}
-      <div
-        className="filter-buttons"
-        style={{ marginTop: "10px", display: "flex", gap: "10px" }}
-      >
+      {/* FILTER BUTTONS */}
+      <div className="filter-buttons">
         <button className="btn-filter" onClick={() => applyQuickFilter("day")}>
           Hari Ini
         </button>
@@ -319,18 +303,11 @@ const KelolaKeuangan = () => {
           }}
         >
           <option value="">Pilih Bulan</option>
-          <option value="1">Januari</option>
-          <option value="2">Februari</option>
-          <option value="3">Maret</option>
-          <option value="4">April</option>
-          <option value="5">Mei</option>
-          <option value="6">Juni</option>
-          <option value="7">Juli</option>
-          <option value="8">Agustus</option>
-          <option value="9">September</option>
-          <option value="10">Oktober</option>
-          <option value="11">November</option>
-          <option value="12">Desember</option>
+          {[...Array(12)].map((_, i) => (
+            <option key={i + 1} value={i + 1}>
+              {new Date(0, i).toLocaleString("id-ID", { month: "long" })}
+            </option>
+          ))}
         </select>
 
         {/* Dropdown Tahun */}
@@ -343,7 +320,7 @@ const KelolaKeuangan = () => {
           }}
         >
           <option value="">Pilih Tahun</option>
-          {[2023, 2024, 2025, 2026, 2027, 2028, 2029].map((year) => (
+          {[2023, 2024, 2025, 2026, 2027].map((year) => (
             <option key={year} value={year}>
               {year}
             </option>
@@ -369,24 +346,20 @@ const KelolaKeuangan = () => {
           <tbody>
             {currentData.length > 0 ? (
               <>
-                {currentData.map((item, index) => {
-                  const isFirstItemOfOrderOnPage =
-                    index === 0 || currentData[index - 1].orderId !== item.orderId;
-
-                  const actualRowSpan = isFirstItemOfOrderOnPage
-                    ? flattenedData.filter((d) => d.orderId === item.orderId).length
-                    : 0;
+                {currentData.map((item, i) => {
+                  const isFirst = i === 0 || currentData[i - 1].orderId !== item.orderId;
 
                   return (
                     <tr key={`${item.orderId}-${item.itemId}`}>
-                      {isFirstItemOfOrderOnPage && (
+                      {isFirst && (
                         <>
-                          <td rowSpan={actualRowSpan}>{item.orderNumber}</td>
-                          <td rowSpan={actualRowSpan}>
+                          <td rowSpan={rowSpanMap[item.orderId]}>{item.orderNumber}</td>
+                          <td rowSpan={rowSpanMap[item.orderId]}>
                             {new Date(item.orderDate).toLocaleDateString("id-ID")}
                           </td>
                         </>
                       )}
+
                       <td>{item.itemName}</td>
                       <td>{item.paymentMethod}</td>
                       <td>Rp {item.itemPrice.toLocaleString()}</td>
@@ -425,7 +398,7 @@ const KelolaKeuangan = () => {
         </table>
       </div>
 
-      {/* PAGE CONTROL */}
+      {/* PAGINATION */}
       <div className="pagination-controls">
         <span className="pagination-arrow" onClick={handlePrevPage}>
           &lt;
