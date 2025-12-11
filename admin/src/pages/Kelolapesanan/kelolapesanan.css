@@ -1,9 +1,22 @@
-.container-pesanan {
-  padding: 30px;
-  padding-left: 280px;
-  box-sizing: border-box;
-  min-height: 100vh;
+/* ====== WRAPPER AGAR MENGIKUTI SIDEBAR ====== */
+.kelola-pesanan-wrapper {
+  width: 100%;
+  transition: all 0.3s ease;
 }
+
+.kelola-pesanan-content {
+  margin-left: 280px;
+  padding: 30px;
+  min-height: 100vh;
+  transition: all 0.3s ease;
+}
+
+/* Jika sidebar tertutup */
+.sidebar.closed ~ .kelola-pesanan-wrapper .kelola-pesanan-content {
+  margin-left: 80px !important;
+}
+
+/* ====== SISANYA TIDAK DIUBAH ====== */
 
 .judul {
   margin-bottom: 20px;
@@ -12,11 +25,9 @@
   font-size: 28px;
 }
 
-/* 🔍 Search */
 .search-container {
   margin-bottom: 15px;
   display: flex;
-  justify-content: flex-start; /* agak ke kiri */
 }
 
 .search-container input {
@@ -24,9 +35,7 @@
   padding: 10px 14px;
   border: 1px solid #ccc;
   border-radius: 8px;
-  font-size: 14px;
-  outline: none;
-  transition: all 0.2s ease;
+  transition: 0.2s;
 }
 
 .search-container input:focus {
@@ -34,7 +43,7 @@
   box-shadow: 0 0 6px rgba(179, 0, 0, 0.3);
 }
 
-/* 📋 Table */
+/* TABLE */
 .table-container {
   overflow-x: auto;
 }
@@ -44,11 +53,11 @@
   border-collapse: collapse;
   background: white;
   border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   border: 1px solid #ddd;
+  overflow: hidden;
 }
 
+/* Header */
 .tabel-pesanan thead {
   background-color: #b30000;
   color: #fff;
@@ -58,17 +67,22 @@
 .tabel-pesanan td {
   padding: 14px 16px;
   font-size: 14px;
-  text-align: left;
   border: 1px solid #ddd;
   vertical-align: middle;
 }
 
-.tabel-pesanan tbody tr:hover {
-  background-color: #f9f9f9;
-  transition: background-color 0.2s;
+/* ==== ROW HOVER + SHADOW ==== */
+.tabel-pesanan tbody tr {
+  transition: 0.2s ease-in-out;
 }
 
-/* Status */
+.tabel-pesanan tbody tr:hover {
+  background-color: #fff4f4;      /* sedikit kemerahan */
+  transform: scale(1.002);        /* sedikit membesar */
+  box-shadow: 0px 4px 10px rgba(0,0,0,0.07);
+}
+
+/* STATUS */
 .status-menunggu {
   color: #ff9900;
   font-weight: bold;
@@ -84,16 +98,17 @@
   font-weight: bold;
 }
 
-/* Tombol aksi (tetap seperti lama) */
+/* ====== AKSI BUTTON (TIDAK DIUBAH LOGIKANYA) ====== */
 .aksi button {
   margin: 2px;
   padding: 6px 10px;
-  border: none;
   border-radius: 4px;
-  cursor: pointer;
   font-size: 12px;
   font-weight: bold;
+  cursor: pointer;
   color: #fff;
+  border: none;
+  transition: 0.2s ease;
 }
 
 .status-button.menunggu {
@@ -106,28 +121,23 @@
   background-color: #28a745;
 }
 
+/* ==== TAMBAHAN: BUTTON HOVER ==== */
 .status-button.menunggu:hover {
   background-color: #e68a00;
-  box-shadow: 0 4px 10px rgba(255, 153, 0, 0.4);
+  box-shadow: 0px 3px 8px rgba(255, 153, 0, 0.4);
 }
+
 .status-button.diproses:hover {
   background-color: #0056b3;
-  box-shadow: 0 4px 10px rgba(0, 123, 255, 0.4);
+  box-shadow: 0px 3px 8px rgba(0, 123, 255, 0.4);
 }
+
 .status-button.selesai:hover {
   background-color: #1e7e34;
-  box-shadow: 0 4px 10px rgba(40, 167, 69, 0.4);
+  box-shadow: 0px 3px 8px rgba(40, 167, 69, 0.4);
 }
 
-/* Pesan kosong */
-.no-orders {
-  text-align: center;
-  font-style: italic;
-  color: #999;
-  padding: 20px;
-}
-
-/* ✅ Success & Error */
+/* SUCCESS & ERROR */
 .success-message,
 .error-message {
   margin-bottom: 20px;
@@ -139,77 +149,19 @@
 .success-message {
   background-color: #d4edda;
   color: #155724;
-  border: 1px solid #c3e6cb;
 }
 
 .error-message {
   background-color: #f8d7da;
   color: #721c24;
-  border: 1px solid #f5c6cb;
 }
 
-/* Loading */
-.loading-container {
-  text-align: center;
-  padding: 40px;
-}
-
-/* Modal */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 999;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.modal-content {
-  background-color: #fff;
-  padding: 25px 30px;
-  border-radius: 8px;
-  width: 90%;
-  max-width: 500px;
-  text-align: center;
-  box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.3);
-}
-
-.modal-buttons {
-  margin-top: 20px;
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-}
-
-.confirm-btn {
-  background-color: #28a745;
-  color: #fff;
-  padding: 10px 16px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.cancel-btn {
-  background-color: #6c757d;
-  color: #fff;
-  padding: 10px 16px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-/* Pagination */
+/* PAGINATION */
 .pagination-controls {
   margin-top: 20px;
   display: flex;
   justify-content: center;
-  align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .pagination-arrow {
@@ -217,30 +169,69 @@
   font-size: 18px;
   font-weight: bold;
   color: #b30000;
-  user-select: none;
 }
 
-.pagination-arrow:hover {
-  color: #800000;
+/* MODAL */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
 }
 
-@media (max-width: 768px) {
-  .container-pesanan {
-    width: 95%;
-    padding: 20px;
-  }
+.modal-content {
+  background: white;
+  padding: 25px 30px;
+  border-radius: 10px;
+  width: 340px;
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+  animation: modalPop 0.25s ease-out;
+}
 
-  .judul {
-    font-size: 22px;
-  }
+.modal-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 20px;
+}
 
-  .search-container input {
-    width: 100%;
-  }
+.modal-buttons button {
+  padding: 10px 20px;
+  border-radius: 6px;
+  border: none;
+  font-weight: 700;
+  cursor: pointer;
+  color: white;
+  transition: 0.2s ease;
+}
 
-  .tabel-pesanan th,
-  .tabel-pesanan td {
-    padding: 10px;
-    font-size: 12px;
+/* YA (hijau) */
+.confirm-btn {
+  background-color: #28a745;
+}
+.confirm-btn:hover {
+  background-color: #1e7e34;
+}
+
+/* BATAL (abu) */
+.cancel-btn {
+  background-color: #6c757d;
+}
+.cancel-btn:hover {
+  background-color: #5a6268;
+}
+
+@keyframes modalPop {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
   }
 }

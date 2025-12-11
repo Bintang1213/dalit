@@ -12,7 +12,6 @@ import {
 
 const SERVER_URL = "http://localhost:4000";
 let socket = null;
-
 const Navbar = ({ setShowLogin }) => {
   const [menu, setMenu] = useState("home");
   const [searchQuery, setSearchQuery] = useState("");

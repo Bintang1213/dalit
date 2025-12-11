@@ -1,72 +1,70 @@
-/* Sesuaikan margin-left dengan lebar sidebar kamu */
-.container-pengguna {
-  width: calc(100% - 260px); /* 260px untuk sidebar + margin kecil */
-  margin-left: 260px; /* geser ke kanan supaya tidak tertutup sidebar */
-  padding: 30px;
-  background-color: #f7f7f7;
-  font-family: "Poppins", sans-serif;
-  padding-bottom: 300px;
-  position: relative;
+/* Wrapper mengikuti sidebar */
+.main-content {
+  margin-left: 270px;
+  transition: margin-left 0.3s ease;
+  padding: 20px;
 }
 
+.sidebar.closed ~ .main-content {
+  margin-left: 100px;
+}
+
+/* ====== CONTAINER ====== */
+.container-pengguna {
+  background-color: #f7f7f7;
+  padding: 30px;
+  min-height: 100vh;
+  border-radius: 8px;
+}
+
+/* Header */
 .kelola-pengguna-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 
 .kelola-pengguna-header h2 {
-  font-size: 32px;
-  color: #222;
+  font-size: 28px;
   font-weight: bold;
-  margin: 0;
+  color: #222;
 }
 
+/* ====== TABLE ====== */
 .kelola-pengguna-table {
   width: 100%;
   border-collapse: collapse;
   background: white;
-  border: 1px solid #ccc;
   border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  margin-top: 20px;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
 }
 
 .kelola-pengguna-table th,
 .kelola-pengguna-table td {
   padding: 16px 20px;
-  text-align: left;
-  font-size: 16px;
   border: 1px solid #ccc;
-  white-space: nowrap;
+  font-size: 15px;
 }
 
 .kelola-pengguna-table th {
-  background-color: #b30000;
+  background: #b30000;
   color: white;
 }
 
 .kelola-pengguna-table tr:hover {
-  background-color: #f9f9f9;
-  transition: 0.2s ease;
+  background: #f2f2f2;
 }
 
 /* Tombol Hapus */
 .btn-hapus {
   background-color: #e74c3c;
-  color: #fff;
   border: none;
   padding: 8px 14px;
   border-radius: 6px;
   font-size: 14px;
+  color: white;
   cursor: pointer;
-  font-weight: 600;
   box-shadow: 0 2px 6px rgba(231, 76, 60, 0.4);
-  transition:
-    background-color 0.3s ease,
-    box-shadow 0.3s ease;
+  transition: 0.3s;
 }
 
 .btn-hapus:hover {
@@ -78,50 +76,35 @@
 .pagination-controls {
   display: flex;
   justify-content: center;
-  align-items: center;
+  gap: 12px;
   margin-top: 20px;
-  gap: 10px;
-  font-size: 16px;
   font-weight: 500;
 }
 
 .pagination-arrow {
   padding: 6px 12px;
-  background-color: #b30000;
+  background: #b30000;
   color: white;
   border-radius: 4px;
   cursor: pointer;
-  user-select: none;
-  transition: background-color 0.3s ease;
 }
 
 .pagination-arrow:hover {
-  background-color: #990000;
+  background: #990000;
 }
 
+/* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
-  .container-pengguna {
-    padding: 20px;
-    width: 100%;
-    margin-left: 0; /* supaya full layar kalau di mobile */
+  .main-content {
+    margin-left: 0 !important; 
   }
 
-  .kelola-pengguna-header h2 {
-    font-size: 24px;
+  .container-pengguna {
+    padding: 20px;
   }
 
   .kelola-pengguna-table th,
   .kelola-pengguna-table td {
     padding: 12px;
-    font-size: 14px;
-  }
-
-  .btn-hapus {
-    padding: 6px 10px;
-    font-size: 12px;
-  }
-
-  .pagination-controls {
-    font-size: 14px;
   }
 }

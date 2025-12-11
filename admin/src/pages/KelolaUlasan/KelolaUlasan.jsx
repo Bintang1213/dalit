@@ -35,7 +35,6 @@ const KelolaUlasan = ({ isSidebarCollapsed }) => {
         const res = await axios.get(`${API_BASE}/top`);
         let menus = Array.isArray(res.data) ? res.data : [];
 
-        // ✅ FILTER: Jangan tampilkan menu dengan nama hilang / sudah dihapus
         menus = menus.filter(
           (m) => m.name && m.name !== "Unknown" && m.totalReviews > 0
         );
@@ -122,7 +121,7 @@ const KelolaUlasan = ({ isSidebarCollapsed }) => {
 
           <div className="favorite-cards">
             {topMenus.map((menu) => (
-              <div key={menu._id} className="favorite-card">
+              <div key={menu._id} className="favorite-card hover-up">
                 <div className="menu-name">{menu.name}</div>
 
                 <div className="menu-rating">
@@ -171,19 +170,13 @@ const KelolaUlasan = ({ isSidebarCollapsed }) => {
 
           <tbody>
             {currentReviews.map((rev, index) => (
-              <tr key={rev._id}>
+              <tr key={rev._id} className="row-hover">
                 <td>{startIndex + index + 1}</td>
                 <td>{rev.userId?.name || "Anonim"}</td>
-
-                {/* Jika menu sudah dihapus → tampilkan '-' */}
                 <td>{rev.foodId?.name ?? "-"}</td>
-
                 <td>{"⭐".repeat(rev.rating)}</td>
-
                 <td className="comment-cell">{rev.comment}</td>
-
                 <td>{new Date(rev.createdAt).toLocaleDateString()}</td>
-
                 <td>
                   <button
                     className="btn-delete"
