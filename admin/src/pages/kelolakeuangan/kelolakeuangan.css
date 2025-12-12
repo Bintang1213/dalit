@@ -1,8 +1,20 @@
-.container-keuangan {
-  width: calc(100% - 260px);
+/* Wrapper mengikuti sidebar */
+.main-content {
   margin-left: 270px;
-  padding: 30px;
+  transition: margin-left 0.3s ease;
+  padding: 20px;
+}
+
+.sidebar.closed ~ .main-content {
+  margin-left: 100px;
+}
+
+/* CONTAINER */
+.container-keuangan {
   background-color: #f7f7f7;
+  padding: 30px;
+  min-height: 100vh;
+  border-radius: 8px;
   font-family: "Poppins", sans-serif;
   padding-bottom: 300px;
   position: relative;
@@ -23,7 +35,7 @@
   font-weight: bold;
 }
 
-/* FILTER TANPA RESET */
+/* FILTER */
 .filter-kategori select,
 .filter-kategori input[type="date"] {
   padding: 10px 14px;
@@ -35,12 +47,6 @@
   transition: all 0.3s ease;
 }
 
-.filter-kategori select:hover,
-.filter-kategori input[type="date"]:hover {
-  border-color: #d63031;
-  box-shadow: 0 0 8px rgba(214, 48, 49, 0.25);
-}
-
 /* FILTER BUTTONS */
 .filter-buttons {
   margin-top: 10px;
@@ -49,7 +55,6 @@
   align-items: center;
 }
 
-/* Tombol filter (Hari Ini, Semua) */
 .btn-filter {
   background-color: #d63031;
   color: white;
@@ -66,22 +71,6 @@
 .btn-filter:hover {
   background-color: #b30000;
   transform: translateY(-2px);
-}
-
-/* Dropdown untuk Bulan & Tahun */
-.dropdown-filter {
-  padding: 10px 14px;
-  font-size: 14px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  background: white;
-  cursor: pointer;
-  transition: 0.3s ease;
-}
-
-.dropdown-filter:hover {
-  border-color: #d63031;
-  box-shadow: 0 0 8px rgba(214, 48, 49, 0.25);
 }
 
 /* TABLE */
@@ -108,34 +97,19 @@
   text-align: center;
   vertical-align: middle;
   border: 1px solid #eee;
-  transition: background 0.25s ease;
 }
 
-/* HEADER TABLE */
-.tabel-keuangan th {
-  background-color: #b30000;
-  color: white;
-  font-weight: 600;
-}
-
-/* ROW HOVER */
 .tabel-keuangan tbody tr:hover {
   background-color: #f9f2f2;
 }
 
-/* Kolom pertama */
-.tabel-keuangan td:nth-child(1),
-.tabel-keuangan th:nth-child(1) {
-  width: 50px;
-}
-
-/* Total row */
+/* TOTAL */
 .total-row {
   background-color: #fff9f4;
   font-weight: 500;
 }
 
-/* Menu terlaris */
+/* MENU TERLARIS */
 .menu-terlaris-row {
   background-color: #ffeaea;
   font-weight: 600;
@@ -143,11 +117,6 @@
   font-size: 16px;
   color: #b30000;
   letter-spacing: 0.3px;
-}
-
-.menu-terlaris-row td {
-  padding: 18px;
-  border-top: 2px solid #ffcccc;
 }
 
 /* DOWNLOAD BUTTON */
@@ -168,13 +137,12 @@
   font-weight: 500;
   cursor: pointer;
   box-shadow: 0 4px 8px rgba(214, 48, 49, 0.2);
-  transition: all 0.3s ease-in-out;
+  transition: all 0.3s ease;
 }
 
 .download-button:hover {
   background-color: #c0392b;
   transform: translateY(-3px);
-  box-shadow: 0 6px 12px rgba(192, 57, 43, 0.35);
 }
 
 /* PAGINATION */
@@ -194,7 +162,6 @@
   color: #d63031;
   user-select: none;
   padding: 0 10px;
-  transition: 0.25s ease;
 }
 
 .pagination-arrow:hover {
@@ -204,34 +171,11 @@
 
 /* RESPONSIVE */
 @media (max-width: 768px) {
+  .main-content {
+    margin-left: 0 !important;
+  }
+
   .container-keuangan {
-    width: 100%;
-    margin-left: 0;
     padding: 15px;
-  }
-
-  .kelola-keuangan-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .filter-kategori {
-    width: 100%;
-    margin-top: 10px;
-  }
-
-  .tabel-keuangan th,
-  .tabel-keuangan td {
-    font-size: 14px;
-    padding: 12px;
-  }
-
-  .download-button-container {
-    justify-content: center;
-  }
-
-  .menu-terlaris-row {
-    font-size: 15px;
-    padding: 10px;
   }
 }
