@@ -13,10 +13,8 @@ const KelolaPesanan = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  // 🔍 state pencarian
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
 
@@ -65,7 +63,7 @@ const KelolaPesanan = () => {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-        },
+        }
       );
 
       setStatusMessage(`Status berhasil diubah menjadi ${status}`);
@@ -98,18 +96,16 @@ const KelolaPesanan = () => {
     getOrders();
   }, []);
 
-  // 🔍 Filter berdasarkan nama pemesan
   const filteredPesanan = pesanan.filter((order) =>
-    order.name?.toLowerCase().includes(searchQuery.toLowerCase()),
+    order.name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Pagination setelah difilter
   const totalPages = Math.ceil(filteredPesanan.length / itemsPerPage);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentPesanan = filteredPesanan.slice(
     indexOfFirstItem,
-    indexOfLastItem,
+    indexOfLastItem
   );
 
   if (loading) {
@@ -121,147 +117,157 @@ const KelolaPesanan = () => {
   }
 
   return (
-    <div className="container-pesanan">
-      <h1 className="judul">Kelola Pesanan</h1>
+    <div className="kelola-pesanan-wrapper">
+      <div className="kelola-pesanan-content">
 
-      {statusMessage && (
-        <div className="success-message">✓ {statusMessage}</div>
-      )}
-      {error && <div className="error-message">❗ {error}</div>}
+        <h1 className="judul">Kelola Pesanan</h1>
 
-      {/* 🔍 Input pencarian */}
-      <div className="search-container">
-        <input
-          type="text"
-          placeholder="Cari berdasarkan nama pemesan..."
-          value={searchQuery}
-          onChange={(e) => {
-            setSearchQuery(e.target.value);
-            setCurrentPage(1); // reset ke page 1 setiap pencarian
-          }}
-        />
-      </div>
+        {statusMessage && <div className="success-message">✓ {statusMessage}</div>}
+        {error && <div className="error-message">❗ {error}</div>}
 
-      <div className="table-container">
-        <table className="tabel-pesanan">
-          <thead>
-            <tr>
-              <th>No</th>
-              <th>Nama Pemesan</th> {/* ✅ Tambah kolom nama */}
-              <th>Tanggal</th>
-              <th>Pesanan</th>
-              <th>Harga</th>
-              <th>Jumlah</th>
-              <th>Total</th>
-              <th>Layanan</th>
-              <th>Metode</th>
-              <th>Status</th>
-              <th>Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            {currentPesanan.length > 0 ? (
-              currentPesanan.map((order, index) => (
-                <tr key={order._id}>
-                  <td>{indexOfFirstItem + index + 1}</td>
-                  <td>{order.name}</td> {/* ✅ Tampilkan nama */}
-                  <td>{new Date(order.createdAt).toLocaleString()}</td>
-                  <td>
-                    {order.items.map((item) => (
-                      <div key={item._id}>{item.name}</div>
-                    ))}
-                  </td>
-                  <td>
-                    {order.items.map((item) => (
-                      <div key={item._id}>Rp {item.price.toLocaleString()}</div>
-                    ))}
-                  </td>
-                  <td>
-                    {order.items.map((item) => (
-                      <div key={item._id}>{item.quantity}</div>
-                    ))}
-                  </td>
-                  <td>Rp {order.totalAmount.toLocaleString()}</td>
-                  <td>{order.method}</td>
-                  <td>{order.payment}</td>
-                  <td className={`status-${order.status.toLowerCase()}`}>
-                    {order.status}
-                  </td>
-                  <td className="aksi">
-                    <button
-                      onClick={() => openModal(order._id, "Menunggu")}
-                      className="status-button menunggu"
-                    >
-                      Menunggu
-                    </button>
-                    <button
-                      onClick={() => openModal(order._id, "Diproses")}
-                      className="status-button diproses"
-                    >
-                      Diproses
-                    </button>
-                    <button
-                      onClick={() => openModal(order._id, "Selesai")}
-                      className="status-button selesai"
-                    >
-                      Selesai
-                    </button>
-                  </td>
-                </tr>
-              ))
-            ) : (
+        <div className="search-container">
+          <input
+            type="text"
+            placeholder="Cari berdasarkan nama pemesan..."
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setCurrentPage(1);
+            }}
+          />
+        </div>
+
+        <div className="table-container">
+          <table className="tabel-pesanan">
+            <thead>
               <tr>
-                <td colSpan="11">Tidak ada pesanan</td>
+                <th>No</th>
+                <th>Nama Pemesan</th>
+                <th>Tanggal</th>
+                <th>Pesanan</th>
+                <th>Harga</th>
+                <th>Jumlah</th>
+                <th>Total</th>
+                <th>Layanan</th>
+                <th>Metode</th>
+                <th>Status</th>
+                <th>Aksi</th>
               </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+            </thead>
 
-      {/* Pagination */}
-      <div className="pagination-controls">
-        <span
-          className="pagination-arrow"
-          onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
-        >
-          &lt;
-        </span>
-        <span>
-          halaman {currentPage} dari {totalPages}
-        </span>
-        <span
-          className="pagination-arrow"
-          onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
-        >
-          &gt;
-        </span>
-      </div>
+            <tbody>
+              {currentPesanan.length > 0 ? (
+                currentPesanan.map((order, index) => (
+                  <tr key={order._id}>
+                    <td>{indexOfFirstItem + index + 1}</td>
+                    <td>{order.name}</td>
+                    <td>{new Date(order.createdAt).toLocaleString()}</td>
 
-      {/* Modal Konfirmasi */}
-      {isModalOpen && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h2>
-              Ubah status ke{" "}
-              <span className={`status-${selectedStatus.toLowerCase()}`}>
-                {selectedStatus}
-              </span>
-              ?
-            </h2>
-            <div className="modal-buttons">
-              <button
-                className="confirm-btn"
-                onClick={() => updateStatus(selectedStatus)}
-              >
-                Ya
-              </button>
-              <button className="cancel-btn" onClick={closeModal}>
-                Batal
-              </button>
+                    <td>
+                      {order.items.map((item) => (
+                        <div key={item._id}>{item.name}</div>
+                      ))}
+                    </td>
+
+                    <td>
+                      {order.items.map((item) => (
+                        <div key={item._id}>Rp {item.price.toLocaleString()}</div>
+                      ))}
+                    </td>
+
+                    <td>
+                      {order.items.map((item) => (
+                        <div key={item._id}>{item.quantity}</div>
+                      ))}
+                    </td>
+
+                    <td>Rp {order.totalAmount.toLocaleString()}</td>
+                    <td>{order.method}</td>
+                    <td>{order.payment}</td>
+
+                    <td className={`status-${order.status.toLowerCase()}`}>
+                      {order.status}
+                    </td>
+
+                    <td className="aksi">
+                      <button
+                        onClick={() => openModal(order._id, "Menunggu")}
+                        className="status-button menunggu"
+                      >
+                        Menunggu
+                      </button>
+
+                      <button
+                        onClick={() => openModal(order._id, "Diproses")}
+                        className="status-button diproses"
+                      >
+                        Diproses
+                      </button>
+
+                      <button
+                        onClick={() => openModal(order._id, "Selesai")}
+                        className="status-button selesai"
+                      >
+                        Selesai
+                      </button>
+                    </td>
+
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="11">Tidak ada pesanan</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="pagination-controls">
+          <span
+            className="pagination-arrow"
+            onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+          >
+            &lt;
+          </span>
+          <span>
+            halaman {currentPage} dari {totalPages}
+          </span>
+          <span
+            className="pagination-arrow"
+            onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+          >
+            &gt;
+          </span>
+        </div>
+
+        {isModalOpen && (
+          <div className="modal-overlay">
+            <div className="modal-content">
+              <h2>
+                Ubah status ke{" "}
+                <span className={`status-${selectedStatus.toLowerCase()}`}>
+                  {selectedStatus}
+                </span>
+                ?
+              </h2>
+
+              <div className="modal-buttons">
+                <button
+                  className="confirm-btn"
+                  onClick={() => updateStatus(selectedStatus)}
+                >
+                  Ya
+                </button>
+                <button className="cancel-btn" onClick={closeModal}>
+                  Batal
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+
+      </div>
     </div>
   );
 };

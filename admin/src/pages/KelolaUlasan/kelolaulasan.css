@@ -1,19 +1,23 @@
-/* src/components/KelolaUlasan/kelolaulasan.css */
+/* ==========================
+ CONTAINER
+========================== */
 
 .container-ulasan {
   flex: 1;
   margin-left: 260px;
   padding: 30px;
   font-family: "Poppins", sans-serif;
-  background-color: #f9f9f9;
-  transition:
-    margin-left 0.3s ease,
-    width 0.3s ease;
+  background-color: #f7f7f7;
+  transition: margin-left 0.3s ease, width 0.3s ease;
 }
 
 .container-ulasan.sidebar-collapsed {
   margin-left: 80px;
 }
+
+/* ==========================
+ TITLE
+========================== */
 
 .kelola-ulasan-header h2 {
   font-size: 32px;
@@ -22,42 +26,9 @@
   margin-bottom: 20px;
 }
 
-.table-container {
-  overflow-x: auto;
-  margin-bottom: 40px;
-}
-
-.tabel-ulasan {
-  width: 100%;
-  border-collapse: collapse;
-  background: white;
-  border-radius: 14px;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
-  border: 1px solid #ddd;
-  overflow: hidden;
-}
-
-.tabel-ulasan th,
-.tabel-ulasan td {
-  padding: 14px;
-  text-align: center;
-  border-bottom: 1px solid #eee;
-  font-size: 15px;
-  vertical-align: top;
-}
-
-.tabel-ulasan td.comment-cell {
-  max-width: 300px;
-  white-space: normal;
-  word-break: break-word;
-  text-align: left;
-}
-
-.tabel-ulasan th {
-  background-color: #b30000;
-  color: white;
-  font-weight: 600;
-}
+/* ==========================
+ SUMMARY CARDS
+========================== */
 
 .summary-section h3 {
   font-size: 24px;
@@ -71,20 +42,50 @@
 }
 
 .summary-card {
-  background: white;
+  background: #ffffff;
   padding: 20px;
   border-radius: 14px;
   flex: 1 1 200px;
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
   text-align: center;
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 .summary-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.15);
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* ==========================
+ FAVORITE CARDS
+========================== */
+
+.favorite-section h3 {
+  font-size: 24px;
+  margin-top: 10px;
+}
+
+.favorite-cards {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.favorite-card {
+  padding: 18px;
+  border-radius: 12px;
+  background: #ffffff;
+  border: 1px solid #ddd;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  text-align: center;
+  width: 220px;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.favorite-card:hover {
+  transform: translateY(-6px) scale(1.03);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.15);
 }
 
 .menu-name {
@@ -99,33 +100,9 @@
   font-size: 15px;
 }
 
-.menu-rating span {
-  color: #555;
-  font-weight: 400;
-}
-
-.favorite-section h3 {
-  font-size: 24px;
-  margin-bottom: 15px;
-}
-
-.favorite-cards {
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  margin-top: 20px;
-}
-
-.favorite-card {
-  flex: 0 0 auto;
-  padding: 15px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  background-color: #fff;
-  text-align: center;
-}
+/* ==========================
+ BUTTON REKOMENDASI
+========================== */
 
 .btn-recommend {
   margin-top: 12px;
@@ -144,6 +121,7 @@
 }
 
 .btn-recommend:hover {
+  transform: translateY(-2px);
   opacity: 0.9;
 }
 
@@ -153,12 +131,81 @@
   font-weight: 500;
 }
 
+/* ==========================
+ TABLE
+========================== */
+
+.table-container {
+  overflow-x: auto;
+  margin-bottom: 40px;
+}
+
+.tabel-ulasan {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+.tabel-ulasan th {
+  background-color: #b30000;
+  color: white;
+  font-weight: 600;
+  padding: 14px;
+}
+
+.tabel-ulasan td {
+  padding: 14px;
+  text-align: center;
+  border-bottom: 1px solid #eee;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+/* Hover baris pada tabel */
+.row-hover:hover {
+  background-color: #f2f2f2;
+  transform: translateX(4px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.comment-cell {
+  max-width: 300px;
+  white-space: normal;
+  text-align: left;
+  word-break: break-word;
+}
+
+/* ==========================
+ DELETE BUTTON
+========================== */
+
+.btn-delete {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  background-color: #dc3545;
+  color: white;
+  transition: 0.2s;
+}
+
+.btn-delete:hover {
+  background-color: #c82333;
+  transform: translateY(-2px);
+}
+
+/* ==========================
+ PAGINATION
+========================== */
+
 .pagination {
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 12px;
-  margin-top: 20px;
 }
 
 .pagination button {
@@ -168,49 +215,14 @@
   padding: 8px 14px;
   border-radius: 6px;
   cursor: pointer;
-  font-weight: 500;
   transition: 0.3s;
+}
+
+.pagination button:hover {
+  transform: translateY(-2px);
 }
 
 .pagination button:disabled {
   background: #9b0303;
   cursor: not-allowed;
-}
-
-.pagination span {
-  font-size: 15px;
-  font-weight: 1000;
-  color: #333;
-}
-
-/* --- Penambahan CSS untuk Fitur Hapus --- */
-
-.btn-delete {
-  padding: 8px 12px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 500;
-  background-color: #dc3545; /* Merah untuk aksi hapus */
-  color: white;
-  transition:
-    background-color 0.3s ease,
-    transform 0.2s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.btn-delete:hover {
-  background-color: #c82333;
-  transform: translateY(-1px);
-}
-
-.btn-delete:active {
-  background-color: #bd2130;
-  transform: translateY(0);
-}
-
-.tabel-ulasan th:last-child,
-.tabel-ulasan td:last-child {
-  width: 80px; /* Atur lebar kolom Aksi */
-  text-align: center;
 }

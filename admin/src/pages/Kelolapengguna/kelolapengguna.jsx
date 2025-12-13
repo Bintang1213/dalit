@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./kelolapengguna.css";
@@ -12,7 +13,6 @@ const KelolaPengguna = () => {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const currentItems = pengguna.slice(startIndex, startIndex + itemsPerPage);
 
-  // 🔹 Refactoring: Data-level → Extract BASE_URL
   const BASE_URL = "http://localhost:4000/api/user";
 
   const getPengguna = async () => {
@@ -62,70 +62,71 @@ const KelolaPengguna = () => {
   }, []);
 
   return (
-    <div className="container-pengguna">
-      <div className="kelola-pengguna-header">
-        <h2>Kelola Pengguna</h2>
-      </div>
+    <div className="main-content">
+      <div className="container-pengguna">
+        <div className="kelola-pengguna-header">
+          <h2>Kelola Pengguna</h2>
+        </div>
 
-      <table className="kelola-pengguna-table">
-        <thead>
-          <tr>
-            <th>No</th>
-            <th>Nama</th>
-            <th>Email</th>
-            <th>Aksi</th>
-          </tr>
-        </thead>
-        <tbody>
-          {loading ? (
+        <table className="kelola-pengguna-table">
+          <thead>
             <tr>
-              <td colSpan="4" style={{ textAlign: "center" }}>
-                Memuat data...
-              </td>
+              <th>No</th>
+              <th>Nama</th>
+              <th>Email</th>
+              <th>Aksi</th>
             </tr>
-          ) : currentItems.length > 0 ? (
-            currentItems.map((user, index) => (
-              <tr key={user._id}>
-                <td>{startIndex + index + 1}</td>
-                <td>{user.name}</td>
-                <td>{user.email}</td>
-                <td>
-                  <button
-                    className="btn-hapus"
-                    onClick={() => handleHapus(user._id)}
-                  >
-                    Hapus
-                  </button>
+          </thead>
+          <tbody>
+            {loading ? (
+              <tr>
+                <td colSpan="4" style={{ textAlign: "center" }}>
+                  Memuat data...
                 </td>
               </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="4" style={{ textAlign: "center" }}>
-                Tidak ada pengguna
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+            ) : currentItems.length > 0 ? (
+              currentItems.map((user, index) => (
+                <tr key={user._id}>
+                  <td>{startIndex + index + 1}</td>
+                  <td>{user.name}</td>
+                  <td>{user.email}</td>
+                  <td>
+                    <button
+                      className="btn-hapus"
+                      onClick={() => handleHapus(user._id)}
+                    >
+                      Hapus
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="4" style={{ textAlign: "center" }}>
+                  Tidak ada pengguna
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
 
-      {/* Pagination */}
-      <div className="pagination-controls">
-        <span
-          className="pagination-arrow"
-          onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
-        >
-          &lt;
-        </span>
-        <span>
-          halaman {currentPage} dari {totalPages}
-        </span>
-        <span
-          className="pagination-arrow"
-          onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
-        >
-          &gt;
-        </span>
+        <div className="pagination-controls">
+          <span
+            className="pagination-arrow"
+            onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+          >
+            &lt;
+          </span>
+          <span>
+            halaman {currentPage} dari {totalPages}
+          </span>
+          <span
+            className="pagination-arrow"
+            onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+          >
+            &gt;
+          </span>
+        </div>
       </div>
     </div>
   );
