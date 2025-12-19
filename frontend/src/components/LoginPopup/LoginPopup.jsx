@@ -11,8 +11,15 @@ const LoginPopup = ({ setShowLogin, onLoginSuccess }) => {
   const { url, setToken } = useContext(StoreContext);
 
   const [currState, setCurrState] = useState("Login");
-  const [data, setData] = useState({ name: "", email: "", password: "" });
+  const [data, setData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "", // ✅ tambahan
+  });
+
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const onChangeHandler = (event) => {
@@ -22,13 +29,35 @@ const LoginPopup = ({ setShowLogin, onLoginSuccess }) => {
 
   const onLogin = async (event) => {
     event.preventDefault();
+
+    // ✅ validasi konfirmasi password (HANYA SAAT DAFTAR)
+    if (currState === "Daftar" && data.password !== data.confirmPassword) {
+      toast.error("Password dan konfirmasi password tidak sama", {
+        autoClose: 2500,
+      });
+      return;
+    }
+
     setLoading(true);
 
     const newUrl =
       url + (currState === "Login" ? "/api/user/login" : "/api/user/register");
 
+    // ❗ kirim confirmPassword ke backend tidak perlu
+    const payload =
+      currState === "Login"
+        ? {
+            email: data.email,
+            password: data.password,
+          }
+        : {
+            name: data.name,
+            email: data.email,
+            password: data.password,
+          };
+
     try {
-      const response = await axios.post(newUrl, data);
+      const response = await axios.post(newUrl, payload);
 
       if (response.data.success) {
         if (currState === "Login") {
@@ -47,13 +76,20 @@ const LoginPopup = ({ setShowLogin, onLoginSuccess }) => {
             autoClose: 2500,
           });
           setCurrState("Login");
-          setData({ name: "", email: "", password: "" });
+          setData({
+            name: "",
+            email: "",
+            password: "",
+            confirmPassword: "",
+          });
         }
       } else {
         toast.error(response.data.message, { autoClose: 2500 });
       }
     } catch (error) {
-      toast.error("Terjadi kesalahan. Silakan coba lagi.", { autoClose: 2500 });
+      toast.error("Terjadi kesalahan. Silakan coba lagi.", {
+        autoClose: 2500,
+      });
       console.error(error);
     } finally {
       setLoading(false);
@@ -62,16 +98,12 @@ const LoginPopup = ({ setShowLogin, onLoginSuccess }) => {
 
   return (
     <div className="login-popup">
-      {/* 🔹 Tambahin ToastContainer sekali aja di sini */}
       <ToastContainer
         position="top-right"
         autoClose={2500}
         hideProgressBar={false}
-        newestOnTop={true}
+        newestOnTop
         closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
         pauseOnHover
         toastStyle={{ background: "white", color: "black" }}
       />
@@ -97,6 +129,7 @@ const LoginPopup = ({ setShowLogin, onLoginSuccess }) => {
               required
             />
           )}
+
           <input
             type="email"
             name="email"
@@ -105,6 +138,8 @@ const LoginPopup = ({ setShowLogin, onLoginSuccess }) => {
             onChange={onChangeHandler}
             required
           />
+
+          {/* PASSWORD */}
           <div style={{ position: "relative" }}>
             <input
               type={showPassword ? "text" : "password"}
@@ -130,6 +165,37 @@ const LoginPopup = ({ setShowLogin, onLoginSuccess }) => {
               {showPassword ? <FaEye /> : <FaEyeSlash />}
             </span>
           </div>
+
+          {/* ✅ KONFIRMASI PASSWORD */}
+          {currState === "Daftar" && (
+            <div style={{ position: "relative" }}>
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                name="confirmPassword"
+                placeholder="Konfirmasi Password"
+                value={data.confirmPassword}
+                onChange={onChangeHandler}
+                required
+                style={{ width: "100%", paddingRight: "40px" }}
+              />
+              <span
+                onClick={() =>
+                  setShowConfirmPassword(!showConfirmPassword)
+                }
+                style={{
+                  position: "absolute",
+                  top: "50%",
+                  right: "10px",
+                  transform: "translateY(-50%)",
+                  cursor: "pointer",
+                  fontSize: "18px",
+                  color: "#555",
+                }}
+              >
+                {showConfirmPassword ? <FaEye /> : <FaEyeSlash />}
+              </span>
+            </div>
+          )}
         </div>
 
         <button type="submit" disabled={loading}>
@@ -145,20 +211,6 @@ const LoginPopup = ({ setShowLogin, onLoginSuccess }) => {
             </p>
           </div>
         )}
-
-        {currState === "Login" && (
-          <p
-            style={{ marginTop: "10px", color: "#007bff", cursor: "pointer" }}
-            onClick={() =>
-              toast.info("Fitur lupa password belum tersedia. Hubungi admin.", {
-                autoClose: 2500,
-              })
-            }
-          >
-            Lupa kata sandi?
-          </p>
-        )}
-
         <p>
           {currState === "Login" ? (
             <>

@@ -14,7 +14,6 @@ const KelolaPesanan = () => {
   const navigate = useNavigate();
 
   const [searchQuery, setSearchQuery] = useState("");
-
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
 
@@ -50,10 +49,7 @@ const KelolaPesanan = () => {
   const updateStatus = async (status) => {
     try {
       const token = localStorage.getItem("authToken");
-      if (!token) {
-        setError("Anda perlu login.");
-        return navigate("/login");
-      }
+      if (!token) return navigate("/login");
 
       await Axios.patch(
         `http://localhost:4000/api/order/${selectedOrderId}`,
@@ -70,13 +66,7 @@ const KelolaPesanan = () => {
       setIsModalOpen(false);
       getOrders();
     } catch (error) {
-      if (error.response?.status === 401 || error.response?.status === 403) {
-        setError("Sesi Anda telah berakhir. Silakan login kembali.");
-        localStorage.removeItem("authToken");
-        navigate("/login");
-      } else {
-        setError(error.response?.data?.message || "Gagal memperbarui status.");
-      }
+      setError(error.response?.data?.message || "Gagal memperbarui status.");
     }
   };
 
@@ -119,10 +109,11 @@ const KelolaPesanan = () => {
   return (
     <div className="kelola-pesanan-wrapper">
       <div className="kelola-pesanan-content">
-
         <h1 className="judul">Kelola Pesanan</h1>
 
-        {statusMessage && <div className="success-message">✓ {statusMessage}</div>}
+        {statusMessage && (
+          <div className="success-message">✓ {statusMessage}</div>
+        )}
         {error && <div className="error-message">❗ {error}</div>}
 
         <div className="search-container">
@@ -142,7 +133,7 @@ const KelolaPesanan = () => {
             <thead>
               <tr>
                 <th>No</th>
-                <th>Nama Pemesan</th>
+                <th>Biodata Pemesan</th>
                 <th>Tanggal</th>
                 <th>Pesanan</th>
                 <th>Harga</th>
@@ -160,7 +151,23 @@ const KelolaPesanan = () => {
                 currentPesanan.map((order, index) => (
                   <tr key={order._id}>
                     <td>{indexOfFirstItem + index + 1}</td>
-                    <td>{order.name}</td>
+
+                    {/* 🔥 BIODATA PEMESAN */}
+                    <td>
+                      <strong>{order.name}</strong>
+
+                      {order.method?.toLowerCase() === "diantar" && (
+                        <>
+                          <div>No. Telp: {order.phone || "-"}</div>
+                          <div>Alamat: {order.address || "-"}</div>
+                        </>
+                      )}
+
+                      {order.method?.toLowerCase() === "makan di tempat" && (
+                        <div>No. Meja: {order.tableNumber || "-"}</div>
+                      )}
+                    </td>
+
                     <td>{new Date(order.createdAt).toLocaleString()}</td>
 
                     <td>
@@ -171,7 +178,9 @@ const KelolaPesanan = () => {
 
                     <td>
                       {order.items.map((item) => (
-                        <div key={item._id}>Rp {item.price.toLocaleString()}</div>
+                        <div key={item._id}>
+                          Rp {item.price.toLocaleString()}
+                        </div>
                       ))}
                     </td>
 
@@ -196,14 +205,12 @@ const KelolaPesanan = () => {
                       >
                         Menunggu
                       </button>
-
                       <button
                         onClick={() => openModal(order._id, "Diproses")}
                         className="status-button diproses"
                       >
                         Diproses
                       </button>
-
                       <button
                         onClick={() => openModal(order._id, "Selesai")}
                         className="status-button selesai"
@@ -211,7 +218,6 @@ const KelolaPesanan = () => {
                         Selesai
                       </button>
                     </td>
-
                   </tr>
                 ))
               ) : (
@@ -223,6 +229,7 @@ const KelolaPesanan = () => {
           </table>
         </div>
 
+        {/* 🔥 PAGINATION MODEL LAMA */}
         <div className="pagination-controls">
           <span
             className="pagination-arrow"
@@ -266,7 +273,6 @@ const KelolaPesanan = () => {
             </div>
           </div>
         )}
-
       </div>
     </div>
   );
