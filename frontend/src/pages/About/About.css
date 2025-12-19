@@ -5,21 +5,20 @@
   padding-bottom: 80px;
   margin-top: 20px;
 }
-/* HERO */
+
+/* ================= HERO ================= */
 .hero-section {
-  background-color: #e63946;
+  background: linear-gradient(135deg, #800020, #6b001a);
   color: white;
   padding: 20px 10px;
   text-align: center;
   border-radius: 20px;
-  transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease;
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
 }
 
 .hero-section:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.15);
+  transform: translateY(-6px);
+  box-shadow: 0 12px 30px rgba(128, 0, 32, 0.45);
 }
 
 .hero-title {
@@ -33,7 +32,7 @@
   opacity: 0.9;
 }
 
-/* STORY */
+/* ================= STORY ================= */
 .story-section {
   display: flex;
   flex-direction: column;
@@ -44,7 +43,7 @@
 }
 
 .story-text h2 {
-  color: #e63946;
+  color: #800020;
   font-size: 28px;
   margin-bottom: 15px;
 }
@@ -60,29 +59,27 @@
   width: 100%;
   max-width: 400px;
   border-radius: 20px;
-  border: 5px solid #e63946;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-  transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease;
+  border: 5px solid #800020;
+  box-shadow: 0 8px 20px rgba(128, 0, 32, 0.2);
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
 }
 
 .story-image img:hover {
-  transform: scale(1.05);
-  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+  transform: scale(1.06);
+  box-shadow: 0 14px 35px rgba(128, 0, 32, 0.45);
 }
 
+/* ================= VISI MISI ================= */
 .visi-misi-section {
   background-color: #f8f8f8;
   padding: 50px 20px 0;
   text-align: center;
-  padding-top: 10px;
 }
 
 .visi-misi-grid {
   padding-top: 30px;
   display: flex;
-  flex-direction: column; /* default: kolom untuk mobile */
+  flex-direction: column;
   gap: 30px;
   max-width: 1000px;
   margin: 0 auto;
@@ -90,22 +87,20 @@
 
 .visi-box,
 .misi-box {
-  background: #fff;
+  background: #ffffff;
   padding: 25px;
   border-radius: 15px;
-  border-left: 5px solid #e63946;
+  border-left: 6px solid #800020;
   text-align: left;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-  transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease;
+  box-shadow: 0 6px 16px rgba(128, 0, 32, 0.12);
+  transition: all 0.35s ease;
 }
 
-/* Hover efek */
 .visi-box:hover,
 .misi-box:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.1);
+  transform: translateY(-10px);
+  border-left-color: #5c0015;
+  box-shadow: 0 16px 35px rgba(128, 0, 32, 0.35);
 }
 
 .misi-box ul {
@@ -116,22 +111,10 @@
   margin-bottom: 10px;
 }
 
-/* RESPONSIVE: desktop */
-@media (min-width: 768px) {
-  .visi-misi-grid {
-    flex-direction: row; /* jadi baris */
-  }
-
-  .visi-box,
-  .misi-box {
-    flex: 1; /* sama rata lebar */
-    max-width: none; /* hilangkan batasan max-width jika ada */
-  }
-}
-
+/* ================= KEUNGGULAN ================= */
 .keunggulan-section {
   padding: 40px 20px;
-  background-color: #e63946;
+  background: linear-gradient(135deg, #800020, #6b001a);
   text-align: center;
   margin-top: 40px;
   border-radius: 20px;
@@ -150,55 +133,38 @@
 }
 
 .keunggulan-item {
-  background: #fff;
+  background: #ffffff;
   padding: 15px 25px;
-  border-radius: 10px;
-  border: 2px solid #2a1a1b;
+  border-radius: 12px;
+  border: 2px solid #800020;
   font-weight: 500;
-  transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease;
   color: #1a1a1a;
-  min-width: 200px; /* supaya box tetap cukup besar */
-  max-width: 220px; /* batasi maksimal lebar */
-  box-sizing: border-box;
-  text-align: center; /* posisi isi tetap tengah */
+  min-width: 200px;
+  max-width: 220px;
+  transition: all 0.35s ease;
 }
 
 .keunggulan-item:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.1);
+  background: #ffda07;
+  color: #000000;
+  transform: translateY(-10px) scale(1.03);
+  box-shadow: 0 14px 30px rgba(128, 0, 32, 0.45);
 }
 
-/* RESPONSIVE */
-@media (max-width: 768px) {
-  .keunggulan-grid {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .keunggulan-item {
-    max-width: 300px; /* biar nggak terlalu melebar */
-    width: 90%;
-  }
-}
-
+/* ================= TEAM ================= */
 .team-section {
   padding: 60px 20px;
   background: #fff;
-  border-top: 5px solid #e63946;
+  border-top: 5px solid #800020;
   border-radius: 20px;
   margin-top: 40px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
 }
 
 .team-heading {
   font-size: 30px;
   font-weight: 700;
-  color: #1a1a1a;
   text-align: center;
   margin-bottom: 60px;
-  position: relative;
 }
 
 .team-heading::after {
@@ -206,150 +172,66 @@
   display: block;
   width: 280px;
   height: 4px;
-  background-color: #e63946;
-  margin: 12px auto 0 auto;
+  background-color: #800020;
+  margin: 12px auto 0;
   border-radius: 2px;
 }
 
-.team-grid {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 40px;
-}
-
 .team-card {
-  background: #fefefe;
+  background: #ffffff;
   border-radius: 15px;
   padding: 25px;
   width: 240px;
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.07);
-  transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease;
   text-align: center;
   border: 2px solid transparent;
+  box-shadow: 0 8px 18px rgba(128, 0, 32, 0.18);
+  transition: all 0.35s ease;
 }
 
 .team-card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
-  border-color: #e63946;
+  transform: translateY(-12px);
+  border-color: #800020;
+  box-shadow: 0 18px 40px rgba(128, 0, 32, 0.4);
 }
 
 .team-card img {
   width: 120px;
   height: 120px;
-  object-fit: cover;
   border-radius: 50%;
-  border: 4px solid #e63946;
+  border: 4px solid #800020;
   margin-bottom: 15px;
-  transition: transform 0.3s ease;
+  object-fit: cover;
+  transition: transform 0.35s ease;
 }
 
 .team-card:hover img {
-  transform: scale(1.05);
+  transform: scale(1.08);
 }
 
-.team-card h3 {
-  font-size: 20px;
-  font-weight: 600;
-  color: #1a1a1a;
-  margin: 0;
-}
-
-/* Optional: untuk menambahkan role/tugas mereka */
-.team-card p {
-  font-size: 14px;
-  color: #666;
-  margin-top: 8px;
-}
-
-.team-card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.15);
-}
-
-.team-card img {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  border: 4px solid #e63946;
-  margin-bottom: 15px;
-  object-fit: cover;
-}
-
-.team-card h3 {
-  font-size: 16px;
-  font-weight: 600;
-}
-
-/* CTA */
+/* ================= CTA ================= */
 .cta-section {
-  background-color: #e63946;
+  background: linear-gradient(135deg, #800020, #6b001a);
   color: white;
   text-align: center;
   font-size: 18px;
   padding: 50px 30px;
   border-radius: 20px;
-  margin: 60px 20px 0 20px;
-  transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease;
+  margin: 60px 20px 0;
+  transition: all 0.35s ease;
 }
 
 .cta-section:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.15);
+  transform: translateY(-6px);
+  box-shadow: 0 14px 35px rgba(128, 0, 32, 0.45);
 }
 
-.cta-section h2 {
-  font-size: 28px;
-  color: white;
-  position: relative;
-}
-
-.cta-section h2 span.emoji {
-  background: white;
-  border-radius: 50%;
-  padding: 2px 6px;
-  margin-right: 8px;
-  display: inline-block;
-  vertical-align: middle;
-}
-
-/* MAP SECTION */
-.map-section {
-  max-width: 1000px;
-  margin: 60px auto 80px auto;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-  background: white;
-  padding: 10px;
-  transition:
-    box-shadow 0.3s ease,
-    transform 0.3s ease;
-}
-
-.map-section:hover {
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
-  transform: translateY(-5px);
-}
-
+/* ================= MAP ================= */
 .map-title {
   font-size: 24px;
   font-weight: 700;
-  color: #e63946;
+  color: #800020;
   text-align: center;
   margin-bottom: 15px;
-  user-select: none;
-}
-
-.map-title .emoji {
-  margin-left: 8px;
-  display: inline-block;
-  vertical-align: middle;
 }
 
 .map-iframe {
@@ -357,14 +239,15 @@
   height: 400px;
   border: 0;
   border-radius: 15px;
-  transition: filter 0.3s ease;
+  transition: filter 0.3s ease, transform 0.3s ease;
 }
 
 .map-iframe:hover {
-  filter: brightness(1.05);
+  filter: brightness(1.08);
+  transform: scale(1.01);
 }
 
-/* RESPONSIVE */
+/* ================= RESPONSIVE ================= */
 @media (min-width: 768px) {
   .story-section {
     flex-direction: row;

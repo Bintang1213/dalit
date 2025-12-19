@@ -11,48 +11,28 @@ import {
   FaQuestionCircle,
 } from "react-icons/fa";
 import ReviewForm from "../../components/ReviewForm/ReviewForm";
-import { StoreContext } from "../../context/StoreContext"; // 👉 tambahin ini
+import { StoreContext } from "../../context/StoreContext";
 
 const OrderHistory = () => {
   const navigate = useNavigate();
+  const { setCartItems } = useContext(StoreContext);
+
   const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
-  const [recommendations, setRecommendations] = useState([]);
+
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
-
-  // ID pesanan yang sudah di-review
   const [reviewedOrderIds, setReviewedOrderIds] = useState(new Set());
   const [isReadOnly, setIsReadOnly] = useState(false);
 
-  // 👉 ambil setCartItems dari StoreContext
-  const { setCartItems } = useContext(StoreContext);
-
-  const formatCurrency = (number) => {
-    return new Intl.NumberFormat("id-ID", {
+  const formatCurrency = (number) =>
+    new Intl.NumberFormat("id-ID", {
       style: "currency",
       currency: "IDR",
       minimumFractionDigits: 0,
     }).format(number);
-  };
-
-  const getStatusClass = (status) => {
-    switch (status?.toLowerCase()) {
-      case "menunggu":
-        return "status-menunggu";
-      case "diproses":
-        return "status-diproses";
-      case "selesai":
-        return "status-selesai";
-      case "gagal":
-        return "status-gagal";
-      default:
-        return "status-unknown";
-    }
-  };
 
   const getStatusIcon = (status) => {
     switch (status?.toLowerCase()) {
@@ -75,206 +55,159 @@ const OrderHistory = () => {
         const token = localStorage.getItem("token");
         if (!token) {
           setError("Anda belum login");
-          setLoading(false);
           return;
         }
 
-        const response = await axios.get(
+        const res = await axios.get(
           "http://localhost:4000/api/order/user",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
+          { headers: { Authorization: `Bearer ${token}` } }
         );
 
-        // Ambil ID pesanan yang sudah di-review
         const reviewedIds = new Set(
-          response.data.data
-            .filter((order) => order.reviewed)
-            .map((order) => order._id.toString())
+          res.data.data
+            .filter((o) => o.reviewed)
+            .map((o) => o._id.toString())
         );
 
-        setOrders(response.data.data);
+        setOrders(res.data.data);
         setReviewedOrderIds(reviewedIds);
-      } catch (err) {
+      } catch {
         setError("Gagal memuat riwayat pesanan");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    const fetchRecommendations = async () => {
-      try {
-        const res = await axios.get("http://localhost:4000/api/reviews/top");
-        setRecommendations(res.data);
-      } catch (error) {
-        console.error(
-          "Gagal ambil rekomendasi:",
-          error?.response?.data || error.message
-        );
       }
     };
 
     fetchOrders();
-    fetchRecommendations();
   }, []);
 
   const handleReviewClick = (order) => {
     setSelectedOrder(order);
+    setIsReadOnly(false);
     setShowReviewModal(true);
-    setIsReadOnly(false); // Mode beri rating
   };
 
   const handleViewRatingClick = (order) => {
     setSelectedOrder(order);
+    setIsReadOnly(true);
     setShowReviewModal(true);
-    setIsReadOnly(true); // Mode read-only
   };
 
   const onReviewSubmitted = () => {
-    setReviewedOrderIds((prev) =>
-      new Set(prev).add(selectedOrder._id.toString())
+    setReviewedOrderIds(
+      (prev) => new Set(prev).add(selectedOrder._id.toString())
     );
     setShowReviewModal(false);
     setSelectedOrder(null);
     setIsReadOnly(false);
   };
 
-  // 👉 Fungsi Reorder
   const handleReorder = (order) => {
-    try {
-      const newCart = {};
-
-      order.items.forEach((item) => {
-        // pastikan pakai field yang benar (foodId atau _id)
-        const id = item.foodId || item._id;
-        newCart[id] = item.quantity || item.qty || 1;
-      });
-
-      setCartItems(newCart); // update context
-      navigate("/cart");
-    } catch (err) {
-      console.error("Gagal reorder:", err);
-    }
+    const newCart = {};
+    order.items.forEach((item) => {
+      const id = item.foodId || item._id;
+      newCart[id] = item.quantity || item.qty || 1;
+    });
+    setCartItems(newCart);
+    navigate("/cart");
   };
 
-  const indexOfLastOrder = currentPage * itemsPerPage;
-  const indexOfFirstOrder = indexOfLastOrder - itemsPerPage;
-  const currentOrders = orders.slice(indexOfFirstOrder, indexOfLastOrder);
+  const indexOfLast = currentPage * itemsPerPage;
+  const currentOrders = orders.slice(indexOfLast - itemsPerPage, indexOfLast);
   const totalPages = Math.ceil(orders.length / itemsPerPage);
-
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   if (error) {
     return (
-      <div className="order-history">
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            minHeight: "50vh",
-            textAlign: "center",
-            padding: "2rem",
-          }}
-        >
-          <h3
-            style={{ fontWeight: "600", color: "#333", marginBottom: "0.5rem" }}
-          >
-            Anda belum login
-          </h3>
-          <p style={{ color: "#666" }}>
-            Silakan login untuk melihat riwayat pesanan Anda.
-          </p>
-        </div>
+      <div className="order-history empty">
+        <h3>{error}</h3>
       </div>
     );
   }
 
   return (
     <div className="order-history">
-      <div className="table-wrapper">
-        <table className="order-table">
-          <thead>
-            <tr>
-              <th>Waktu Pesan</th>
-              <th>Pesanan</th>
-              <th>Pembayaran</th>
-              <th>Layanan</th>
-              <th>Total</th>
-              <th>Status</th>
-              <th>Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            {currentOrders.map((order) => (
-              <tr key={order._id}>
-                <td>{moment(order.createdAt).format("DD/MM/YYYY HH:mm")}</td>
-                <td className="ellipsis">
-                  {order.items.map((item) => item.name).join(", ")}
-                </td>
-                <td>{order.payment}</td>
-                <td>{order.method}</td>
-                <td>{formatCurrency(order.totalAmount)}</td>
-                <td className={getStatusClass(order.status)}>
-                  {getStatusIcon(order.status)} {order.status}
-                </td>
-                <td
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: "6px",
-                    }}
+      {currentOrders.map((order) => {
+        const statusClass = order.status.toLowerCase();
+        const isFinished = statusClass === "selesai";
+        const isReviewed = reviewedOrderIds.has(order._id.toString());
+
+        return (
+          <div
+            key={order._id}
+            className={`order-card status-${statusClass}`}
+          >
+            <div className="order-top">
+              <span className={`status-badge ${statusClass}`}>
+                {getStatusIcon(order.status)} {order.status}
+              </span>
+              <span className="order-date">
+                {moment(order.createdAt).format("DD MMM YYYY • HH:mm")}
+              </span>
+            </div>
+
+            <div className="order-main">
+              <div className="order-info">
+                <div className="order-title">
+                  Pesanan: {order.items.map((i) => i.name).join(", ")}
+                </div>
+                <div className="order-sub">
+                  {order.payment} • {order.method}
+                </div>
+              </div>
+
+              <div className="order-right">
+                <div className="order-total">
+                  {formatCurrency(order.totalAmount)}
+                </div>
+
+                <div className="order-actions">
+                  <button
+                    className="btn-outline"
+                    onClick={() =>
+                      navigate("/struk", { state: { order } })
+                    }
                   >
-                    <button
-                      className="view-detail-btn"
-                      onClick={() => navigate("/struk", { state: { order } })}
-                    >
-                      Lihat Detail
-                    </button>
+                    Lihat Detail
+                  </button>
 
-                    {/* Rating Button */}
-                    {order.status.toLowerCase() === "selesai" &&
-                      (reviewedOrderIds.has(order._id.toString()) ? (
-                        <button
-                          className="view-rating-btn"
-                          onClick={() => handleViewRatingClick(order)}
-                        >
-                          Lihat Rating
-                        </button>
-                      ) : (
-                        <button
-                          className="rate-btn"
-                          onClick={() => handleReviewClick(order)}
-                        >
-                          Beri Rating
-                        </button>
-                      ))}
-
-                    {/* 👉 Tambahkan kondisi ini */}
-                    {order.status.toLowerCase() === "selesai" && (
+                  {isFinished &&
+                    (isReviewed ? (
                       <button
-                        className="reorder-btn"
-                        onClick={() => handleReorder(order)}
+                        className="btn-success"
+                        onClick={() => handleViewRatingClick(order)}
                       >
-                        Pesan Lagi
+                        Lihat Rating
                       </button>
-                    )}
-                  </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+                    ) : (
+                      <button
+                        className="btn-warning"
+                        onClick={() => handleReviewClick(order)}
+                      >
+                        Beri Rating
+                      </button>
+                    ))}
+
+                  {isFinished && (
+                    <button
+                      className="btn-primary"
+                      onClick={() => handleReorder(order)}
+                    >
+                      Pesan Lagi
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })}
 
       <div className="pagination">
-        {Array.from({ length: totalPages }, (_, index) => (
+        {Array.from({ length: totalPages }, (_, i) => (
           <button
-            key={index + 1}
-            className={currentPage === index + 1 ? "active" : ""}
-            onClick={() => paginate(index + 1)}
+            key={i}
+            className={currentPage === i + 1 ? "active" : ""}
+            onClick={() => setCurrentPage(i + 1)}
           >
-            {index + 1}
+            {i + 1}
           </button>
         ))}
       </div>

@@ -1,317 +1,197 @@
-/* --- Container Utama --- */
 .order-history {
-  padding: 16px;
-  font-family: "Poppins", sans-serif;
-  background-color: #f8f8f8;
-  margin-top: 35px;
+  padding: 24px;
   min-height: 100vh;
-  color: #333;
+  font-family: "Poppins", sans-serif;
 }
 
-/* --- Rekomendasi Menu (Baru) --- */
-.recommendation-section {
-  margin-bottom: 1.5rem;
-  padding: 1rem;
-  background: #fff7f7;
-  border: 1px solid #f5c2c7;
-  border-radius: 8px;
-  box-shadow: 0 0 6px rgba(0, 0, 0, 0.05);
-}
-
-.recommendation-section h3 {
-  margin-bottom: 0.75rem;
-  color: #b30000;
-  font-size: 1.1rem;
-  font-weight: 600;
-}
-
-.recommendation-section ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.recommendation-section li {
-  margin-bottom: 0.5rem;
-  font-weight: 500;
-  color: #333;
-}
-
-/* --- Tabel Pesanan --- */
-.table-wrapper {
-  width: 100%;
-  overflow-x: auto;
-}
-
-.order-table {
-  width: 100%;
-  border-collapse: collapse;
-  table-layout: fixed;
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  overflow: hidden;
+/* ================= CARD ================= */
+.order-card {
+  position: relative;
   background: #fff;
-}
-
-.order-table th,
-.order-table td {
-  border: 1px solid #ddd;
-  padding: 12px 16px;
-  text-align: left;
-  vertical-align: middle;
-  word-wrap: break-word;
-  white-space: normal;
-  font-size: 0.9rem;
-}
-
-.order-table th {
-  background-color: #b30000;
-  color: white;
-  font-weight: 600;
-}
-
-.order-table td.ellipsis {
-  max-width: 250px;
+  border-radius: 14px;
+  padding: 18px 22px 18px 26px;
+  margin-bottom: 18px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  transition: all 0.25s ease;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
-/* --- Tombol Lihat Detail --- */
-.view-detail-btn {
-  background-color: crimson;
-  color: white;
-  padding: 6px 12px;
-  border: none;
-  border-radius: 4px;
+/* STATUS STRIPE */
+.order-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 6px;
+  height: 100%;
+  background: #ccc;
+  transition: width 0.25s ease;
+}
+
+.order-card.status-menunggu::before { background: #9e9e9e; }
+.order-card.status-diproses::before { background: #ff9800; }
+.order-card.status-selesai::before { background: #4caf50; }
+.order-card.status-gagal::before { background: #f44336; }
+
+/* HOVER */
+.order-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 32px rgba(0,0,0,0.14);
+}
+
+.order-card:hover::before {
+  width: 10px;
+}
+
+/* ================= TOP ================= */
+.order-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.order-date {
   font-size: 0.85rem;
+  color: #777;
+}
+
+/* ================= STATUS BADGE ================= */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  font-size: 0.75rem;
   font-weight: 600;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-  cursor: pointer;
-  transition: 0.2s ease;
-}
-.view-detail-btn:hover {
-  background-color: darkred;
+  border-radius: 999px;
+  color: #fff;
 }
 
-/* --- Status Pesanan --- */
-.status-menunggu {
-  color: gray;
-  font-weight: bold;
+.status-badge.menunggu { background: #9e9e9e; }
+.status-badge.diproses { background: linear-gradient(135deg,#ff9800,#ffb74d); }
+.status-badge.selesai { background: linear-gradient(135deg,#4caf50,#66bb6a); }
+.status-badge.gagal { background: linear-gradient(135deg,#f44336,#e57373); }
+
+/* ================= MAIN ================= */
+.order-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
 }
-.status-diproses {
-  color: orange;
-  font-weight: bold;
+
+.order-title {
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: #222;
 }
-.status-selesai {
-  color: green;
-  font-weight: bold;
-}
-.status-gagal {
-  color: red;
-  font-weight: bold;
-}
-.status-unknown {
+
+.order-sub {
+  font-size: 0.85rem;
   color: #666;
-  font-weight: bold;
 }
 
-/* --- Pagination --- */
+/* ================= RIGHT ================= */
+.order-right {
+  text-align: right;
+}
+
+.order-total {
+  font-weight: 700;
+  font-size: 1.15rem;
+  margin-bottom: 8px;
+}
+
+.order-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+/* ================= BUTTON ================= */
+button {
+  transition: all 0.2s ease;
+}
+
+.btn-outline {
+  border: 1px solid crimson;
+  color: crimson;
+  background: transparent;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.btn-outline:hover {
+  background: rgba(220,20,60,0.08);
+}
+
+.btn-primary {
+  background: crimson;
+  color: white;
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 600;
+}
+
+.btn-primary:hover {
+  background: darkred;
+}
+
+.btn-warning {
+  background: linear-gradient(135deg,#ff9800,#ffb74d);
+  color: white;
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 600;
+}
+
+.btn-success {
+  background: linear-gradient(135deg,#4caf50,#66bb6a);
+  color: white;
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 600;
+}
+
+/* ================= PAGINATION ================= */
 .pagination {
   display: flex;
   justify-content: center;
-  margin-top: 1.5rem;
-  gap: 0.5rem;
+  margin-top: 24px;
+  gap: 8px;
 }
 
 .pagination button {
-  padding: 6px 10px;
-  border: none;
-  background-color: #eee;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.85rem;
-  font-weight: 600;
-  transition: 0.2s ease;
-}
-
-.pagination button:hover {
-  background-color: #ffd6d6;
-}
-
-.pagination button.active {
-  background-color: crimson;
-  color: white;
-  font-weight: bold;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-}
-
-/* --- Review Section --- */
-.review-section {
-  margin-top: 1rem;
-  padding: 1rem;
-  background: #fff;
-  border: 1px solid #ddd;
+  padding: 6px 12px;
   border-radius: 8px;
-}
-
-.review-section h4 {
-  font-size: 16px;
-  margin-bottom: 0.75rem;
-  color: #333;
-}
-
-.review-form {
-  margin-bottom: 1rem;
-  padding: 0.75rem;
-  border: 1px solid #eee;
-  border-radius: 6px;
-  background: #fafafa;
-}
-
-.review-form p {
-  margin: 0 0 0.5rem;
-  font-weight: 500;
-}
-
-.review-form .rating {
-  display: flex;
-  gap: 6px;
-  margin-bottom: 0.5rem;
-  font-size: 1.3rem;
-}
-
-.review-form textarea {
-  width: 100%;
-  min-height: 60px;
-  resize: vertical;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-family: "Poppins", sans-serif;
-  font-size: 14px;
-  margin-bottom: 0.5rem;
-}
-
-.review-form textarea:focus {
-  border-color: crimson;
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(220, 20, 60, 0.2);
-}
-
-.review-form button {
-  background-color: crimson;
-  color: white;
   border: none;
-  padding: 6px 12px;
-  border-radius: 4px;
-  font-size: 14px;
-  font-weight: 600;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
   cursor: pointer;
-  transition: 0.2s ease;
 }
 
-.review-form button:hover {
-  background-color: darkred;
+.pagination .active {
+  background: crimson;
+  color: white;
 }
 
-/* --- Responsive --- */
+/* ================= RESPONSIVE ================= */
 @media (max-width: 768px) {
-  .order-table {
-    font-size: 12px;
+  .order-main {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
-  .view-detail-btn {
-    padding: 4px 8px;
-    font-size: 12px;
+  .order-right {
+    width: 100%;
+    text-align: left;
   }
-}
 
-/* --- Tombol Beri Rating --- */
-.rate-btn {
-  background-color: rgba(255, 166, 0, 0.95);
-  color: white;
-  padding: 6px 12px;
-  border: none;
-  border-radius: 4px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.4);
-  cursor: pointer;
-  transition: 0.2s ease;
-}
-.rate-btn:hover {
-  background-color: darkorange;
-}
-
-/* Overlay gelap */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  backdrop-filter: blur(4px); /* ✅ Blur hanya background */
-  background: rgba(0, 0, 0, 0.4); /* ✅ Gelap transparan */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-/* Konten modal */
-.modal-content {
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  position: relative;
-  width: 500px;
-  max-width: 90%;
-  z-index: 1001;
-}
-
-/* Tombol close */
-.close-modal {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  background: transparent;
-  border: none;
-  font-size: 20px;
-  cursor: pointer;
-}
-
-/* --- Tombol Lihat Rating --- */
-.view-rating-btn {
-  background-color: #54d854; /* hijau */
-  color: white;
-  padding: 6px 12px;
-  border: none;
-  border-radius: 4px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-  cursor: pointer;
-  transition: 0.2s ease;
-}
-.view-rating-btn:hover {
-  background-color: #4eca69; /* hijau lebih gelap */
-}
-
-/* --- Tombol Reorder --- */
-.reorder-btn {
-  background-color: #007bff; /* biru */
-  color: white;
-  padding: 6px 12px;
-  border: none;
-  border-radius: 4px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-  cursor: pointer;
-  transition: 0.2s ease;
-}
-.reorder-btn:hover {
-  background-color: #0056b3; /* biru lebih gelap */
+  .order-actions {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
 }
