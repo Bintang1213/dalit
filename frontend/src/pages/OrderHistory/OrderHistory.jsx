@@ -8,6 +8,7 @@ import {
   FaCogs,
   FaCheckCircle,
   FaTimesCircle,
+  FaBan,
   FaQuestionCircle,
 } from "react-icons/fa";
 import ReviewForm from "../../components/ReviewForm/ReviewForm";
@@ -34,20 +35,63 @@ const OrderHistory = () => {
       minimumFractionDigits: 0,
     }).format(number);
 
+  /**
+   * 🔥 Tentukan status FINAL yang dipakai UI
+   */
+  const normalizeStatus = (rawStatus = "") => {
+  const s = rawStatus.toLowerCase();
+
+  if (s.includes("menunggu")) return "menunggu";
+  if (s.includes("diproses")) return "diproses";
+  if (s.includes("selesai") || s.includes("berhasil")) return "selesai";
+  if (s.includes("dibatalkan")) return "dibatalkan";
+  if (s.includes("gagal")) return "gagal";
+
+  return "unknown";
+};
+
+const getFinalStatus = (order) => {
+  if (order.paymentStatus) {
+    return normalizeStatus(order.paymentStatus);
+  }
+  return normalizeStatus(order.status);
+};
+
+
   const getStatusIcon = (status) => {
-    switch (status?.toLowerCase()) {
+    switch (status) {
       case "menunggu":
         return <FaClock />;
       case "diproses":
         return <FaCogs />;
       case "selesai":
+      case "berhasil":
         return <FaCheckCircle />;
       case "gagal":
         return <FaTimesCircle />;
+      case "dibatalkan":
+        return <FaBan />;
       default:
         return <FaQuestionCircle />;
     }
   };
+
+  const getStatusLabel = (status) => {
+  switch (status) {
+    case "menunggu":
+      return "Menunggu Pembayaran";
+    case "diproses":
+      return "Sedang Diproses";
+    case "selesai":
+      return "Pembayaran Berhasil";
+    case "dibatalkan":
+      return "Pembayaran Dibatalkan";
+    case "gagal":
+      return "Pembayaran Gagal";
+    default:
+      return "Status Tidak Diketahui";
+  }
+};
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -125,18 +169,20 @@ const OrderHistory = () => {
   return (
     <div className="order-history">
       {currentOrders.map((order) => {
-        const statusClass = order.status.toLowerCase();
-        const isFinished = statusClass === "selesai";
+        const finalStatus = getFinalStatus(order);
+        const isFinished = finalStatus === "selesai" || finalStatus === "berhasil";
+        const isFailed =
+          finalStatus === "gagal" || finalStatus === "dibatalkan";
         const isReviewed = reviewedOrderIds.has(order._id.toString());
 
         return (
           <div
             key={order._id}
-            className={`order-card status-${statusClass}`}
+            className={`order-card status-${finalStatus}`}
           >
             <div className="order-top">
-              <span className={`status-badge ${statusClass}`}>
-                {getStatusIcon(order.status)} {order.status}
+              <span className={`status-badge ${finalStatus}`}>
+                {getStatusIcon(finalStatus)} {getStatusLabel(finalStatus)}
               </span>
               <span className="order-date">
                 {moment(order.createdAt).format("DD MMM YYYY • HH:mm")}
@@ -192,6 +238,12 @@ const OrderHistory = () => {
                     >
                       Pesan Lagi
                     </button>
+                  )}
+
+                  {isFailed && (
+                    <span className="failed-note">
+                      Pesanan tidak dapat dilanjutkan
+                    </span>
                   )}
                 </div>
               </div>
