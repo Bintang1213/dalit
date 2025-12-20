@@ -194,4 +194,47 @@ button {
     justify-content: flex-start;
     flex-wrap: wrap;
   }
+  /* STATUS STRIPE */
+.order-card.status-gagal::before {
+  background: #f44336;
+}
+
+.order-card.status-dibatalkan::before {
+  background: #616161;
+}
+
+/* STATUS BADGE */
+.status-badge.gagal {
+  background: linear-gradient(135deg,#f44336,#e57373);
+}
+
+.status-badge.dibatalkan {
+  background: linear-gradient(135deg,#616161,#9e9e9e);
+}
+
+/* INFO GAGAL */
+.failed-note {
+  font-size: 0.75rem;
+  color: #f44336;
+  font-weight: 600;
+}
+
+/* STATUS STRIPE */
+.order-card.status-dibatalkan::before {
+  background: #616161;
+}
+
+.order-card.status-gagal::before {
+  background: #f44336;
+}
+
+/* STATUS BADGE */
+.status-badge.dibatalkan {
+  background: linear-gradient(135deg,#616161,#9e9e9e);
+}
+
+.status-badge.gagal {
+  background: linear-gradient(135deg,#f44336,#e57373);
+}
+
 }
