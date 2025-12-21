@@ -59,6 +59,15 @@ setRatings(mapped);
     }
   };
 
+  const [unreadChatCount, setUnreadChatCount] = useState(
+  Number(localStorage.getItem("unreadChatCount")) || 0
+);
+
+useEffect(() => {
+  localStorage.setItem("unreadChatCount", unreadChatCount);
+}, [unreadChatCount]);
+
+
   const fetchUser = async (authToken) => {
     if (!authToken) {
       setUser(null);
@@ -253,6 +262,8 @@ setRatings(mapped);
     login,
     clearUserSession,
     fetchUser: (authToken) => fetchUser(authToken),
+    unreadChatCount,
+    setUnreadChatCount,
   };
 
   return (

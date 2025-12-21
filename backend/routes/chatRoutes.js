@@ -4,6 +4,36 @@ import chatModel from "../models/chatModel.js";
 
 const chatRouter = express.Router();
 
+// ✅ ROUTE KHUSUS: Ambil conversationId user (UNTUK NAVBAR)
+chatRouter.get(
+  "/user/conversation-id",
+  authMiddleware,
+  async (req, res) => {
+    try {
+      if (!req.userId) {
+        return res.status(403).json({
+          success: false,
+          message: "Akses ditolak",
+        });
+      }
+
+      const conversationId = `user_${req.userId}_admin`;
+
+      res.json({
+        success: true,
+        conversationId,
+      });
+    } catch (error) {
+      console.error("Error get conversationId:", error);
+      res.status(500).json({
+        success: false,
+        message: "Gagal mengambil conversationId",
+      });
+    }
+  }
+);
+
+
 // ✅ PERBAIKAN MASALAH 1: Route untuk user mengambil chat history mereka
 chatRouter.get("/user/history", authMiddleware, async (req, res) => {
   try {

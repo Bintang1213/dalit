@@ -56,7 +56,7 @@
 }
 
 .btn-filter {
-  background-color: #d63031;
+  background-color: #8b0000; /* merah tua */
   color: white;
   padding: 10px 18px;
   border: none;
@@ -64,12 +64,12 @@
   font-size: 14px;
   cursor: pointer;
   font-weight: 500;
-  box-shadow: 0 3px 6px rgba(214, 48, 49, 0.25);
+  box-shadow: 0 3px 6px rgba(139, 0, 0, 0.25);
   transition: all 0.25s ease-in-out;
 }
 
 .btn-filter:hover {
-  background-color: #b30000;
+  background-color: #6f0000;
   transform: translateY(-2px);
 }
 
@@ -85,11 +85,23 @@
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
-  margin-top: 1px;
+  margin-top: 12px;
   border: 1px solid #e0e0e0;
 }
 
-.tabel-keuangan th,
+/* 🔴 HEADER TABEL (INI INTI YANG KAMU MAU) */
+.tabel-keuangan thead th {
+  background-color: #8b0000; /* MERAH */
+  color: #ffffff; /* PUTIH */
+  font-weight: 600;
+  font-size: 15px;
+  text-align: center;
+  padding: 16px;
+  border: 1px solid #ffffff;
+  letter-spacing: 0.4px;
+}
+
+/* BODY */
 .tabel-keuangan td {
   padding: 16px;
   font-size: 15px;
@@ -100,22 +112,22 @@
 }
 
 .tabel-keuangan tbody tr:hover {
-  background-color: #f9f2f2;
+  background-color: #fbeaea;
 }
 
 /* TOTAL */
 .total-row {
-  background-color: #fff9f4;
-  font-weight: 500;
+  background-color: #fff1f1;
+  font-weight: 600;
 }
 
 /* MENU TERLARIS */
 .menu-terlaris-row {
-  background-color: #ffeaea;
+  background-color: #ffe5e5;
   font-weight: 600;
   text-align: center;
   font-size: 16px;
-  color: #b30000;
+  color: #8b0000;
   letter-spacing: 0.3px;
 }
 
@@ -128,7 +140,7 @@
 }
 
 .download-button {
-  background-color: #d63031;
+  background-color: #8b0000;
   color: white;
   padding: 12px 28px;
   border: none;
@@ -136,12 +148,12 @@
   font-size: 15px;
   font-weight: 500;
   cursor: pointer;
-  box-shadow: 0 4px 8px rgba(214, 48, 49, 0.2);
+  box-shadow: 0 4px 8px rgba(139, 0, 0, 0.25);
   transition: all 0.3s ease;
 }
 
 .download-button:hover {
-  background-color: #c0392b;
+  background-color: #6f0000;
   transform: translateY(-3px);
 }
 
@@ -159,13 +171,13 @@
 .pagination-arrow {
   cursor: pointer;
   font-size: 1.5rem;
-  color: #d63031;
+  color: #8b0000;
   user-select: none;
   padding: 0 10px;
 }
 
 .pagination-arrow:hover {
-  color: #b30000;
+  color: #6f0000;
   transform: scale(1.2);
 }
 

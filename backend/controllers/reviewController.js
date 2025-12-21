@@ -162,36 +162,34 @@ export const toggleMenuRecommendation = async (req, res) => {
 // ==============================
 export const getTopRatedMenus = async (req, res) => {
   try {
-    const topMenus = await Review.aggregate([
-      { $match: { foodId: { $ne: null } } },
-      {
-        $group: {
-          _id: "$foodId",
-          avgRating: { $avg: "$rating" },
-          totalReviews: { $sum: 1 },
-        },
-      },
-      { $sort: { avgRating: -1 } },
-      { $limit: 10 },
-    ]);
+    const reviews = await Review.find().populate("foodId");
 
-    if (!topMenus.length) return res.json([]);
+    const summary = {};
 
-    const foodIds = topMenus.map((t) => t._id);
-    const foods = await Food.find({ _id: { $in: foodIds } });
+    reviews.forEach((r) => {
+      // ⛔ skip review kalau menu sudah dihapus
+      if (!r.foodId) return;
 
-    const merged = topMenus.map((t) => {
-      const food = foods.find((f) => f._id.toString() === t._id.toString());
-      return {
-        _id: t._id,
-        name: food ? food.name : "Unknown",
-        avgRating: t.avgRating,
-        totalReviews: t.totalReviews,
-        isRecommended: food ? food.isRecommended : false,
-      };
+      const id = r.foodId._id.toString();
+
+      if (!summary[id]) {
+        summary[id] = {
+          _id: r.foodId._id,
+          name: r.foodId.name,
+          totalReviews: 0,
+          totalRating: 0,
+          avgRating: 0,
+          isRecommended: r.foodId.isRecommended,
+        };
+      }
+
+      summary[id].totalReviews += 1;
+      summary[id].totalRating += r.rating;
+      summary[id].avgRating =
+        summary[id].totalRating / summary[id].totalReviews;
     });
 
-    res.json(merged);
+    res.json(Object.values(summary));
   } catch (err) {
     console.error("Error get top menus:", err);
     res.status(500).json({ message: err.message });

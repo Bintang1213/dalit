@@ -193,7 +193,7 @@ const Dashboard = () => {
                 },
                 {
                   icon: "🔥",
-                  title: "Menu Terlaris",
+                  title: "Menu Terlaris Saat Ini",
                   value: dashboardData.menuTerlaris.name,
                   subtext: `Terjual ${dashboardData.menuTerlaris.total} kali`,
                   link: null,

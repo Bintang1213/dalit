@@ -9,6 +9,8 @@ import {
   markAllAsRead,
   fetchNotifications,
 } from "../../api/notificationApi";
+let chatSocket = null;
+
 
 const SERVER_URL = "http://localhost:4000";
 let socket = null;
@@ -22,6 +24,8 @@ const Navbar = ({ setShowLogin }) => {
   const [showNotificationDropdown, setShowNotificationDropdown] =
     useState(false);
   const [notifications, setNotifications] = useState([]);
+  const { unreadChatCount, setUnreadChatCount } = useContext(StoreContext);
+
 
   const {
     getTotalCartAmount,
@@ -52,19 +56,22 @@ const Navbar = ({ setShowLogin }) => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    setToken("");
-    if (socket) {
-      socket.disconnect();
-      socket = null;
-    }
-    toast.success("Anda berhasil logout", {
-      style: { background: "white", color: "black" },
-    });
-    setTimeout(() => {
-      setShowLogin(true);
-    }, 300);
-  };
+  localStorage.removeItem("token");
+  setToken("");
+
+  if (socket) {
+    socket.disconnect();
+    socket = null;
+  }
+
+  if (chatSocket) {
+    chatSocket.disconnect();
+    chatSocket = null;
+  }
+
+  toast.success("Anda berhasil logout");
+  setTimeout(() => setShowLogin(true), 300);
+};
 
   const handleMarkAllRead = async () => {
     if (unreadCount > 0) {
@@ -122,6 +129,75 @@ const Navbar = ({ setShowLogin }) => {
     });
     return items.slice(0, 3);
   };
+
+  const getConversationId = async () => {
+  try {
+    const res = await fetch(
+      "http://localhost:4000/api/chat/user/conversation-id",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    const data = await res.json();
+    return data.conversationId;
+  } catch (e) {
+    console.error("Gagal ambil conversationId", e);
+    return null;
+  }
+};
+
+useEffect(() => {
+  if (!token) return;
+
+  let mounted = true;
+
+  const initNavbarChat = async () => {
+    const conversationId = await getConversationId();
+    if (!conversationId || !mounted) return;
+
+    if (!chatSocket) {
+      chatSocket = io(SERVER_URL, {
+        auth: { token },
+        transports: ["websocket"],
+      });
+
+      chatSocket.on("connect", () => {
+        console.log("Navbar join chat:", conversationId);
+        chatSocket.emit("join_chat", conversationId);
+      });
+
+      chatSocket.on("receive_message", (message) => {
+        if (message.senderType === "User") return;
+
+        console.log("📩 CHAT MASUK KE NAVBAR:", message);
+
+        setUnreadChatCount((prev) => prev + 1);
+
+        setNotifications((prev) => [
+          {
+            message: "Admin membalas chat Anda",
+            createdAt: new Date().toISOString(),
+            isRead: false,
+          },
+          ...prev,
+        ]);
+      });
+
+      chatSocket.on("connect_error", (err) => {
+        console.error("Navbar chat socket error:", err.message);
+      });
+    }
+  };
+
+  initNavbarChat();
+
+  return () => {
+    mounted = false;
+  };
+}, [token]);
+
 
   useEffect(() => {
     if (token) {
@@ -241,15 +317,17 @@ const Navbar = ({ setShowLogin }) => {
             Pesanan
           </Link>
           <Link
-            to="/chat"
-            onClick={() => {
-              setMenu("chat");
-              setMobileMenuOpen(false);
-            }}
-            className={menu === "chat" ? "active" : ""}
-          >
-            Chat
-          </Link>
+  to="/chat"
+  onClick={() => {
+    setMenu("chat");
+    setUnreadChatCount(0); // RESET SAAT MASUK CHAT
+    setMobileMenuOpen(false);
+  }}
+  className={menu === "chat" ? "active chat-menu" : "chat-menu"}
+>
+  Chat
+  {unreadChatCount > 0 && <span className="chat-dot"></span>}
+</Link>
           <Link
             to="/tentang-kami"
             onClick={() => {
