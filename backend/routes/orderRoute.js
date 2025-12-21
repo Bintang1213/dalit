@@ -105,6 +105,88 @@ export default (io) => {
         }
     });
 
+        // =======================================================
+        // POST retry payment (User)
+        // =======================================================
+        router.post("/retry-payment/:orderId", authMiddleware, async (req, res) => {
+        try {
+            if (!req.userId) {
+            return errorResponse(res, 403, "Akses ditolak");
+            }
+
+            const { orderId } = req.params;
+
+            const order = await Order.findById(orderId);
+
+            if (!order) {
+            return errorResponse(res, 404, "Pesanan tidak ditemukan");
+            }
+
+            // Pastikan milik user
+            if (order.userId.toString() !== req.userId) {
+            return errorResponse(res, 403, "Bukan pesanan Anda");
+            }
+
+            // Kunci status
+            if (
+            order.payment !== "Non-Tunai" ||
+            order.status !== "Menunggu Pembayaran"
+            ) {
+            return errorResponse(
+                res,
+                400,
+                "Pesanan tidak dapat dibayar ulang"
+            );
+            }
+
+            const user = await User.findById(req.userId);
+            if (!user) {
+            return errorResponse(res, 404, "User tidak ditemukan");
+            }
+
+            // Generate ulang Snap Transaction
+                const parameter = {
+                transaction_details: {
+                    order_id: order._id.toString(),
+                    gross_amount: Math.round(order.totalAmount),
+                },
+                customer_details: {
+                    first_name: order.name,
+                    email: user.email,
+                    phone: order.phone || user.phone || "081234567890",
+                    address: order.address || user.address || "No Address",
+                },
+                callbacks: {
+                    finish: `${FRONTEND_BASE_URL}/status-pembayaran?order_id=${order._id.toString()}`,
+                    error: `${FRONTEND_BASE_URL}/gagal-bayar`,
+                    unfinish: `${FRONTEND_BASE_URL}/belum-selesai`,
+                },
+                };
+
+            const transaction = await snap.createTransaction(parameter);
+
+            // Simpan token baru
+            order.midtransToken = transaction.token;
+            order.midtransRedirectUrl = transaction.redirect_url;
+            order.updatedAt = moment().tz("Asia/Jakarta").toDate();
+            await order.save();
+
+            return res.status(200).json({
+            success: true,
+            message: "Silakan lanjutkan pembayaran",
+            token: transaction.token,
+            redirect_url: transaction.redirect_url,
+            });
+        } catch (error) {
+            console.error("[ERROR] Retry payment:", error);
+            res.status(500).json({
+            success: false,
+            message: "Gagal memproses pembayaran ulang",
+            });
+        }
+        });
+
+
     // =======================================================
     // GET order by ID
     // =======================================================
@@ -129,6 +211,7 @@ export default (io) => {
             errorResponse(res, 500, "Terjadi kesalahan server");
         }
     });
+
 
     // =======================================================
     // POST buat order baru (DENGAN LOGIKA DEEP LINK MIDTRANS)

@@ -27,9 +27,9 @@
   background: #ccc;
   transition: width 0.25s ease;
 }
-
-.order-card.status-menunggu::before { background: #9e9e9e; }
-.order-card.status-diproses::before { background: #ff9800; }
+.order-card.status-dibatalkan::before { background: #dc0000; }
+.order-card.status-menunggu::before { background: #ff9800; }
+.order-card.status-diproses::before { background: #008cff; }
 .order-card.status-selesai::before { background: #4caf50; }
 .order-card.status-gagal::before { background: #f44336; }
 
@@ -68,10 +68,16 @@
   color: #fff;
 }
 
-.status-badge.menunggu { background: #9e9e9e; }
-.status-badge.diproses { background: linear-gradient(135deg,#ff9800,#ffb74d); }
+.status-badge.menunggu { background: #ff9800; }
+.status-badge.diproses { background: linear-gradient(135deg,#008cff,#008cff); }
 .status-badge.selesai { background: linear-gradient(135deg,#4caf50,#66bb6a); }
-.status-badge.gagal { background: linear-gradient(135deg,#f44336,#e57373); }
+.status-badge.gagal { background: linear-gradient(135deg,#f44336,#930000); }
+/* ================= STATUS BADGE ================= */
+.status-badge.dibatalkan {
+  background: linear-gradient(135deg, #ba1e1e, #920000);
+  color: #fff;
+}
+
 
 /* ================= MAIN ================= */
 .order-main {
@@ -177,23 +183,15 @@ button {
   background: crimson;
   color: white;
 }
+/* MENUNGGU PEMBAYARAN */
+.status-badge.menunggu_pembayaran {
+  background: linear-gradient(135deg, #ba1f14, #a00005);
+  color: #fff;
+}
+.order-card.status-menunggu_pembayaran::before {
+  background:#a00005;
+}
 
-/* ================= RESPONSIVE ================= */
-@media (max-width: 768px) {
-  .order-main {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .order-right {
-    width: 100%;
-    text-align: left;
-  }
-
-  .order-actions {
-    justify-content: flex-start;
-    flex-wrap: wrap;
-  }
   /* STATUS STRIPE */
 .order-card.status-gagal::before {
   background: #f44336;
@@ -208,17 +206,12 @@ button {
   background: linear-gradient(135deg,#f44336,#e57373);
 }
 
-.status-badge.dibatalkan {
-  background: linear-gradient(135deg,#616161,#9e9e9e);
-}
-
 /* INFO GAGAL */
 .failed-note {
   font-size: 0.75rem;
   color: #f44336;
   font-weight: 600;
 }
-
 /* STATUS STRIPE */
 .order-card.status-dibatalkan::before {
   background: #616161;
@@ -237,4 +230,20 @@ button {
   background: linear-gradient(135deg,#f44336,#e57373);
 }
 
+/* ================= RESPONSIVE ================= */
+@media (max-width: 768px) {
+  .order-main {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .order-right {
+    width: 100%;
+    text-align: left;
+  }
+
+  .order-actions {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
 }

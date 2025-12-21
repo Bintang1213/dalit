@@ -21,12 +21,12 @@ const OrderHistory = () => {
   const [orders, setOrders] = useState([]);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 8;
-
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [reviewedOrderIds, setReviewedOrderIds] = useState(new Set());
   const [isReadOnly, setIsReadOnly] = useState(false);
+
+  const itemsPerPage = 8;
 
   const formatCurrency = (number) =>
     new Intl.NumberFormat("id-ID", {
@@ -35,32 +35,58 @@ const OrderHistory = () => {
       minimumFractionDigits: 0,
     }).format(number);
 
-  /**
-   * 🔥 Tentukan status FINAL yang dipakai UI
-   */
+  /* =========================
+     STATUS HANDLER
+  ========================= */
   const normalizeStatus = (rawStatus = "") => {
   const s = rawStatus.toLowerCase();
 
   if (s.includes("menunggu")) return "menunggu";
   if (s.includes("diproses")) return "diproses";
-  if (s.includes("selesai") || s.includes("berhasil")) return "selesai";
-  if (s.includes("dibatalkan")) return "dibatalkan";
-  if (s.includes("gagal")) return "gagal";
+  if (s.includes("selesai")) return "selesai";
+  if (s.includes("dibatalkan") || s.includes("cancel")) return "dibatalkan";
 
   return "unknown";
 };
 
 const getFinalStatus = (order) => {
-  if (order.paymentStatus) {
-    return normalizeStatus(order.paymentStatus);
+  const paymentStatus = (order.paymentStatus || "").toLowerCase();
+  const status = (order.status || "").toLowerCase();
+
+  // 🔴 DIBATALKAN
+  if (
+    status.includes("dibatalkan") ||
+    paymentStatus.includes("cancel") ||
+    paymentStatus.includes("expire")
+  ) {
+    return "dibatalkan";
   }
+
+  // 🟡 MENUNGGU PEMBAYARAN (MIDTRANS BELUM SELESAI)
+  if (
+    order.payment === "Non-Tunai" &&
+    (paymentStatus === "pending" || paymentStatus === "")
+  ) {
+    return "menunggu_pembayaran";
+  }
+
+  // 🟠 MIDTRANS SUKSES → MENUNGGU KONFIRMASI ADMIN
+  if (
+    order.payment === "Non-Tunai" &&
+    ["settlement", "capture", "success"].includes(paymentStatus)
+  ) {
+    return "menunggu";
+  }
+
+  // 🟢 TUNAI / STATUS DARI ADMIN
   return normalizeStatus(order.status);
 };
-
 
   const getStatusIcon = (status) => {
     switch (status) {
       case "menunggu":
+        return <FaClock />;
+      case "menunggu_pembayaran":
         return <FaClock />;
       case "diproses":
         return <FaCogs />;
@@ -76,23 +102,27 @@ const getFinalStatus = (order) => {
     }
   };
 
-  const getStatusLabel = (status) => {
+const getStatusLabel = (status) => {
   switch (status) {
-    case "menunggu":
+    case "menunggu_pembayaran":
       return "Menunggu Pembayaran";
+    case "menunggu":
+      return "Menunggu Konfirmasi";
     case "diproses":
-      return "Sedang Diproses";
+      return "Pesanan Diproses";
     case "selesai":
-      return "Pembayaran Berhasil";
+      return "Pesanan Selesai";
     case "dibatalkan":
       return "Pembayaran Dibatalkan";
-    case "gagal":
-      return "Pembayaran Gagal";
     default:
       return "Status Tidak Diketahui";
   }
 };
 
+
+  /* =========================
+     FETCH DATA
+  ========================= */
   useEffect(() => {
     const fetchOrders = async () => {
       try {
@@ -104,7 +134,11 @@ const getFinalStatus = (order) => {
 
         const res = await axios.get(
           "http://localhost:4000/api/order/user",
-          { headers: { Authorization: `Bearer ${token}` } }
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
 
         const reviewedIds = new Set(
@@ -123,6 +157,9 @@ const getFinalStatus = (order) => {
     fetchOrders();
   }, []);
 
+  /* =========================
+     ACTION HANDLER
+  ========================= */
   const handleReviewClick = (order) => {
     setSelectedOrder(order);
     setIsReadOnly(false);
@@ -146,16 +183,54 @@ const getFinalStatus = (order) => {
 
   const handleReorder = (order) => {
     const newCart = {};
+
     order.items.forEach((item) => {
       const id = item.foodId || item._id;
       newCart[id] = item.quantity || item.qty || 1;
     });
+
     setCartItems(newCart);
     navigate("/cart");
   };
 
+  const handlePayNow = async (orderId) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const res = await axios.post(
+        `http://localhost:4000/api/order/retry-payment/${orderId}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const snapToken = res.data.token;
+
+      if (window.snap) {
+        window.snap.pay(snapToken);
+      } else {
+        window.location.href = res.data.redirect_url;
+      }
+    } catch (error) {
+      console.error("Gagal bayar ulang:", error);
+      alert(
+        error.response?.data?.message ||
+          "Gagal memproses pembayaran ulang"
+      );
+    }
+  };
+
+  /* =========================
+     PAGINATION
+  ========================= */
   const indexOfLast = currentPage * itemsPerPage;
-  const currentOrders = orders.slice(indexOfLast - itemsPerPage, indexOfLast);
+  const currentOrders = orders.slice(
+    indexOfLast - itemsPerPage,
+    indexOfLast
+  );
   const totalPages = Math.ceil(orders.length / itemsPerPage);
 
   if (error) {
@@ -166,14 +241,22 @@ const getFinalStatus = (order) => {
     );
   }
 
+  /* =========================
+     RENDER
+  ========================= */
   return (
     <div className="order-history">
       {currentOrders.map((order) => {
         const finalStatus = getFinalStatus(order);
-        const isFinished = finalStatus === "selesai" || finalStatus === "berhasil";
+        const isWaiting = finalStatus === "menunggu";
+        const isWaitingPayment = finalStatus === "menunggu_pembayaran";
+        const isProcessing = finalStatus === "diproses";
+        const isFinished = finalStatus === "selesai";
         const isFailed =
           finalStatus === "gagal" || finalStatus === "dibatalkan";
-        const isReviewed = reviewedOrderIds.has(order._id.toString());
+        const isReviewed = reviewedOrderIds.has(
+          order._id.toString()
+        );
 
         return (
           <div
@@ -181,18 +264,25 @@ const getFinalStatus = (order) => {
             className={`order-card status-${finalStatus}`}
           >
             <div className="order-top">
-              <span className={`status-badge ${finalStatus}`}>
-                {getStatusIcon(finalStatus)} {getStatusLabel(finalStatus)}
+              <span
+                className={`status-badge ${finalStatus}`}
+              >
+                {getStatusIcon(finalStatus)}
+                {getStatusLabel(finalStatus)}
               </span>
+
               <span className="order-date">
-                {moment(order.createdAt).format("DD MMM YYYY • HH:mm")}
+                {moment(order.createdAt).format(
+                  "DD MMM YYYY • HH:mm"
+                )}
               </span>
             </div>
 
             <div className="order-main">
               <div className="order-info">
                 <div className="order-title">
-                  Pesanan: {order.items.map((i) => i.name).join(", ")}
+                  Pesanan:{" "}
+                  {order.items.map((i) => i.name).join(", ")}
                 </div>
                 <div className="order-sub">
                   {order.payment} • {order.method}
@@ -205,44 +295,69 @@ const getFinalStatus = (order) => {
                 </div>
 
                 <div className="order-actions">
-                  <button
-                    className="btn-outline"
-                    onClick={() =>
-                      navigate("/struk", { state: { order } })
-                    }
-                  >
-                    Lihat Detail
-                  </button>
-
-                  {isFinished &&
-                    (isReviewed ? (
-                      <button
-                        className="btn-success"
-                        onClick={() => handleViewRatingClick(order)}
-                      >
-                        Lihat Rating
-                      </button>
-                    ) : (
-                      <button
-                        className="btn-warning"
-                        onClick={() => handleReviewClick(order)}
-                      >
-                        Beri Rating
-                      </button>
-                    ))}
-
-                  {isFinished && (
+                  {/* 🟡 MENUNGGU PEMBAYARAN */}
+                  {isWaitingPayment && (
                     <button
                       className="btn-primary"
-                      onClick={() => handleReorder(order)}
+                      onClick={() => handlePayNow(order._id)}
                     >
-                      Pesan Lagi
+                      Bayar Sekarang
                     </button>
                   )}
 
+                  {/* 🟠 MENUNGGU KONFIRMASI & 🔵 DIPROSES */}
+                  {(isWaiting || isProcessing) && (
+                    <button
+                      className="btn-outline"
+                      onClick={() =>
+                        navigate("/struk", { state: { order } })
+                      }
+                    >
+                      Lihat Detail
+                    </button>
+                  )}
+
+                  {/* 🟢 SELESAI */}
+                  {isFinished && (
+                    <>
+                      <button
+                        className="btn-outline"
+                        onClick={() =>
+                          navigate("/struk", { state: { order } })
+                        }
+                      >
+                        Lihat Detail
+                      </button>
+
+                      {isReviewed ? (
+                        <button
+                          className="btn-success"
+                          onClick={() => handleViewRatingClick(order)}
+                        >
+                          Lihat Rating
+                        </button>
+                      ) : (
+                        <button
+                          className="btn-warning"
+                          onClick={() => handleReviewClick(order)}
+                        >
+                          Beri Rating
+                        </button>
+                      )}
+
+                      <button
+                        className="btn-primary"
+                        onClick={() => handleReorder(order)}
+                      >
+                        Pesan Lagi
+                      </button>
+                    </>
+                  )}
+
+                  {/* 🔴 GAGAL / DIBATALKAN */}
                   {isFailed && (
                     <span className="failed-note">
-                      Pesanan tidak dapat dilanjutkan
+                      Pembayaran dibatalkan. Silakan lakukan pemesanan ulang.
                     </span>
                   )}
                 </div>
@@ -272,6 +387,7 @@ const getFinalStatus = (order) => {
               onReviewSubmitted={onReviewSubmitted}
               isReadOnly={isReadOnly}
             />
+
             <button
               className="close-modal"
               onClick={() => {
