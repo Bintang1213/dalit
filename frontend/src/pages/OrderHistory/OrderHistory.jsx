@@ -28,12 +28,16 @@ const OrderHistory = () => {
 
   const itemsPerPage = 8;
 
-  const formatCurrency = (number) =>
-    new Intl.NumberFormat("id-ID", {
-      style: "currency",
-      currency: "IDR",
-      minimumFractionDigits: 0,
-    }).format(number);
+const formatCurrency = (number) => {
+  if (number == null) return "Rp 0";
+
+  return (
+    "Rp " +
+    Number(number)
+      .toString()
+      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+  );
+};
 
   /* =========================
      STATUS HANDLER
@@ -375,16 +379,27 @@ const getStatusLabel = (status) => {
       })}
 
       <div className="pagination">
-        {Array.from({ length: totalPages }, (_, i) => (
-          <button
-            key={i}
-            className={currentPage === i + 1 ? "active" : ""}
-            onClick={() => setCurrentPage(i + 1)}
-          >
-            {i + 1}
-          </button>
-        ))}
-      </div>
+  <button
+    className="nav-btn"
+    disabled={currentPage === 1}
+    onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+  >
+    ← Sebelumnya
+  </button>
+
+  <span className="page-indicator">
+    Halaman {currentPage} dari {totalPages}
+  </span>
+
+  <button
+    className="nav-btn"
+    disabled={currentPage === totalPages}
+    onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+  >
+    Berikutnya →
+  </button>
+</div>
+
 
       {showReviewModal && (
         <div className="modal-overlay">

@@ -86,6 +86,18 @@ const Kelolamenu = ({ url }) => {
     fetchList();
   }, []);
 
+  const formatCurrency = (number) => {
+  if (number == null) return "Rp 0";
+
+  return (
+    "Rp " +
+    Number(number)
+      .toString()
+      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+  );
+};
+
+
   return (
     <div className="kelola-menu-wrapper">
       <div className="kelola-menu-content">
@@ -114,7 +126,7 @@ const Kelolamenu = ({ url }) => {
                 </td>
                 <td>{item.name}</td>
                 <td>{item.category}</td>
-                <td>{item.price}</td>
+                <td>{formatCurrency(item.price)}</td>
                 <td>
                   <span
                     className={`status-badge ${

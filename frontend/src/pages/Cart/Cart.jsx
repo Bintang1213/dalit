@@ -129,6 +129,17 @@ const Cart = () => {
     );
   };
 
+  const formatCurrency = (number) => {
+  if (number == null) return "Rp 0";
+
+  return (
+    "Rp " +
+    Number(number)
+      .toString()
+      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+  );
+};
+
   return (
     <div className="cart">
       {/* 🔹 ToastContainer fix: pojok kanan atas dan di atas popup */}
@@ -183,8 +194,8 @@ const Cart = () => {
                     }
                   />
                   <p>{item.name}</p>
-                  <p>{item.price}</p>
-                  <p>{cartItems[item._id]}</p>
+                  <p>{formatCurrency(item.price)}</p>
+                  <p>{formatCurrency(item.price * cartItems[item._id])}</p>
                   <p>Rp{item.price * cartItems[item._id]}</p>
                   <p
                     onClick={() => handleRemove(item._id, item.name)}
@@ -240,9 +251,8 @@ const Cart = () => {
           <div className="cart-summary-row">
             <div className="cart-summary">
               <p>Subtotal</p>
-              <h3>Rp. {getTotalCartAmount().toLocaleString()}</h3>
-            </div>
-
+              <h3>{formatCurrency(getTotalCartAmount())}</h3>            
+              </div>
             <button className="confirm-btn" onClick={handleConfirm}>
               Konfirmasi Pesanan
             </button>
