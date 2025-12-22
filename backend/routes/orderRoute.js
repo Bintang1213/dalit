@@ -442,15 +442,15 @@ export default (io) => {
                     item_details: midtransItems,
                     callbacks: {
                     finish: isMobileApp
-                        ? `${DEEP_LINK_SCHEME}://payment/finish?order_id=${order._id}`
-                        : `${FRONTEND_BASE_URL}/status-pembayaran?order_id=${order._id}`,
+                        ? `${DEEP_LINK_SCHEME}://payment/finish?order_id=${savedOrder._id}`
+                        : `${FRONTEND_BASE_URL}/status-pembayaran?order_id=${savedOrder._id}`,
 
                     error: isMobileApp
-                        ? `${DEEP_LINK_SCHEME}://payment/error?order_id=${order._id}`
+                        ? `${DEEP_LINK_SCHEME}://payment/error?order_id=${savedOrder._id}`
                         : `${FRONTEND_BASE_URL}/gagal-bayar`,
 
                     unfinish: isMobileApp
-                        ? `${DEEP_LINK_SCHEME}://payment/unfinish?order_id=${order._id}`
+                        ? `${DEEP_LINK_SCHEME}://payment/unfinish?order_id=${savedOrder._id}`
                         : `${FRONTEND_BASE_URL}/belum-selesai`,
                     },
                 };

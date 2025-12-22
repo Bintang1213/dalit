@@ -53,32 +53,41 @@ const getFinalStatus = (order) => {
   const ps = order.paymentStatus;
   const s = (order.status || "").toLowerCase();
 
-  // ❌ DIBATALKAN
+  // ❌ PRIORITAS TERTINGGI: ADMIN MEMBATALKAN
+  // (penting untuk kasus timeout / user keluar)
+  if (
+    order.payment === "Non-Tunai" &&
+    s.includes("dibatalkan")
+  ) {
+    return "dibatalkan";
+  }
+
+  // ❌ MIDTRANS EXPLICIT CANCEL
   if (["cancel", "expire", "deny"].includes(ps)) {
     return "dibatalkan";
   }
 
-  // 🟡 BELUM BAYAR (AMAN UNTUK DATA LAMA)
+  // 🟡 BELUM BAYAR (BENAR-BENAR BELUM SELESAI)
   if (
     order.payment === "Non-Tunai" &&
-    (ps === "pending" || (!ps && s.includes("menunggu pembayaran")))
+    ps === "pending" &&
+    !s.includes("dibatalkan")
   ) {
     return "menunggu_pembayaran";
   }
 
-  // 🟠 SUDAH BAYAR
+  // 🟠 SUDAH BAYAR (NON-TUNAI)
   if (order.payment === "Non-Tunai" && ps === "settlement") {
     return "menunggu";
   }
 
-  // 🟢 TUNAI & ADMIN
+  // 🟢 STATUS ADMIN (TUNAI & LANJUTAN)
   if (s.includes("menunggu")) return "menunggu";
   if (s.includes("diproses")) return "diproses";
   if (s.includes("selesai")) return "selesai";
 
   return "menunggu";
 };
-
 
   const getStatusIcon = (status) => {
     switch (status) {
