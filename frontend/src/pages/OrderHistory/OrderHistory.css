@@ -230,6 +230,21 @@ button {
   background: linear-gradient(135deg,#f44336,#e57373);
 }
 
+.btn-pay {
+  background: linear-gradient(135deg, #d32f2f, #b71c1c);
+  color: white;
+  padding: 6px 16px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-pay:hover {
+  background: linear-gradient(135deg, #b71c1c, #7f0000);
+}
+
+
 /* ================= RESPONSIVE ================= */
 @media (max-width: 768px) {
   .order-main {

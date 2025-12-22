@@ -50,37 +50,35 @@ const OrderHistory = () => {
 };
 
 const getFinalStatus = (order) => {
-  const paymentStatus = (order.paymentStatus || "").toLowerCase();
-  const status = (order.status || "").toLowerCase();
+  const ps = order.paymentStatus;
+  const s = (order.status || "").toLowerCase();
 
-  // 🔴 DIBATALKAN
-  if (
-    status.includes("dibatalkan") ||
-    paymentStatus.includes("cancel") ||
-    paymentStatus.includes("expire")
-  ) {
+  // ❌ DIBATALKAN
+  if (["cancel", "expire", "deny"].includes(ps)) {
     return "dibatalkan";
   }
 
-  // 🟡 MENUNGGU PEMBAYARAN (MIDTRANS BELUM SELESAI)
+  // 🟡 BELUM BAYAR (AMAN UNTUK DATA LAMA)
   if (
     order.payment === "Non-Tunai" &&
-    (paymentStatus === "pending" || paymentStatus === "")
+    (ps === "pending" || (!ps && s.includes("menunggu pembayaran")))
   ) {
     return "menunggu_pembayaran";
   }
 
-  // 🟠 MIDTRANS SUKSES → MENUNGGU KONFIRMASI ADMIN
-  if (
-    order.payment === "Non-Tunai" &&
-    ["settlement", "capture", "success"].includes(paymentStatus)
-  ) {
+  // 🟠 SUDAH BAYAR
+  if (order.payment === "Non-Tunai" && ps === "settlement") {
     return "menunggu";
   }
 
-  // 🟢 TUNAI / STATUS DARI ADMIN
-  return normalizeStatus(order.status);
+  // 🟢 TUNAI & ADMIN
+  if (s.includes("menunggu")) return "menunggu";
+  if (s.includes("diproses")) return "diproses";
+  if (s.includes("selesai")) return "selesai";
+
+  return "menunggu";
 };
+
 
   const getStatusIcon = (status) => {
     switch (status) {
@@ -296,9 +294,9 @@ const getStatusLabel = (status) => {
 
                 <div className="order-actions">
                   {/* 🟡 MENUNGGU PEMBAYARAN */}
-                  {isWaitingPayment && (
+                  {finalStatus === "menunggu_pembayaran" && (
                     <button
-                      className="btn-primary"
+                      className="btn-pay"
                       onClick={() => handlePayNow(order._id)}
                     >
                       Bayar Sekarang
