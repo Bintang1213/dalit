@@ -50,36 +50,43 @@ const OrderHistory = () => {
 };
 
 const getFinalStatus = (order) => {
-  const paymentStatus = (order.paymentStatus || "").toLowerCase();
-  const status = (order.status || "").toLowerCase();
+  const ps = order.paymentStatus;
+  const s = (order.status || "").toLowerCase();
 
-  // 🔴 DIBATALKAN
+  // ❌ PRIORITAS TERTINGGI: ADMIN MEMBATALKAN
+  // (penting untuk kasus timeout / user keluar)
   if (
-    status.includes("dibatalkan") ||
-    paymentStatus.includes("cancel") ||
-    paymentStatus.includes("expire")
+    order.payment === "Non-Tunai" &&
+    s.includes("dibatalkan")
   ) {
     return "dibatalkan";
   }
 
-  // 🟡 MENUNGGU PEMBAYARAN (MIDTRANS BELUM SELESAI)
+  // ❌ MIDTRANS EXPLICIT CANCEL
+  if (["cancel", "expire", "deny"].includes(ps)) {
+    return "dibatalkan";
+  }
+
+  // 🟡 BELUM BAYAR (BENAR-BENAR BELUM SELESAI)
   if (
     order.payment === "Non-Tunai" &&
-    (paymentStatus === "pending" || paymentStatus === "")
+    ps === "pending" &&
+    !s.includes("dibatalkan")
   ) {
     return "menunggu_pembayaran";
   }
 
-  // 🟠 MIDTRANS SUKSES → MENUNGGU KONFIRMASI ADMIN
-  if (
-    order.payment === "Non-Tunai" &&
-    ["settlement", "capture", "success"].includes(paymentStatus)
-  ) {
+  // 🟠 SUDAH BAYAR (NON-TUNAI)
+  if (order.payment === "Non-Tunai" && ps === "settlement") {
     return "menunggu";
   }
 
-  // 🟢 TUNAI / STATUS DARI ADMIN
-  return normalizeStatus(order.status);
+  // 🟢 STATUS ADMIN (TUNAI & LANJUTAN)
+  if (s.includes("menunggu")) return "menunggu";
+  if (s.includes("diproses")) return "diproses";
+  if (s.includes("selesai")) return "selesai";
+
+  return "menunggu";
 };
 
   const getStatusIcon = (status) => {
@@ -296,9 +303,9 @@ const getStatusLabel = (status) => {
 
                 <div className="order-actions">
                   {/* 🟡 MENUNGGU PEMBAYARAN */}
-                  {isWaitingPayment && (
+                  {finalStatus === "menunggu_pembayaran" && (
                     <button
-                      className="btn-primary"
+                      className="btn-pay"
                       onClick={() => handlePayNow(order._id)}
                     >
                       Bayar Sekarang

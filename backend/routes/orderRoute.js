@@ -364,24 +364,31 @@ export default (io) => {
 
             // Buat objek Order baru
             const newOrder = new Order({
-                userId: req.userId,
-                name,
-                tableNumber: method === "Makan di Tempat" ? tableNumber : undefined,
-                phone: method === "Diantar" ? phone : undefined,
-                address: method === "Diantar" ? address : undefined,
-                note,
-                payment,
-                method,
-                items,
-                subtotal: subtotalFromItems,
-                discount: finalDiscount,
-                totalAmount: backendTotal,
-                serviceFee,
-                deliveryFee,
-                status:
-                    payment === "Tunai" ? "Menunggu Konfirmasi" : "Menunggu Pembayaran",
-                createdAt: moment().tz("Asia/Jakarta").toDate(),
-                updatedAt: moment().tz("Asia/Jakarta").toDate(),
+            userId: req.userId,
+            name,
+            tableNumber: method === "Makan di Tempat" ? tableNumber : undefined,
+            phone: method === "Diantar" ? phone : undefined,
+            address: method === "Diantar" ? address : undefined,
+            note,
+            payment,
+            method,
+            items,
+            subtotal: subtotalFromItems,
+            discount: finalDiscount,
+            totalAmount: backendTotal,
+            serviceFee,
+            deliveryFee,
+
+            status:
+                payment === "Tunai"
+                ? "Menunggu Konfirmasi"
+                : "Menunggu Pembayaran",
+
+            paymentStatus:
+                payment === "Non-Tunai" ? "pending" : undefined,
+
+            createdAt: moment().tz("Asia/Jakarta").toDate(),
+            updatedAt: moment().tz("Asia/Jakarta").toDate(),
             });
 
             const savedOrder = await newOrder.save();
@@ -434,18 +441,17 @@ export default (io) => {
                     },
                     item_details: midtransItems,
                     callbacks: {
-                        // LOGIKA PENTING: Pilih callback berdasarkan isMobileApp
-                        finish: isMobileApp
-                            ? `${DEEP_LINK_SCHEME}://payment/finish?order_id=${savedOrder._id.toString()}`
-                            : `${FRONTEND_BASE_URL}/status-pembayaran?order_id=${savedOrder._id.toString()}`,
-                         
-                        error: isMobileApp
-                            ? `${DEEP_LINK_SCHEME}://payment/error?order_id=${savedOrder._id.toString()}`
-                            : `${FRONTEND_BASE_URL}/gagal-bayar`,
-                         
-                        unfinish: isMobileApp
-                            ? `${DEEP_LINK_SCHEME}://payment/unfinish?order_id=${savedOrder._id.toString()}`
-                            : `${FRONTEND_BASE_URL}/belum-selesai`,
+                    finish: isMobileApp
+                        ? `${DEEP_LINK_SCHEME}://payment/finish?order_id=${savedOrder._id}`
+                        : `${FRONTEND_BASE_URL}/status-pembayaran?order_id=${savedOrder._id}`,
+
+                    error: isMobileApp
+                        ? `${DEEP_LINK_SCHEME}://payment/error?order_id=${savedOrder._id}`
+                        : `${FRONTEND_BASE_URL}/gagal-bayar`,
+
+                    unfinish: isMobileApp
+                        ? `${DEEP_LINK_SCHEME}://payment/unfinish?order_id=${savedOrder._id}`
+                        : `${FRONTEND_BASE_URL}/belum-selesai`,
                     },
                 };
 
@@ -485,116 +491,75 @@ export default (io) => {
     // =======================================================
     // Midtrans Notification Handler (Webhook)
     // =======================================================
-    router.post("/midtrans-notification", async (req, res) => {
-        try {
-            console.log("📥 Midtrans Notification Received:", req.body);
+   router.post("/midtrans-notification", async (req, res) => {
+  try {
+    console.log("📥 Midtrans Notification Received:", req.body);
 
-            const notification = req.body;
-             
-            // Verifikasi signature/status dari Midtrans
-            const statusResponse = await coreApi.transaction.notification(notification);
-            console.log("✅ Midtrans Status Response:", statusResponse);
+    const statusResponse = await coreApi.transaction.notification(req.body);
+    console.log("✅ Midtrans Status Response:", statusResponse);
 
-            const { order_id, transaction_status, fraud_status, settlement_time } = statusResponse;
-             
-            const order = await Order.findById(order_id);
-            if (!order) {
-                console.error("❌ Order not found:", order_id);
-                return res.status(404).json({ message: "Order not found" });
-            }
+    const { order_id, transaction_status } = statusResponse;
 
-            console.log("📦 Current Order Status:", order.status);
+    const order = await Order.findById(order_id);
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
 
-            let newStatus;
-            let notificationMessage;
+    let notificationMessage = "";
 
-            // Mapping status Midtrans ke status order lokal
-            if (transaction_status === "capture") {
-                if (fraud_status === "accept") {
-                    newStatus = "Pembayaran Berhasil";
-                    notificationMessage = "Pembayaran Anda telah berhasil!";
-                } else {
-                    newStatus = "Menunggu Konfirmasi";
-                    notificationMessage = "Pembayaran sedang diverifikasi";
-                }
-            } else if (transaction_status === "settlement") {
-                newStatus = "Pembayaran Berhasil";
-                notificationMessage = "Pembayaran Anda telah berhasil!";
-            } else if (transaction_status === "pending") {
-                newStatus = "Menunggu Pembayaran";
-                notificationMessage = "Menunggu pembayaran Anda";
-            } else if (["cancel", "expire", "deny"].includes(transaction_status)) {
-                newStatus = "Pembayaran Dibatalkan";
-                notificationMessage = "Pembayaran dibatalkan atau kadaluarsa";
-            } else if (["refund", "partial_refund"].includes(transaction_status)) {
-                newStatus = "Refunded";
-                notificationMessage = "Pembayaran telah dikembalikan";
-            } else {
-                newStatus = "Unknown";
-                notificationMessage = "Status pembayaran tidak diketahui";
-            }
+    if (transaction_status === "settlement") {
+      order.paymentStatus = "settlement";
+      order.status = "Menunggu Konfirmasi";
+      notificationMessage = "Pembayaran Anda telah berhasil!";
+    }
+    else if (transaction_status === "pending") {
+      order.paymentStatus = "pending";
+      order.status = "Menunggu Pembayaran";
+      notificationMessage = "Menunggu pembayaran Anda";
+    }
+    else if (["cancel", "expire", "deny"].includes(transaction_status)) {
+      order.paymentStatus = transaction_status;
+      order.status = "Pembayaran Dibatalkan";
+      notificationMessage = "Pembayaran dibatalkan atau kadaluarsa";
+    } else {
+      return res.status(200).json({ message: "Status tidak perlu update" });
+    }
 
-            console.log("🔄 New Status:", newStatus);
+    order.updatedAt = moment().tz("Asia/Jakarta").toDate();
+    await order.save();
 
-            // Update status order jika ada perubahan
-            if (order.status !== newStatus) {
-                order.status = newStatus;
-                order.updatedAt = moment().tz("Asia/Jakarta").toDate();
-                 
-                if (settlement_time) {
-                    order.settlementTime = moment(settlement_time).tz("Asia/Jakarta").toDate();
-                }
-                 
-                await order.save();
-                console.log("💾 Order status updated successfully");
+    // ===== NOTIFIKASI =====
+    const namaPesanan = order.items?.map(i => i.name).join(", ") || "Pesanan";
 
-                // Persiapan notifikasi
-                const targetUserId = order.userId.toString();
-                let namaPesanan = "Pesanan";
+    const fullNotificationMessage =
+      `${notificationMessage} - Pesanan: ${namaPesanan}`;
 
-                if (order.items && order.items.length > 0) {
-                    namaPesanan = order.items.map(i => i.name || i.title).join(", ");
-                }
-
-                const fullNotificationMessage = `${notificationMessage} - Pesanan: ${namaPesanan}`;
-
-                // Simpan notifikasi ke database
-                await Notification.create({
-                    userId: targetUserId,
-                    message: fullNotificationMessage,
-                    orderId: order._id,
-                });
-
-                // Emit notifikasi real-time via Socket.IO
-                io.to(targetUserId).emit("orderStatusUpdate", {
-                    orderId: order._id,
-                    newStatus: newStatus,
-                    message: fullNotificationMessage,
-                    namaPesanan: namaPesanan,
-                    transactionStatus: transaction_status,
-                });
-
-                console.log("📢 Notification sent to user:", targetUserId);
-            } else {
-                console.log("ℹ️ Status unchanged, skipping update");
-            }
-
-            res.status(200).json({ 
-                success: true,
-                message: "Notification processed successfully",
-                order_id: order_id,
-                new_status: newStatus
-            });
-        } catch (error) {
-            console.error("❌ [ERROR] Midtrans notification:", error);
-            res.status(500).json({
-                success: false,
-                message: "Error processing notification",
-                error: error.message,
-            });
-        }
+    await Notification.create({
+      userId: order.userId,
+      message: fullNotificationMessage,
+      orderId: order._id,
     });
 
+    io.to(order.userId.toString()).emit("orderStatusUpdate", {
+      orderId: order._id,
+      status: order.status,
+      paymentStatus: order.paymentStatus,
+      message: fullNotificationMessage,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Notification processed",
+    });
+  } catch (error) {
+    console.error("❌ Midtrans webhook error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Webhook error",
+      error: error.message,
+    });
+  }
+});
     // =======================================================
     // PATCH update order status (Admin Only)
     // =======================================================

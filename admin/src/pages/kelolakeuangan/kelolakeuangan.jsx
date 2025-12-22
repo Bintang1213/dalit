@@ -81,34 +81,33 @@ const KelolaKeuangan = () => {
   };
 
   const filterTransaksi = () => {
-    return orderData.filter((order) => {
-      const orderDate = new Date(order.createdAt);
-      orderDate.setHours(0, 0, 0, 0);
+  return orderData.filter((order) => {
+    // 🔴 FILTER PALING PENTING
+    if (!isOrderPaid(order)) return false;
 
-      if (startDate && endDate) {
-        const start = new Date(startDate);
-        const end = new Date(endDate);
-        start.setHours(0, 0, 0, 0);
-        end.setHours(23, 59, 59, 999);
-        return orderDate >= start && orderDate <= end;
-      }
-      return true;
-    });
-  };
+    const orderDate = new Date(order.createdAt);
+    orderDate.setHours(0, 0, 0, 0);
+
+    if (startDate && endDate) {
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      start.setHours(0, 0, 0, 0);
+      end.setHours(23, 59, 59, 999);
+
+      return orderDate >= start && orderDate <= end;
+    }
+
+    return true;
+  });
+};
 
   const calculateTotalPemasukan = (filteredOrders) => {
-    let total = 0;
-    filteredOrders.forEach((order) => {
-      if (Array.isArray(order.items)) {
-        order.items.forEach((item) => {
-          const price = parseInt(item.price) || 0;
-          const qty = parseInt(item.quantity) || 0;
-          total += price * qty;
-        });
-      }
-    });
-    setTotalPemasukan(total);
-  };
+  const total = filteredOrders.reduce((sum, order) => {
+    return sum + (order.totalAmount || 0);
+  }, 0);
+
+  setTotalPemasukan(total);
+};
 
   const calculateMenuTerlaris = (filteredOrders) => {
     const menuCount = {};
@@ -140,33 +139,46 @@ const KelolaKeuangan = () => {
     calculateMenuTerlaris(filtered);
   }, [startDate, endDate, orderData]);
 
+  const isOrderPaid = (order) => {
+  // Tunai dianggap langsung lunas
+  if (order.payment === "Tunai") return true;
+
+  // Non-Tunai → cek STATUS ORDER
+  if (
+    order.payment === "Non-Tunai" &&
+    order.status === "Pembayaran Berhasil"
+  ) {
+    return true;
+  }
+
+  return false;
+};
+
+
   const filteredOrders = filterTransaksi();
 
   const flattenedData = [];
   let orderNumber = 1;
 
   filteredOrders.forEach((order) => {
-    if (Array.isArray(order.items)) {
-      const paymentMethod = order.paymentMethod || "Tunai";
-
-      order.items.forEach((item) => {
-        flattenedData.push({
-          orderId: order._id,
-          orderNumber,
-          orderDate: order.createdAt,
-          paymentMethod,
-          itemId: item._id,
-          itemName: item.name,
-          itemPrice: parseInt(item.price) || 0,
-          itemQuantity: parseInt(item.quantity) || 0,
-          itemTotal:
-            (parseInt(item.price) || 0) * (parseInt(item.quantity) || 0),
-        });
+  if (Array.isArray(order.items)) {
+    order.items.forEach((item) => {
+      flattenedData.push({
+        orderId: order._id,
+        orderNumber,
+        orderDate: order.createdAt,
+        paymentMethod: order.payment, // 🔥 INI SATU-SATUNYA SUMBER
+        itemId: item._id,
+        itemName: item.name,
+        itemPrice: Number(item.price) || 0,
+        itemQuantity: Number(item.quantity) || 0,
+        itemTotal:
+          (Number(item.price) || 0) * (Number(item.quantity) || 0),
       });
-
-      orderNumber++;
-    }
-  });
+    });
+    orderNumber++;
+  }
+});
 
   const totalPages = Math.ceil(flattenedData.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -362,7 +374,7 @@ const KelolaKeuangan = () => {
                         )}
 
                         <td>{item.itemName}</td>
-                        <td>{item.paymentMethod}</td>
+                        <td className="payment-cell">{item.paymentMethod}</td>
                         <td>
                           Rp {item.itemPrice.toLocaleString()}
                         </td>

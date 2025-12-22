@@ -1,13 +1,16 @@
 import React, { useState } from "react";
 import Axios from "axios";
 import { useNavigate, useLocation } from "react-router-dom";
+import { FiEye, FiEyeOff } from "react-icons/fi";
 import "./login.css";
 
 const Login = () => {
-  const [email, setEmail] = useState(""); // Ganti dari username ke email
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -19,50 +22,26 @@ const Login = () => {
     try {
       const response = await Axios.post(
         "http://localhost:4000/api/admin/login",
-        {
-          email,
-          password,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          withCredentials: true,
-        },
+        { email, password },
+        { headers: { "Content-Type": "application/json" } }
       );
-
-      console.log("Login Response:", response.data);
 
       if (response.data.token) {
         localStorage.setItem("authToken", response.data.token);
         localStorage.setItem("adminId", response.data.adminId);
 
-        // ✅ Simpan nama admin kalau dikirim dari backend
         if (response.data.adminName) {
           localStorage.setItem("adminName", response.data.adminName);
         }
 
-        const from = location.state?.from?.pathname || "/dashboard";
-        navigate(from, { replace: true });
+        navigate(location.state?.from?.pathname || "/dashboard", {
+          replace: true,
+        });
       } else {
-        throw new Error("Token tidak diterima dari server");
+        throw new Error();
       }
-    } catch (error) {
-      console.error("Login error details:", {
-        message: error.message,
-        response: error.response?.data,
-        status: error.response?.status,
-        headers: error.response?.headers,
-      });
-
-      const backendMessage = error.response?.data?.message;
-      setError(
-        backendMessage || "Login gagal. Periksa email dan password Anda.",
-      );
-
-      localStorage.removeItem("authToken");
-      localStorage.removeItem("adminId");
-      localStorage.removeItem("adminName");
+    } catch {
+      setError("Login gagal. Periksa email dan password.");
     } finally {
       setLoading(false);
     }
@@ -70,57 +49,57 @@ const Login = () => {
 
   return (
     <div className="login-container">
-      <div className="login-form">
-        <h2>Login Admin</h2>
-        {error && (
-          <div className="error-message">
-            <i className="error-icon">!</i>
-            {error}
-          </div>
-        )}
+      <div className="login-card">
+        <div className="login-header">
+          <h1>KEDAI WARTIYEM</h1>
+          <p>Admin Dashboard</p>
+        </div>
+
+        {error && <div className="error-message">{error}</div>}
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="email">Email</label>
+            <label>Email Admin</label>
             <input
               type="email"
-              id="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              placeholder="contoh@gmail.com"
               required
-              autoComplete="email"
-              placeholder="contoh@email.com"
             />
           </div>
 
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
+          {/* PASSWORD + ICON */}
+          <div className="form-group password-group">
+            <label>Password</label>
             <input
-              type="password"
-              id="password"
+              type={showPassword ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
               required
-              autoComplete="current-password"
-              placeholder="Masukkan password"
             />
+
+            <button
+              type="button"
+              className="toggle-password"
+              onClick={() => setShowPassword(!showPassword)}
+              aria-label="Toggle password visibility"
+            >
+              {showPassword ? <FiEye /> : <FiEyeOff />}
+            </button>
           </div>
 
           <button
             type="submit"
-            disabled={loading}
             className={`login-button ${loading ? "loading" : ""}`}
+            disabled={loading}
           >
-            {loading ? (
-              <>
-                <span className="spinner"></span>
-                Memproses...
-              </>
-            ) : (
-              "Login"
-            )}
+            {loading ? "Memproses..." : "Masuk Dashboard"}
           </button>
         </form>
+
+        <p className="login-footer">© Kedai Wartiyem</p>
       </div>
     </div>
   );
