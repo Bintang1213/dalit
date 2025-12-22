@@ -149,6 +149,16 @@ const Dashboard = () => {
       },
     },
   };
+const formatCurrency = (number) => {
+  if (number == null) return "Rp 0";
+
+  return (
+    "Rp " +
+    Number(number)
+      .toString()
+      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+  );
+};
 
   return (
     <div className="dashboard-wrapper">
@@ -188,7 +198,7 @@ const Dashboard = () => {
                 {
                   icon: "📊",
                   title: "Pemasukan Bulan Ini",
-                  value: `Rp ${dashboardData.totalPemasukan.toLocaleString("id-ID")}`,
+                  value: formatCurrency(dashboardData.totalPemasukan),                  
                   link: "/kelolakeuangan",
                 },
                 {

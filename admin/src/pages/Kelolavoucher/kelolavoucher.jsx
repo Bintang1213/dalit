@@ -133,6 +133,18 @@ const KelolaVoucher = () => {
     return `${day}/${month}/${year}`;
   };
 
+  const formatCurrency = (number) => {
+  if (number == null) return "Rp 0";
+
+  return (
+    "Rp " +
+    Number(number)
+      .toString()
+      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+  );
+};
+
+
   return (
     <div className="main-content">
       <div className="voucher-container">
@@ -242,9 +254,9 @@ const KelolaVoucher = () => {
                   <td>
                     {v.discountType === "percent"
                       ? `${v.discountValue}%`
-                      : `Rp ${v.discountValue}`}
+                      : formatCurrency(v.discountValue)}
                   </td>
-                  <td>Rp {v.minPurchase}</td>
+                  <td>{formatCurrency(v.minPurchase)}</td>
                   <td>{v.maxUsagePerUser ?? "-"}</td>
                   <td>{v.maxUsagePerDay === 0 ? "Unlimited" : v.maxUsagePerDay}</td>
                   <td>{v.autoApply ? "Ya" : "Tidak"}</td>

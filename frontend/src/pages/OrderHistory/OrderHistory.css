@@ -172,17 +172,39 @@ button {
   gap: 8px;
 }
 
-.pagination button {
-  padding: 6px 12px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin-top: 28px;
 }
 
-.pagination .active {
+.nav-btn {
+  padding: 8px 18px;
+  border-radius: 999px;
+  border: none;
   background: crimson;
   color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
+
+.nav-btn:hover:not(:disabled) {
+  background: darkred;
+}
+
+.nav-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.page-indicator {
+  font-weight: 600;
+  color: #555;
+}
+
 /* MENUNGGU PEMBAYARAN */
 .status-badge.menunggu_pembayaran {
   background: linear-gradient(135deg, #ba1f14, #a00005);
