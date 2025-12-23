@@ -38,19 +38,22 @@ const Struk = () => {
   }
 
   // ambil data sesuai dengan PlaceOrder (langsung pakai dari order, kalau gak ada hitung manual)
-  const subtotal =
-    order.subtotal ??
-    order.items.reduce((acc, item) => acc + item.price * item.quantity, 0);
-  const serviceFee =
-    order.serviceFee !== undefined && order.serviceFee !== null
-      ? order.serviceFee
-      : subtotal * 0.1;
-  const deliveryFee =
-    order.deliveryFee ?? (order.method === "Diantar" ? 10000 : 0);
-  const discount = order.discount ?? 0;
-  const total =
-    order.totalAmount ?? subtotal + serviceFee + deliveryFee - discount;
-  const totalQty = order.items.reduce((acc, item) => acc + item.quantity, 0);
+// === DATA AMAN DARI DB / STATE ===
+const subtotal = order.subtotal || 0;
+const serviceFee = order.serviceFee || 0;
+const deliveryFee = order.deliveryFee || 0;
+const discount = order.discount || 0;
+const total = order.totalAmount || 0;
+
+// 🔥 INI YANG TADI HILANG
+const totalQty =
+  Array.isArray(order.items)
+    ? order.items.reduce(
+        (acc, item) => acc + (item.quantity || 0),
+        0
+      )
+    : 0;
+
 
   return (
     <div className="struk-wrapper">

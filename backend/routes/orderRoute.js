@@ -228,14 +228,15 @@ export default (io) => {
                 method,
                 items,
                 subtotal,
+                serviceFee,      // ✅ TAMBAH
+                deliveryFee,     // ✅ TAMBAH
                 discount,
                 totalAmount,
                 voucherType,
                 voucherValue,
                 voucherId,
-                isMobileApp, // Menerima flag dari client
+                isMobileApp,
             } = req.body;
-
             // Validasi Dasar
             if (
                 !name ||
@@ -284,83 +285,71 @@ export default (io) => {
             const userEmail = user.email;
 
             // Perhitungan Biaya
-            const subtotalFromItems = items.reduce(
-                (sum, item) => sum + item.price * item.quantity,
-                0,
-            );
-            const serviceFee = Math.round(subtotalFromItems * 0.1);
-            const deliveryFee = method === "Diantar" ? 10000 : 0;
-            let backendTotal = subtotalFromItems + serviceFee + deliveryFee;
+            // 🔥 ambil dari frontend
+
 
             // Logic Voucher
-            let finalDiscount = 0;
-            if (voucherId) {
-                const voucher = await Voucher.findById(voucherId);
-                if (!voucher) {
-                    return errorResponse(res, 404, "Voucher tidak ditemukan");
-                }
+            // Logic Voucher
+                let finalDiscount = discount || 0;
 
-                const now = new Date();
-                if (now < voucher.startDate || now > voucher.endDate) {
-                    return errorResponse(res, 400, "Voucher tidak berlaku");
-                }
+if (voucherId) {
+    const voucher = await Voucher.findById(voucherId);
+    if (!voucher) {
+        return errorResponse(res, 404, "Voucher tidak ditemukan");
+    }
 
-                if (subtotalFromItems < voucher.minPurchase) {
-                    return errorResponse(
-                        res,
-                        400,
-                        `Minimal belanja Rp ${voucher.minPurchase}`,
-                    );
-                }
+    const now = new Date();
+    if (now < voucher.startDate || now > voucher.endDate) {
+        return errorResponse(res, 400, "Voucher tidak berlaku");
+    }
 
-                const startOfDay = new Date(now.setHours(0, 0, 0, 0));
-                const endOfDay = new Date(now.setHours(23, 59, 59, 999));
-                const usageToday = await VoucherUsage.countDocuments({
-                    voucherId,
-                    usedAt: { $gte: startOfDay, $lte: endOfDay },
-                });
+    if (subtotal < voucher.minPurchase) {
+        return errorResponse(
+            res,
+            400,
+            `Minimal belanja Rp ${voucher.minPurchase}`
+        );
+    }
 
-                if (
-                    voucher.maxUsagePerDay > 0 &&
-                    usageToday >= voucher.maxUsagePerDay
-                ) {
-                    return errorResponse(res, 400, "Kuota voucher hari ini habis");
-                }
+    const startOfDay = new Date(now.setHours(0, 0, 0, 0));
+    const endOfDay = new Date(now.setHours(23, 59, 59, 999));
 
-                const usageByUser = await VoucherUsage.countDocuments({
-                    voucherId,
-                    userId: req.userId,
-                    usedAt: { $gte: startOfDay, $lte: endOfDay },
-                });
+    const usageToday = await VoucherUsage.countDocuments({
+        voucherId,
+        usedAt: { $gte: startOfDay, $lte: endOfDay },
+    });
 
-                if (
-                    voucher.maxUsagePerUser > 0 &&
-                    usageByUser >= voucher.maxUsagePerUser
-                ) {
-                    return errorResponse(
-                        res,
-                        400,
-                        "Kamu sudah menggunakan voucher ini hari ini",
-                    );
-                }
+    if (
+        voucher.maxUsagePerDay > 0 &&
+        usageToday >= voucher.maxUsagePerDay
+    ) {
+        return errorResponse(res, 400, "Kuota voucher hari ini habis");
+    }
 
-                if (voucher.discountType === "percent") {
-                    finalDiscount = Math.round(
-                        (voucher.discountValue / 100) * subtotalFromItems,
-                    );
-                } else {
-                    finalDiscount = voucher.discountValue;
-                }
+    const usageByUser = await VoucherUsage.countDocuments({
+        voucherId,
+        userId: req.userId,
+        usedAt: { $gte: startOfDay, $lte: endOfDay },
+    });
 
-                // Catat penggunaan voucher
-                await VoucherUsage.create({
-                    voucherId,
-                    userId: req.userId,
-                    usedAt: new Date(),
-                });
+    if (
+        voucher.maxUsagePerUser > 0 &&
+        usageByUser >= voucher.maxUsagePerUser
+    ) {
+        return errorResponse(
+            res,
+            400,
+            "Kamu sudah menggunakan voucher ini hari ini"
+        );
+    }
 
-                backendTotal -= finalDiscount;
-            }
+    // CATAT PENGGUNAAN (INI TETAP)
+    await VoucherUsage.create({
+        voucherId,
+        userId: req.userId,
+        usedAt: new Date(),
+    });
+}
 
             // Buat objek Order baru
             const newOrder = new Order({
@@ -373,24 +362,25 @@ export default (io) => {
             payment,
             method,
             items,
-            subtotal: subtotalFromItems,
-            discount: finalDiscount,
-            totalAmount: backendTotal,
+
+            // ✅ SIMPAN ANGKA FINAL
+            subtotal,
             serviceFee,
             deliveryFee,
+            discount: finalDiscount,
+            totalAmount,
 
             status:
                 payment === "Tunai"
-                ? "Menunggu Konfirmasi"
-                : "Menunggu Pembayaran",
+                    ? "Menunggu Konfirmasi"
+                    : "Menunggu Pembayaran",
 
             paymentStatus:
                 payment === "Non-Tunai" ? "pending" : undefined,
 
             createdAt: moment().tz("Asia/Jakarta").toDate(),
             updatedAt: moment().tz("Asia/Jakarta").toDate(),
-            });
-
+        });
             const savedOrder = await newOrder.save();
 
             // Jika pembayaran Non-Tunai, buat transaksi Midtrans Snap
@@ -419,19 +409,19 @@ export default (io) => {
                         name: "Ongkos Kirim",
                     });
                 }
-                if (finalDiscount > 0) {
-                    midtransItems.push({
-                        id: "voucher",
-                        price: -finalDiscount, // Diskon harus bernilai negatif di Midtrans item details
-                        quantity: 1,
-                        name: "Diskon Voucher",
-                    });
-                }
+                if (discount > 0) {
+                        midtransItems.push({
+                            id: "voucher",
+                            price: -discount,
+                            quantity: 1,
+                            name: "Diskon Voucher",
+                        });
+                    }
 
                 const parameter = {
                     transaction_details: {
                         order_id: savedOrder._id.toString(),
-                        gross_amount: Math.round(backendTotal),
+                        gross_amount: Math.round(totalAmount),
                     },
                     customer_details: {
                         first_name: name,

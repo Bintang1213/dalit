@@ -167,13 +167,16 @@ const KelolaKeuangan = () => {
         orderId: order._id,
         orderNumber,
         orderDate: order.createdAt,
-        paymentMethod: order.payment, // 🔥 INI SATU-SATUNYA SUMBER
+        paymentMethod: order.payment,
+
+        // 🔥 ITEM
         itemId: item._id,
         itemName: item.name,
         itemPrice: Number(item.price) || 0,
         itemQuantity: Number(item.quantity) || 0,
-        itemTotal:
-          (Number(item.price) || 0) * (Number(item.quantity) || 0),
+
+        // 🔥 TOTAL TRANSAKSI (BUKAN TOTAL ITEM)
+        orderTotal: Number(order.totalAmount) || 0,
       });
     });
     orderNumber++;
@@ -234,7 +237,7 @@ const KelolaKeuangan = () => {
       item.paymentMethod,
       `Rp ${item.itemPrice.toLocaleString()}`,
       item.itemQuantity,
-      `Rp ${item.itemTotal.toLocaleString()}`,
+`Rp ${item.orderTotal.toLocaleString()}`
     ]);
 
     autoTable(doc, {
@@ -366,10 +369,16 @@ const KelolaKeuangan = () => {
                               {item.orderNumber}
                             </td>
                             <td rowSpan={rowSpanMap[item.orderId]}>
-                              {new Date(item.orderDate).toLocaleDateString(
-                                "id-ID"
-                              )}
-                            </td>
+                            {new Date(item.orderDate).toLocaleString("en-US", {
+                              day: "2-digit",
+                              month: "2-digit",
+                              year: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                              second: "2-digit",
+                              hour12: true,
+                            })}
+                          </td>
                           </>
                         )}
 
@@ -379,9 +388,11 @@ const KelolaKeuangan = () => {
                           Rp {item.itemPrice.toLocaleString()}
                         </td>
                         <td>{item.itemQuantity}</td>
-                        <td>
-                          Rp {item.itemTotal.toLocaleString()}
-                        </td>
+                        {isFirst && (
+                          <td rowSpan={rowSpanMap[item.orderId]}>
+                            Rp {item.orderTotal.toLocaleString()}
+                          </td>
+                        )}
                       </tr>
                     );
                   })}

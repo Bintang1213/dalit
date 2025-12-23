@@ -164,16 +164,18 @@ const PlaceOrder = () => {
       }));
 
     const orderData = {
-      ...formData,
-      method,
-      items: orderedItems,
-      subtotal,
-      discount: discountAmount,
-      totalAmount: total,
-      voucherType: voucherApplied ? voucherApplied.discountType : null,
-      voucherValue: voucherApplied ? voucherApplied.discountValue : null,
-      createdAt: moment().tz("Asia/Jakarta").format(),
-    };
+  ...formData,
+  method,
+  items: orderedItems,
+  subtotal,
+  serviceFee,        // 🔥 TAMBAHKAN
+  deliveryFee,       // 🔥 TAMBAHKAN
+  discount: discountAmount,
+  totalAmount: total,
+  voucherType: voucherApplied ? voucherApplied.discountType : null,
+  voucherValue: voucherApplied ? voucherApplied.discountValue : null,
+  createdAt: moment().tz("Asia/Jakarta").format(),
+};
 
     try {
       const response = await axios.post(

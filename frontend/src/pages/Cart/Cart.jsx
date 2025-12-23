@@ -194,9 +194,9 @@ const Cart = () => {
                     }
                   />
                   <p>{item.name}</p>
-                  <p>{formatCurrency(item.price)}</p>
-                  <p>{formatCurrency(item.price * cartItems[item._id])}</p>
-                  <p>Rp{item.price * cartItems[item._id]}</p>
+                  <p>{formatCurrency(item.price)}</p>           {/* Harga */}
+                  <p>{cartItems[item._id]}</p>                  {/* QTY */}
+                  <p>{formatCurrency(item.price * cartItems[item._id])}</p> {/* Total */}
                   <p
                     onClick={() => handleRemove(item._id, item.name)}
                     className="cross"
