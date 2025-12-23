@@ -4,14 +4,16 @@
   transition: margin-left 0.3s ease;
 }
 
-/* Sidebar OPEN (default 260px) */
 .kelola-menu-content {
   margin-left: 260px;
   padding: 30px;
+  padding-top: 140px;   /* 🔥 KUNCI UTAMA */
   padding-bottom: 300px;
+
   font-family: "Poppins", sans-serif;
   transition: all 0.3s ease;
 }
+
 
 /* Sidebar CLOSED → Ikuti Dashboard */
 .sidebar.closed ~ .kelola-menu-wrapper .kelola-menu-content {

@@ -6,9 +6,14 @@
 
 .kelola-pesanan-content {
   margin-left: 280px;
-  padding: 30px;
+  padding: 10px;
+  padding-top: 140px;   /* 🔥 KUNCI ANTI KETELEN */
   min-height: 100vh;
   transition: all 0.3s ease;
+}
+
+.kelola-pesanan-content {
+  max-width: 1400px; /* 🔥 biar ga liar */
 }
 
 /* Jika sidebar tertutup */

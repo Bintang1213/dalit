@@ -1,7 +1,7 @@
 import React, { useContext, useState, useEffect, useRef } from "react";
 import "./Navbar.css";
 import { assets } from "../../assets/assets";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { StoreContext } from "../../context/StoreContext";
 import { toast } from "react-toastify";
 import io from "socket.io-client";
@@ -9,6 +9,7 @@ import {
   markAllAsRead,
   fetchNotifications,
 } from "../../api/notificationApi";
+
 let chatSocket = null;
 
 
@@ -43,17 +44,31 @@ const Navbar = ({ setShowLogin }) => {
   const cartRef = useRef();
   const navigate = useNavigate();
 
-  const handleSearch = () => {
-    if (searchQuery.trim() !== "") {
-      navigate(`/menu?search=${encodeURIComponent(searchQuery)}`);
-      setSearchQuery("");
-    } else {
-      toast.info("Ketik dulu kata kunci pencarian!", {
-        position: "top-center",
-        autoClose: 2000,
-      });
-    }
-  };
+const handleSearch = () => {
+  if (searchQuery.trim()) {
+    navigate(`/menu?search=${encodeURIComponent(searchQuery.trim())}`);
+  } else {
+    navigate("/menu");
+  }
+};
+
+
+const [searchParams] = useSearchParams();
+useEffect(() => {
+  // Kalau input dikosongkan → balik ke menu awal
+  if (searchQuery === "" && searchParams.get("search")) {
+    navigate("/menu", { replace: true });
+  }
+}, [searchQuery, searchParams, navigate]);
+
+
+useEffect(() => {
+  const q = searchParams.get("search");
+  if (q) {
+    setSearchQuery(q);
+  }
+}, [searchParams]);
+
 
   const handleLogout = () => {
   localStorage.removeItem("token");

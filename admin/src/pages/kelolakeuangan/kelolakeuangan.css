@@ -1,24 +1,25 @@
-/* Wrapper mengikuti sidebar */
 .main-content {
   margin-left: 270px;
-  transition: margin-left 0.3s ease;
+
+  margin-top: 90px;   /* 🔥 INI KUNCINYA */
   padding: 20px;
+
+  transition: margin-left 0.3s ease;
 }
+
 
 .sidebar.closed ~ .main-content {
   margin-left: 100px;
 }
 
-/* CONTAINER */
 .container-keuangan {
   background-color: #f7f7f7;
   padding: 30px;
-  min-height: 100vh;
   border-radius: 8px;
   font-family: "Poppins", sans-serif;
-  padding-bottom: 300px;
-  position: relative;
+  padding-bottom: 20px;
 }
+
 
 /* HEADER */
 .kelola-keuangan-header {

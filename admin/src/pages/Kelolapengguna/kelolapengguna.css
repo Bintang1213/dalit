@@ -1,8 +1,10 @@
-/* Wrapper mengikuti sidebar */
 .main-content {
   margin-left: 270px;
-  transition: margin-left 0.3s ease;
+
   padding: 20px;
+  padding-top: 90px; /* 🔥 ANTI KETELEN HEADER */
+
+  transition: margin-left 0.3s ease;
 }
 
 .sidebar.closed ~ .main-content {
@@ -12,8 +14,7 @@
 /* ====== CONTAINER ====== */
 .container-pengguna {
   background-color: #f7f7f7;
-  padding: 30px;
-  min-height: 100vh;
+  padding: 10px;
   border-radius: 8px;
 }
 

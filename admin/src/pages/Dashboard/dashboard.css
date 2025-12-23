@@ -2,11 +2,15 @@
   width: 100%;
   min-height: 100vh;
   background-color: #f7f7f7;
+
   padding: 20px;
-  padding-left: 270px; /* sama dengan lebar sidebar */
+  padding-left: 270px;
+  padding-top: 90px; /* 🔥 INI KUNCI NYAWA */
+
   box-sizing: border-box;
   transition: padding-left 0.3s ease;
 }
+
 .sidebar.closed ~ .dashboard-wrapper {
   padding-left: 120px;
 }
